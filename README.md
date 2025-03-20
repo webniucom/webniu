@@ -13,7 +13,7 @@ cd webman
 ```
 ## 在安装 webniu
 ```
-composer create-project webniucom/webniu
+composer require webniucom/webniu
 ```
 ## 启动
 ```
