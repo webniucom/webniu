@@ -1,5 +1,5 @@
 {
-  "name": "webman/webniu",
+  "name": "webniucom/webniu",
   "type": "project",
   "license": "MIT",
   "description": "WEBNIU 网牛",
@@ -20,7 +20,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Webman\\Webniu\\": "src"
+      "Webniucom\\Webniu\\": "src"
     }
   }
 }
