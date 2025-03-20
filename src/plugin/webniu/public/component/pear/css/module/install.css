@@ -1,0 +1,38 @@
+.lay-step{
+	text-align:center;
+	padding-left:0px;
+	margin:auto;
+}
+.step-item-main{
+	margin-left:unset;
+	margin-right:unset;
+	padding-left:unset;
+}
+.step-item-tail{
+	left:50%;
+}
+html {
+	background: #c8e2fb;
+	background-image: -webkit-linear-gradient(315deg, #2d8cf000 25%, #2196F3);
+	background-attachment: fixed;
+}
+.layui-panel{
+	width:60%;
+	margin: auto;
+	margin-top:80px;
+}
+.pear-btn{
+	margin-left:10px;
+}
+.width_80b{
+	width:80%;margin: 0 auto;padding-top: 20px;
+}
+.layui-colla-content{
+	padding: 5px 10px 5px 10px;
+}
+.layui-card-body .layui-form{
+	margin-top: 0px;
+}
+.copy_vs{
+	font-size: 10px; color: #a09d9d; position:absolute;top: 10px;right: 10px;
+}

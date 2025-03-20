@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <title>Webniu 网牛管理系统安装向导</title>
+    <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+    <link rel="stylesheet" href="/app/webniu/component/pear/css/module/install.css" />
+    <style>
+         
+    </style>
+</head>
+<body>
+    <div class="layui-panel">
+        <span class="copy_vs"></span>
+        <div class="layui-card-body" style="padding-top: 40px;">
+            <h1 style="text-align:center;margin: 20px 0 40px">Webniu 网牛管理系统</h1>
+    
+            <div class="layui-carousel" id="stepForm" lay-filter="stepForm" style="margin: 0 auto;">
+                <div carousel-item>
+                    <div>
+                        <form class="layui-form width_80b" action="javascript:void(0);">
+                            <div class="layui-form-item">
+                                <textarea placeholder="请输入内容" class="layui-textarea" style="height: 350px;">Webniu 网牛管理系统是基于Webman开发的一套开源的中后台管理系统。</textarea>
+                            </div> 
+    
+                            <div class="layui-form-item" style="text-align: center;margin-top: 30px;">
+                               <button type="button" class="pear-btn">&emsp;取消&emsp;</button>
+                                <button class="pear-btn pear-btn-primary" lay-submit lay-filter="formDetection">
+                                    &emsp;同意&emsp;
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <form class="layui-form width_80b" action="javascript:void(0);">
+                             
+                            <div class="layui-form-item">
+                                <div class="layui-collapse" lay-accordion>
+                                    <div class="layui-colla-item">
+                                      <div class="layui-colla-title">运行环境</div>
+                                      <div class="layui-colla-content layui-show">
+                                        <table class="layui-table" lay-even>
+                                            <colgroup>
+                                              <col width="33%">
+                                              <col width="33%">
+                                              <col width="33%">
+                                            </colgroup>
+                                            <thead>
+                                              <tr>
+                                                <th>项目</th>
+                                                <th>所需环境</th>
+                                                <th>当前环境</th>
+                                              </tr> 
+                                            </thead>
+                                            <tbody id="data-table"></tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                    <div class="layui-colla-item">
+                                      <div class="layui-colla-title">目录权限</div>
+                                      <div class="layui-colla-content">
+                                        <table class="layui-table" lay-even>
+                                            <colgroup>
+                                              <col width="33%">
+                                              <col width="33%">
+                                              <col width="33%">
+                                            </colgroup>
+                                            <thead>
+                                              <tr>
+                                                <th>目录</th>
+                                                <th>写入权限</th>
+                                                <th>读取权限</th>
+                                              </tr> 
+                                            </thead>
+                                            <tbody id="dirfile-table"></tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                     
+                                     
+                                </div>
+                            </div> 
+                            <div class="layui-form-item" style="margin-top:20px;text-align: center;">
+                                <button type="button" class="pear-btn pre">&emsp;上一步&emsp;</button>
+                                 <button class="pear-btn pear-btn-primary next">
+                                     &emsp;跳过此步骤&emsp;
+                                 </button>
+                             </div>
+
+                             
+                        </form>
+                    </div>
+                    <div>
+                        <form class="layui-form" action="javascript:void(0);" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据库账户</label>
+                                <div class="layui-input-block">
+                                    <input type="text" placeholder="请填写数据库账户" lay-reqtext="请填写数据库账户" name="user" class="layui-input" lay-verify="required" required value="" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据库密码</label>
+                                <div class="layui-input-block">
+                                    <input type="password" placeholder="请填写数据库密码" lay-reqtext="请填写数据库密码" name="password" class="layui-input" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据库名称</label>
+                                <div class="layui-input-block">
+                                    <input type="text" placeholder="请填写数据库名称" lay-reqtext="请填写数据库名称" name="database" class="layui-input" lay-verify="required" required value=""/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据库前缀</label>
+                                <div class="layui-input-block">
+                                    <input type="text" placeholder="请填写数据库前缀" lay-reqtext="请填写数据库前缀" name="prefix" class="layui-input" lay-verify="required" required value="wn_"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据库主机</label>
+                                <div class="layui-input-block">
+                                    <input type="text" placeholder="请填写数据库主机" lay-reqtext="请填写数据库主机" name="host" class="layui-input" lay-verify="required" required value="127.0.0.1"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">数据库端口</label>
+                                <div class="layui-input-block">
+                                    <input type="number" placeholder="请填写数据库端口" lay-reqtext="请填写数据库端口" name="port" class="layui-input" required value="3306" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">强制覆盖</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="overwrite" lay-skin="primary">
+                                </div>
+                            </div>
+    
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="button" class="pear-btn pre">上一步</button>
+                                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="formStep">
+                                        &emsp;下一步&emsp;
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <form class="layui-form"  action="javascript:void(0);" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">用户名</label>
+                                <div class="layui-input-block">
+                                    <input type="text" placeholder="请填写入用户名" name="username" class="layui-input" lay-verify="required" required />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">密码</label>
+                                <div class="layui-input-block">
+                                    <input type="password" placeholder="请填写入密码" name="password" class="layui-input"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">确认密码</label>
+                                <div class="layui-input-block">
+                                    <input type="password" placeholder="请填再次写入密码" name="password_confirm" class="layui-input"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="button" class="pear-btn pre">上一步</button>
+                                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="formStep2">
+                                        &emsp;提交&emsp;
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div>
+                        <div style="text-align: center;margin-top: 90px;">
+                            <i class="layui-icon layui-circle pear-back" style="color: white;font-size:30px;font-weight:bold;background: #52C41A;padding: 20px;line-height: 80px;">&#xe605;</i>
+                            <div style="font-size: 24px;color: #333;font-weight: 500;margin-top: 30px;">
+                                安装成功
+                            </div>
+                            <div style="font-size: 14px;color: #666;margin-top: 20px;">需要重启才能生效</div>
+                        </div>
+                        <div style="text-align: center;margin-top: 50px;">
+                            <button class="pear-btn pear-btn-primary finish">进入后台</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="text-align: center; color:rgb(0 0 0 / 20%);padding:20px;">
+        Powered by <a href="//www.webniu.com" style="color:rgb(0 0 0 / 20%);" target="_blank">webniu.com</a> © 2020-2025.
+    </div>
+
+    <script id="TPL-data" type="text/html">
+        {{#  layui.each(d.data, function(index, item){ }}
+        <tr>
+            <td>{{= item.title }}</td>
+            <td>{{= item.recommend }}</td>
+            <td>{{= item.current }}</td>
+        </tr>
+        {{#  }); }}
+    </script>
+    <script id="TPL-dirfile" type="text/html">
+        {{#  layui.each(d.dirfile, function(index, item){ }}
+        <tr>
+            <td>{{= item.path }}</td>
+            <td><i class="layui-icon {{= item.write }}"></i></td>
+            <td><i class="layui-icon {{= item.read }}"></i></td>
+        </tr>
+        {{#  }); }}
+    </script>
+     
+<script>
+    var color = localStorage.getItem("theme-color-color");
+    var second = localStorage.getItem("theme-color-second");
+    if (!color || !second) {
+        localStorage.setItem("theme-color-color", "#2d8cf0");
+        localStorage.setItem("theme-color-second", "#ecf5ff");
+    }
+</script>
+
+<script src="/app/webniu/component/layui/layui.js"></script>
+<script src="/app/webniu/component/pear/pear.js"></script>
+
+<script>
+    layui.use(["form", "step","code","element", "popup","table","laytpl"], function() {
+        var $ = layui.$,
+                form = layui.form,
+                step = layui.step,table = layui.table,laytpl = layui.laytpl;
+
+        layui.code();
+
+        step.render({
+            elem: "#stepForm",
+            filter: "stepForm",
+            width: "100%",
+            stepWidth: "100%",
+            height: "550px",
+            stepItems: [{
+                title: "阅读许可协议"
+            },{
+                title: "环境检查"
+            },{
+                title: "填写数据库信息"
+            }, {
+                title: "填写管理员账户"
+            }, {
+                title: "完成"
+            }]
+        });
+
+        form.on("submit(formDetection)", function(data) {
+             
+            let loading = layer.load();
+            $.ajax({
+                url: "/app/webniu/web/install/detection",
+                type: "POST",
+                dataType: "json",
+                data: data.field,
+                success: function (res) {
+                    console.log(res);
+ 
+                    laytpl(document.getElementById('TPL-data').innerHTML).render(res, function(str){
+                        document.getElementById('data-table').innerHTML = str;
+                    });
+                    
+                    laytpl(document.getElementById('TPL-dirfile').innerHTML).render(res, function(str){
+                        document.getElementById('dirfile-table').innerHTML = str;
+                    });
+
+                     
+                     
+                    step.next("#stepForm");
+                },
+                complete: function () {
+                    layer.close(loading);
+                }
+            })
+            return false;
+        });
+
+        form.on("submit(formStep)", function(data) {
+            let loading = layer.load();
+            console.log(data.field);
+            $.ajax({
+                url: "/app/webniu/web/install/step1",
+                type: "POST",
+                dataType: "json",
+                data: data.field,
+                success: function (res) {
+                    if (res.code) {
+                        return layui.popup.failure(res.msg);
+                    }
+                    layui.popup.success("操作成功", function () {
+                        step.next("#stepForm");
+                    });
+                },
+                complete: function () {
+                    layer.close(loading);
+                }
+            })
+            return false;
+        });
+
+        form.on("submit(formStep2)", function(data) {
+            let loading = layer.load();
+            $.ajax({
+                url: "/app/webniu/web/install/step2",
+                type: "POST",
+                dataType: "json",
+                data: data.field,
+                success: function (res) {
+                    if (res.code) {
+                        return layui.popup.failure(res.msg);
+                    }
+                    //layui.popup.success("安装成功");
+                    step.next("#stepForm");
+                    layer.close(loading);
+                },
+                complete: function () {
+                    layer.close(loading);
+                }
+            })
+            return false;
+        });
+
+        $(".pre").click(function() {
+            step.pre("#stepForm");
+            return false;
+        });
+
+        $(".next").click(function() {
+            step.next("#stepForm");
+            return false;
+        });
+
+        $(".finish").click(function() {
+            location.reload();
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+{
+    "base": {
+		"title": "Webniu 网牛管理",
+        "keyword": "Webniu、网牛平台管理系统",
+        "description": "一款好用的多平台管理引擎。",
+        "siteurl": "/",
+        "image": "/app/webniu/admin/images/logo.png",
+        "ipcbeian": "辽ICP备 20000000号",
+        "copyright": "Powered by webniu.com © 2010-2024."
+    },
+    "core": {
+        "fingerprint": "__WEBNIUGICAI__",
+        "entrance": "/webniu"
+    },
+    "user": {
+        "managereg": true,
+        "background_image": "/app/webniu/admin/images/auth_banner.jpg",
+        "roles": "3,5",
+        "m_phone_verify": false,
+        "userreg": true,
+        "u_phone_verify": false,
+        "u_email_verify": false,
+        "m_image_verify": true,
+        "u_image_verify": false
+    },
+    "atta": {
+        "dirname": "upload",
+        "path_style": "Ymd",
+        "include": "jpg,jpeg,png,gif,txt",
+        "exclude": "php,php3,php5,css,js,html,htm,asp,jsp,exe",
+        "single_limit": "1",
+        "total_limit": "10",
+        "nums": "1",
+        "storage_type": "0",
+        "Ftp": {
+            "ip": "",
+            "port": "",
+            "pasv": "0",
+            "username": "",
+            "password": "",
+            "domain": ""
+        },
+        "Qiniu": {
+            "accessKey": "",
+            "secretKey": "",
+            "bucket": "",
+            "domain": ""
+        },
+        "Oss": {
+            "accessKeyId": "",
+            "accessKeySecret": "",
+            "local": "0",
+            "bucket": "",
+            "endpoint": "",
+            "domain": ""
+        },
+        "Cos": {
+            "secretId": "",
+            "secretKey": "",
+            "bucket": "",
+            "region": "",
+            "domain": ""
+        }
+    },
+    "pic": {
+        "pic_thumb_type": false,
+        "pic_thumb_width": "2000",
+        "pic_thumb_percent": "0.5",
+        "pic_mark_type": false,
+        "pic_mark_style": "1",
+        "pic_thumb_text": "网牛管理",
+        "pic_thumb_size": "30",
+        "pic_thumb_color": "#0e82da",
+        "pic_thumb_touming": "",
+        "pic_thumb_img": "/app/webniu/admin/images/logo.png",
+        "pic_mark_weizhi": "bottom-right"
+    },
+    "menu": {
+        "data": "/app/webniu/web/rule/get",
+        "accordion": true,
+        "collapse": false,
+        "control": false,
+        "controlWidth": 230,
+        "controlHeight": "100%",
+        "select": 3,
+        "async": true
+    },
+    "tab": {
+        "enable": true,
+        "keepState": true,
+        "preload": true,
+        "session": true,
+        "max": "31",
+        "index": {
+            "id": "3",
+            "href": "/app/webniu/web/index/dashboard",
+            "title": "控制台"
+        }
+    },
+    "theme": {
+        "defaultColor": "2",
+        "defaultMenu": "dark-theme",
+        "defaultHeader": "light-theme",
+        "defaultAside": "double-theme",
+        "allowCustom": true,
+        "banner": false,
+        "footer": true,
+        "message": false,
+        "keepLoad": "500",
+        "autoHead": false,
+        "colors": [
+            {
+                "id": "1",
+                "color": "#36b368",
+                "second": "#f0f9eb"
+            },
+            {
+                "id": "2",
+                "color": "#2d8cf0",
+                "second": "#ecf5ff"
+            },
+            {
+                "id": "3",
+                "color": "#f6ad55",
+                "second": "#fdf6ec"
+            },
+            {
+                "id": "4",
+                "color": "#f56c6c",
+                "second": "#fef0f0"
+            },
+            {
+                "id": "5",
+                "color": "#3963bc",
+                "second": "#ecf5ff"
+            }
+        ]
+    },
+    "api": {
+        "smtp": {
+            "type": false,
+            "ip": "",
+            "port": "465",
+            "username": "",
+            "password": "",
+            "secure": "ssl",
+            "from": "",
+            "test": ""
+        },
+        "login": {
+            "type": false,
+            "wechat": {
+                "appid": "",
+                "appkey": "",
+                "callback": ""
+            },
+            "qq": {
+                "appid": "",
+                "appkey": "",
+                "callback": ""
+            }
+        },
+        "sms": {
+            "type": false,
+            "aliyun": {
+                "access_key_id": "",
+                "access_key_secret": "",
+                "sign_name": ""
+            },
+            "qcloud": {
+                "sdk_app_id": "",
+                "secret_id": "",
+                "secret_key": "",
+                "sign_name": ""
+            }
+        }
+    }
+}

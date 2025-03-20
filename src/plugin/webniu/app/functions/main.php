@@ -1,0 +1,202 @@
+<?php
+/**
+ * Here is your custom functions.
+ */
+
+use plugin\webniu\app\model\Admin;
+use plugin\webniu\app\model\AdminRole;
+use plugin\webniu\app\model\AdminLog;
+use plugin\webniu\app\model\Option;
+
+
+/**
+ * 当前管理员id
+ * @return integer|null
+ */
+function admin_id(): ?int
+{
+    return session('admin.id');
+}
+
+/**
+ * 当前管理员
+ * @param null|array|string $fields
+ * @return array|mixed|null
+ * @throws Exception
+ */
+function admin($fields = null)
+{
+    refresh_admin_session();
+    if (!$admin = session('admin')) {
+        return null;
+    }
+    if ($fields === null) {
+        return $admin;
+    }
+    if (is_array($fields)) {
+        $results = [];
+        foreach ($fields as $field) {
+            $results[$field] = $admin[$field] ?? null;
+        }
+        return $results;
+    }
+    return $admin[$fields] ?? null;
+}
+
+
+/**
+ * 刷新当前管理员session
+ * @param bool $force
+ * @return void
+ * @throws Exception
+ */
+function refresh_admin_session(bool $force = false)
+{
+    $admin_session = session('admin');
+    if (!$admin_session) {
+        return null;
+    }
+    $admin_id = $admin_session['id'];
+    $time_now = time();
+    // session在2秒内不刷新
+    $session_ttl = 2;
+    $session_last_update_time = session('admin.session_last_update_time', 0);
+    if (!$force && $time_now - $session_last_update_time < $session_ttl) {
+        return null;
+    }
+    $session = request()->session();
+    $admin = Admin::find($admin_id);
+    if (!$admin) {
+        $session->forget('admin');
+        return null;
+    }
+    $admin = $admin->toArray();
+    $admin['password'] = md5($admin['password']);
+    $admin_session['password'] = $admin_session['password'] ?? '';
+    if ($admin['password'] != $admin_session['password']) {
+        $session->forget('admin');
+        return null;
+    }
+    // 账户被禁用
+    if ($admin['status'] != 0) {
+        $session->forget('admin');
+        return;
+    }
+    $admin['roles'] = AdminRole::where('admin_id', $admin_id)->pluck('role_id')->toArray();
+    $admin['session_last_update_time'] = $time_now;
+    $session->set('admin', $admin);
+}
+
+/**
+ * 检测读写环境
+ */
+if (!function_exists('check_dirfile')) {
+    function check_dirfile() 
+    { 
+        $success    = 'layui-icon-ok layui-font-blue';
+        $error      = 'layui-icon-close layui-font-red';
+        $items      = array(
+            array('dir'=>'dir','write'=>$success,'read'=>$success, 'path'=>'/'),
+            array('dir'=>'dir','write'=>$success,'read'=>$success, 'path'=>'/public'),
+            array('dir'=>'dir','write'=>$success,'read'=>$success, 'path'=>'/runtime'),
+            array('dir'=>'dir','write'=>$success,'read'=>$success, 'path'=>'/plugin/webniu/app'),
+            array('dir'=>'dir','write'=>$success,'read'=>$success, 'path'=>'/plugin/webniu/config'),
+            array('dir'=>'dir','write'=>$success,'read'=>$success, 'path'=>'/plugin/webniu/public/upload'),
+        );
+
+        foreach ($items as &$value) {
+            $item = base_path().$value['path'];  
+            // 写入权限
+            if (!is_writable($item)) {
+                $value['write'] = $error;
+            }
+            // 读取权限
+            if (!is_readable($item)) {
+                $value['read'] = $error;
+            }
+        }
+        return $items;
+    }
+}
+
+/**
+ * 随机获取字符串
+ * @param integer   $m
+ * @param string    $strs
+ * @return string
+ */
+if (!function_exists('randStr')) {
+    function randStr($m=6,$strs=''){
+        $new_str = '';
+        if($strs==''){
+            $strs   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghizklmnopqrstuvwxyz0123456789';
+        }
+		$str = $strs;
+		$max=strlen($str)-1;
+		for ($i = 1; $i <= $m; ++$i) {
+			$new_str .=$str[mt_rand(0, $max)];
+		}
+		return $new_str;
+    }
+}
+
+//读取配置
+if (!function_exists('options')) {
+    function options(array $array = [], $model = null): array
+    {
+        $output = [];
+        
+        // 设置默认模型值
+        $defaultModel = 'webniu';
+        $model = $model ?? $defaultModel;
+
+        foreach ($array as $v) {
+            // 构建查询条件
+            $where = [
+                ['model', '=', $model],
+                ['name', '=', 'system_' . $v]
+            ];
+
+            // 获取配置值
+            $config = Option::where($where)->value('value');
+
+            // 解析并存储结果
+            if (!empty($config)) {
+                $output[$v] = json_decode($config, true);
+            } else {
+                $output[$v] = null;
+            }
+        }
+
+        return $output;
+    }
+
+}
+
+//写入日志
+if (!function_exists('adminlog')) {
+    function adminlog()
+    {
+        $a_session  = session('admin');
+        $request    = request();
+        $header     = $request->header();
+        $AdminLog   = new AdminLog;
+        $userAgent  = $header['user-agent'];
+        $AdminLog->username     = $a_session['username'];
+        $AdminLog->nickname     = $a_session['nickname'] ?? '未知';
+        $AdminLog->user_ip      = $request->getRealIp();
+        $AdminLog->user_agent   = $userAgent;
+        if (preg_match('/.*?\((.*?)\).*?/', $userAgent, $matches)) {
+            $user_os = substr($matches[1], 0, strpos($matches[1], ';'));
+        } else {
+            $user_os = '未知';
+        } 
+        $AdminLog->user_os      = $user_os;
+        $AdminLog->user_browser = preg_replace('/[^(]+\((.*?)[^)]+\) .*?/', '$1', $userAgent);
+        $AdminLog->error        = '登录成功';
+        $AdminLog->status       = '1';
+        $AdminLog->save();
+        return true;
+    }
+
+}

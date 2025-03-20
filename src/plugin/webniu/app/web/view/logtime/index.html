@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8">
+        <title>浏览页面</title>
+        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" /> 
+        <style>
+            .layui-this{
+                background-color: #2d8cf0 ;
+                color:#ffffff;
+                border:1px solid #2d8cf0;
+            }
+
+            .layui-this:hover{
+                color:#ffffff;
+            }
+        </style>
+    </head>
+    <body class="pear-container">
+    
+        <!-- 顶部查询表单 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <form class="layui-form top-search-from layui-manage-top-15">
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态筛选</label>
+                        <div class="layui-input-block">
+                            <select name="status" lay-filter="select-mid">
+                                <option value="0">不限制</option>
+                                <option value="1">正常</option>
+                                <option value="2">异常</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-inline">
+                        <label class="layui-form-label"></label>
+                        <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="table-query">
+                            <i class="layui-icon layui-icon-search"></i>查询
+                        </button>
+                        <button type="reset" class="pear-btn pear-btn-md" lay-submit lay-filter="table-reset">
+                            <i class="layui-icon layui-icon-refresh"></i>重置
+                        </button>
+                    </div>
+                    <div class="toggle-btn">
+                        <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
+                        <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 数据表格 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="data-table" lay-filter="data-table"></table>
+            </div>
+        </div>
+
+        <!-- 表格顶部工具栏 -->
+        <script type="text/html" id="table-toolbar"> 
+            <div class="demo-tab-header layui-btn-container" id="tabHeader" lay-filter="test-hash"> 
+                <button class="layui-btn layui-btn-primary layui-btn-sm layui-this" lay-type="0">登录日志</button> 
+            </div>
+        </script>
+
+        <!-- 表格行工具栏 -->
+        <script type="text/html" id="table-bar">
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit">无</button> 
+        </script>
+
+        <script src="/app/webniu/component/layui/layui.js"></script>
+        <script src="/app/webniu/component/pear/pear.js"></script>
+        <script src="/app/webniu/js/permission.js"></script>
+        <script src="/app/webniu/admin/js/common.js"></script>
+        <script>
+
+            // 相关常量
+            const PRIMARY_KEY = "id";
+            const SELECT_API = "/app/webniu/web/logtime/select"; 
+            // 表格渲染
+            layui.use(["table", "form", "common", "popup", "util","jquery", "xmSelect","drawer","element"], function() {
+                let table   = layui.table;
+                var drawer  = layui.drawer;
+                let form    = layui.form;
+                let $       = layui.$;
+                let common  = layui.common;
+                let element = layui.element; 
+                let util    = layui.util;
+                
+				// 表头参数
+				let cols = [
+					{
+						type: "checkbox"
+					},{
+						title: "主键",
+						field: "id",
+						hide: true,
+					},{
+						title: "账号",
+						field: "username",
+					},{
+						title: "昵称",
+						field: "nickname",
+					},{
+						title: "IP",
+						field: "user_ip",
+					},{
+						title: "代理",
+						field: "user_agent",
+					},{
+						title: "操作系统",
+						field: "user_os",
+					},{
+						title: "浏览器",
+						field: "user_browser",
+					},{
+						title: "日志信息",
+						field: "error",
+					},{
+						title: "日志状态",
+						field: "status",
+                        templet: function (d) {
+                            if(d.status=='1'){
+                                return '正常';
+                            }else{
+                                return '错误';
+                            }
+                             
+                        }
+					},{
+						title: "日志时间",
+						field: "created_at",
+					},{
+						title: "操作",
+						toolbar: "#table-bar",
+						align: "center",
+						fixed: "right",
+                        width: 130,
+					}
+				];
+				
+				// 渲染表格
+				function render()
+				{
+				    table.render({
+				        elem: "#data-table",
+				        url: SELECT_API,
+				        page: true,
+				        cols: [cols],
+				        skin: "line",
+                        toolbar: "#table-toolbar",
+				        size: "lg",
+                        where: { 
+                            'type':0
+                        }, 
+				        autoSort: false,
+				        defaultToolbar: [{
+				            title: "刷新",
+				            layEvent: "refresh",
+				            icon: "layui-icon-refresh",
+				        }, "filter", "print", "exports"],
+				        done: function () {
+				            layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
+				        }
+				    });
+				}
+				 
+
+                render();
+
+                element.tab({
+                    headerElem: '#tabHeader>.layui-btn',
+                    bodyElem: '#tabBody>div'
+                });
+                element.on('tab(test-hash)', function(obj){
+                    let lay_type  = this.getAttribute('lay-type'); 
+                    let field   = [];
+                    switch (lay_type) {
+                        case "1":
+                            field   = {
+                                'type':lay_type, 
+                            };
+                            break;
+                        default:
+                            field   = {
+                                'type':lay_type,
+                            };
+                            break;
+                    } 
+                    table.reloadData("data-table", { 
+                        where: field
+                    })
+
+                });
+				
+                // 编辑或删除行事件
+                table.on("tool(data-table)", function(obj) {
+                    if (obj.event === "edit") {
+                        edit(obj);
+                    }
+                });
+
+                // 表格顶部工具栏事件
+                table.on("toolbar(data-table)", function(obj) {
+                    if (obj.event === "refresh") {
+                        refreshTable();
+                    }
+                });
+
+                
+
+                // 表格顶部搜索事件
+                form.on("submit(table-query)", function(data) {
+                    table.reload("data-table", {
+                        page: {
+                            curr: 1
+                        },
+                        where: data.field
+                    })
+                    return false;
+                });
+                
+                // 表格顶部搜索重置事件
+                form.on("submit(table-reset)", function(data) {
+                    table.reload("data-table", {
+                        where: []
+                    })
+                });
+
+                // 表格排序事件
+                table.on("sort(data-table)", function(obj){
+                    table.reload("data-table", {
+                        initSort: obj,
+                        scrollPos: "fixed",
+                        where: {
+                            field: obj.field,
+                            order: obj.type
+                        }
+                    });
+                });
+
+                
+
+                // 表格编辑数据
+                let edit = function(obj) {
+                    let value = obj.data[PRIMARY_KEY];
+                    layer.open({
+                        type: 2,
+                        title: "修改",
+                        shade: 0.1,
+                        area: [common.isModile()?"100%":"60%", common.isModile()?"100%":"80%"],
+                        content: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                    });
+                }
+
+                 
+
+                // 刷新表格数据
+                window.refreshTable = function(param) {
+                    table.reloadData("data-table", {
+                        scrollPos: "fixed"
+                    });
+                }
+            })
+
+        </script>
+    </body>
+</html>

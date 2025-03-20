@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>新增页面</title>
+        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/component/jsoneditor/css/jsoneditor.css" />
+        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+    </head>
+    <body>
+
+        <form class="layui-form" action="">
+
+            <div class="mainBox">
+                <div class="main-container mr-5">
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <select name="name" lay-search="" lay-creatable="" required lay-verify="required" lay-reqtext="请填写名称！" placeholder="请填写名称！">
+                                <option value="">自行输入创建</option>
+                                <option value="captcha">验证码</option> 
+                            </select> 
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发件人</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="from" readonly value="<?=$api['smtp']['from']?>" class="layui-input" required lay-verify="required" lay-reqtext="请填写发件人" placeholder="获取系统设置-SMTP邮件默认发件人">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">主题</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="subject" value=""  required lay-verify="required" lay-reqtext="请填写主题" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">内容</label>
+                        <div class="layui-input-block">
+                            <textarea id="content" name="content"  required lay-verify="required" lay-reqtext="请填写内容" class="layui-textarea" style="height: 400px;"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom">
+                <div class="button-container">
+                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit=""
+                        lay-filter="save">
+                        提交
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md" id="closeIframe">
+                        关闭
+                    </button>
+                </div>
+            </div>
+            
+        </form>
+
+        <script src="/app/webniu/component/layui/layui.js?v=2.8.12"></script>
+        <script src="/app/webniu/component/pear/pear.js"></script>
+        <script src="/app/webniu/component/jsoneditor/jsoneditor.js"></script>
+        <script src="/app/webniu/admin/js/permission.js"></script>
+        
+        <script>
+
+            // 相关接口
+            const INSERT_API= "/app/webniu/web/emailtemp/insert"; 
+
+            // 字段 内容 content
+            layui.use(["tinymce"], function() {
+                var tinymce = layui.tinymce
+                var edit = tinymce.render({
+                    elem: "#content",
+                    'images_upload_url': "/app/webniu/web/upload/image",
+                });
+                edit.on("blur", function(){
+                    layui.$("#content").val(edit.getContent());
+                });
+            });
+            
+            // 字段 创建时间 created_at
+            layui.use(["laydate"], function() {
+                layui.laydate.render({
+                    elem: "#created_at",
+                    type: "datetime",
+                });
+            })
+            
+            // 字段 更新时间 updated_at
+            layui.use(["laydate"], function() {
+                layui.laydate.render({
+                    elem: "#updated_at",
+                    type: "datetime",
+                });
+            })
+            
+            //提交事件
+            layui.use(["form", "popup"], function () {
+                // 字段验证允许为空
+                layui.form.verify({
+                    name: [/^[a-zA-Z0-9_-]+$/,'只能填写英文字母或者“-”“_”符号。'],
+                });
+                layui.form.on("submit(save)", function (data) {
+                    layui.$.ajax({
+                        url: INSERT_API,
+                        type: "POST",
+                        dateType: "json",
+                        data: data.field,
+                        success: function (res) {
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            return layui.popup.success("操作成功", function () {
+                                parent.refreshTable();
+                                parent.layer.close(parent.layer.getFrameIndex(window.name));
+                            });
+                        }
+                    });
+                    return false;
+                });
+            });
+            layui.$('#closeIframe').click(function(){
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            });
+
+        </script>
+
+    </body>
+</html>

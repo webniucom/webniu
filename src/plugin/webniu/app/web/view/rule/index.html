@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+    </head>
+    <body class="pear-container">
+
+        <!-- 数据表格 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="data-table" lay-filter="data-table"></table>
+            </div>
+        </div>
+
+        <!-- 表格顶部工具栏 -->
+        <script type="text/html" id="table-toolbar">
+            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="app.webniu.web.rule.insert">
+                <i class="layui-icon layui-icon-add-1"></i>新增
+            </button>
+            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="app.webniu.web.rule.delete">
+                <i class="layui-icon layui-icon-delete"></i>删除
+            </button>
+        </script>
+
+        <!-- 表格行工具栏 -->
+        <script type="text/html" id="table-bar">
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.rule.update">编辑</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="app.webniu.web.rule.delete">删除</button>
+        </script>
+
+        <script src="/app/webniu/component/layui/layui.js?v=2.8.12"></script>
+        <script src="/app/webniu/component/pear/pear.js"></script>
+        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/admin/js/common.js"></script>
+
+        <script>
+
+            // 相关常量
+            const PRIMARY_KEY = "id";
+            const SELECT_API = "/app/webniu/web/rule/select?limit=5000&&format=table_tree";
+            const DELETE_API = "/app/webniu/web/rule/delete";
+            const UPDATE_API = "/app/webniu/web/rule/update";
+            const INSERT_URL = "/app/webniu/web/rule/insert";
+            const UPDATE_URL = "/app/webniu/web/rule/update";
+
+            // 表格渲染
+            layui.use(["table", "form", "common", "popup", "util","drawer"], function() {
+                let table   = layui.table;
+                var drawer  = layui.drawer;
+                let form    = layui.form;
+                let $       = layui.$;
+                let common  = layui.common;
+                let treeTable = layui.treeTable;
+                let util    = layui.util;
+                // 表格头部列数据
+                let cols = [
+                    {
+                        type: "checkbox"
+                    },{
+                        title: "标题",
+                        field: "title",
+                    },{
+                        title: "图标",
+                        field: "icon",
+                        templet: function (d) {
+                            return '<i class="layui-icon ' + util.escape(d["icon"]) + '"></i>';
+                        }
+                    },{
+                        title: "主键",
+                        field: "id",
+                        hide: true,
+                    },{
+                        title: "key",
+                        field: "key",
+                    },{
+                        title: "上级菜单",
+                        field: "pid",
+                        hide: true,
+                        templet: function (d) {
+                            let field = "pid";
+                            if(d[field]=='0') return util.escape('无');
+                            if (typeof d[field] == "undefined") return "";
+                            let items = [];
+                            layui.each((d[field] + "").split(","), function (k , v) {
+                                items.push(apiResults[field][v] || v);
+                            });
+                            return util.escape(items.join(","));
+                        }
+                    },{
+                        title: "创建时间",
+                        field: "created_at",
+                        hide: true,
+                    },{
+                        title: "更新时间",
+                        field: "updated_at",
+                        hide: true,
+                    },{
+                        title: "url",
+                        field: "href",
+                    },{
+                        title: "类型",
+                        field: "type",
+                        width: 80,
+                        templet: function (d) {
+                            let field = "type";
+                            let value = apiResults["type"][d["type"]] || d["type"];
+                            let css = {"目录":"layui-bg-blue", "菜单": "layui-bg-green", "权限": "layui-bg-orange"}[value];
+                            return '<span class="layui-badge '+css+'">'+util.escape(value)+'</span>';
+                        }
+                    },{
+                        title: "排序",
+                        field: "weight",
+                        width: 80,
+                    },{
+                        title: "操作",
+                        toolbar: "#table-bar",
+                        align: "center",
+                        fixed: "right",
+                        width: 130,
+                    }
+                ];
+
+                // 渲染表格
+                function render()
+                {
+                    treeTable.render({
+                        elem: '#data-table',
+                        id:"data-table",
+                        url: SELECT_API, // 此处为静态模拟数据，实际使用时需换成真实接口
+                        tree: {
+                            customName: {
+                                'name':'title',
+                                'icon':''
+                            },
+                            view:{
+                                'showIcon':false
+                            }
+                        },
+                        skin: "line",
+                        size: "lg", 
+                        toolbar: "#table-toolbar",
+                        cols: [cols],
+                        defaultToolbar: [{
+                            title: "刷新",
+                            layEvent: "refresh",
+                            icon: "layui-icon-refresh",
+                        },"filter",{ // 右上角工具图标
+                            title: '更多',
+                            layEvent: 'LAYTABLE_TIPS',
+                            icon: 'layui-icon-set',
+                            onClick: function(obj) {
+                                obj.openPanel({
+                                    list: [ // 列表
+                                    '<li data-type="exports">展开</li>',
+                                    '<li data-type="packup">收起</li>'
+                                    ].join(''),
+                                    done: function(panel, list) {
+                                        list.on('click', function() {
+                                            var type = $(this).data('type')
+                                            if (type === 'exports') { 
+                                                treeTable.expandAll('data-table', true);
+                                                panel.remove();
+                                            } else if(type === 'packup') {
+                                                treeTable.expandAll('data-table', false);
+                                                panel.remove();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }],
+                        done: function(){
+
+                        }
+                    });
+                     
+                }
+
+                // 获取下拉菜单及树形组件数据
+                let apis = [];
+                let apiResults = {};
+                apiResults["pid"] = [];
+                apis.push(["pid", "/app/webniu/web/rule/select?format=tree&type=0,1&field=value"]);
+                apiResults["type"] = ["目录","菜单","权限"];
+                let count = apis.length;
+                layui.each(apis, function (k, item) {
+                    let [field, url] = item;
+                    $.ajax({
+                        url: url,
+                        dateType: "json",
+                        success: function (res) {
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            function travel(items) {
+                                for (let k in items) {
+                                    let item = items[k];
+                                    apiResults[field][item.value] = item.name;
+                                    if (item.children) {
+                                        travel(item.children);
+                                    }
+                                }
+                            } 
+                            travel(res.data);
+                        },
+                        complete: function () {
+                            if (--count === 0) {
+                                render();
+                            }
+                        }
+                    });
+                });
+                if (!count) {
+                    render();
+                }
+                
+
+                // 删除或编辑行事件
+                table.on("tool(data-table)", function(obj) {
+                    if (obj.event === "remove") {
+                        remove(obj);
+                    } else if (obj.event === "edit") {
+                        edit(obj);
+                    }
+                });
+
+                // 添加 批量删除 刷新事件
+                table.on("toolbar(data-table)", function(obj) {
+                    if (obj.event === "add") {
+                        add();
+                    } else if (obj.event === "refresh") {
+                        refreshTable();
+                    } else if (obj.event === "batchRemove") {
+                        batchRemove(obj);
+                    }
+                });
+
+                // 添加行
+                let add = function() {
+                    drawer.open({
+                        legacy: false,
+                        title: ['新增菜单', 'font-size:16px;color:#2d8cf0'],
+                        offset: 'r',
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
+                        maxmin: false,
+                        closeBtn: 1,
+                        iframe: INSERT_URL
+                    });
+                }
+
+                // 编辑行
+                let edit = function(obj) {
+                    let value = obj.data[PRIMARY_KEY];
+                     
+                    drawer.open({
+                        legacy: false,
+                        title: ['编辑菜单', 'font-size:16px;color:#2d8cf0'],
+                        offset: 'r',
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
+                        maxmin: false,
+                        closeBtn: 1,
+                        iframe: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                    });
+                }
+
+                // 删除行
+                let remove = function(obj) {
+                    return doRemove(obj.data[PRIMARY_KEY], obj);
+                }
+
+                // 删除多行
+                let batchRemove = function(obj) {
+                    let checkIds = common.checkField(obj, PRIMARY_KEY);
+                    if (checkIds === "") {
+                        layui.popup.warning("未选中数据");
+                        return false;
+                    }
+                    doRemove(checkIds.split(","));
+                }
+
+                // 执行删除
+                let doRemove = function (ids, obj) {
+                    let data = {};
+                    data[PRIMARY_KEY] = ids;
+                    layer.confirm("确定删除?", {
+                        icon: 3,
+                        title: "提示"
+                    }, function(index) {
+                        layer.close(index);
+                        let loading = layer.load();
+                        $.ajax({
+                            url: DELETE_API,
+                            data: data,
+                            dataType: "json",
+                            type: "post",
+                            success: function(res) {
+                                layer.close(loading);
+                                if (res.code) {
+                                    return layui.popup.failure(res.msg);
+                                }
+                                return layui.popup.success("操作成功", function () {
+                                    return obj ? obj.del() : refreshTable();
+                                });
+                            }
+                        })
+                    });
+                }
+
+                // 刷新表格
+                window.refreshTable = function() {
+                    treeTable.reload("data-table", {});
+                }
+            })
+
+        </script>
+    </body>
+</html>

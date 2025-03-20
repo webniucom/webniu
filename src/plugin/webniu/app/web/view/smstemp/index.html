@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>浏览页面</title>
+        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/component/jsoneditor/css/jsoneditor.css" />
+        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+    </head>
+    <body class="pear-container">
+    
+        <!-- 顶部查询表单 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <form class="layui-form top-search-from layui-manage-top-15">
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item layui-inline">
+                        <label class="layui-form-label"></label>
+                        <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="table-query">
+                            <i class="layui-icon layui-icon-search"></i>查询
+                        </button>
+                        <button type="reset" class="pear-btn pear-btn-md" lay-submit lay-filter="table-reset">
+                            <i class="layui-icon layui-icon-refresh"></i>重置
+                        </button>
+                    </div>
+                    <div class="toggle-btn">
+                        <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
+                        <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="ID-test-layer-wrapper" style="display:none;">
+            <form class="layui-form" action="" lay-filter="demo-val-filter">
+
+                <div class="mainBox">
+                    <div class="main-container mr-5">
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">签名</label>
+                            <div class="layui-input-block">
+                                <input readonly type="text" name="sign" value="" required lay-verify="required" lay-reqtext="请输入签名" class="layui-input layui-btn-disabled">
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">模板id</label>
+                            <div class="layui-input-block">
+                                <input readonly type="text" name="template_id" value="" required lay-verify="required" lay-reqtext="请输入模板id" class="layui-input layui-btn-disabled">
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">手机号</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="phone_number" value="" required lay-verify="required|phone" lay-reqtext="请输入手机号" placeholder="请输入手机号" class="layui-input">
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">变量属性</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="jsondata" id="jsondata" value="{}" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="bottom">
+                    <div class="button-container">
+                        <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                            提交
+                        </button>
+                        <button type="reset" class="pear-btn pear-btn-md" id="closeIframe">
+                            关闭
+                        </button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+        
+        <!-- 数据表格 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="data-table" lay-filter="data-table"></table>
+            </div>
+        </div>
+
+        <!-- 表格顶部工具栏 -->
+        <script type="text/html" id="table-toolbar">
+            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="app.webniu.smstemp.insert">
+                <i class="layui-icon layui-icon-add-1"></i>新增
+            </button>
+            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="app.webniu.smstemp.delete">
+                <i class="layui-icon layui-icon-delete"></i>删除
+            </button>
+        </script>
+
+        <!-- 表格行工具栏 -->
+        <script type="text/html" id="table-bar">
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="app.webniu.smstemp.update">编辑</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="test" permission="app.webniu.smstemp.test">测试</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="app.webniu.smstemp.delete">删除</button>
+        </script>
+
+        <script src="/app/webniu/component/layui/layui.js?v=2.8.12"></script>
+        <script src="/app/webniu/component/pear/pear.js"></script>
+        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/component/jsoneditor/jsoneditor.js"></script>
+        <script src="/app/webniu/admin/js/common.js"></script>
+        
+        <script>
+
+            // 相关常量
+            const PRIMARY_KEY = "id";
+            const SELECT_API = "/app/webniu/web/smstemp/select";
+            const UPDATE_API = "/app/webniu/web/smstemp/update";
+            const DELETE_API = "/app/webniu/web/smstemp/delete";
+            const INSERT_URL = "/app/webniu/web/smstemp/insert";
+            const UPDATE_URL = "/app/webniu/web/smstemp/update";
+            const TEST_API   = "/app/webniu/web/smstemp/test";
+            // 表格渲染
+            layui.use(["table", "form", "common", "popup", "util","drawer"], function() {
+                let table = layui.table;
+                var drawer  = layui.drawer;
+                let form = layui.form;
+                let $ = layui.$;
+                let common = layui.common;
+                let util = layui.util;
+                
+				// 表头参数
+				let cols = [
+					{
+						type: "checkbox",
+						align: "center"
+					},{
+						title: "平台",align: "center",
+						field: "uniacid",
+                        templet: function (d) {
+                            if(d.uniacid==null || d.uniacid==0 ){
+                                return '系统模板';
+                            }else{
+                                return '平台ID:'+d.uniacid;
+                            }
+                        }
+					},{
+						title: "名称",align: "center",
+						field: "name",
+                        templet: function (d) {
+                            if(d.name=='captcha'){
+                                return '验证码';
+                            }else{
+                                return d.name;
+                            }
+                        }
+					},{
+						title: "模板id",align: "center",
+						field: "template_id",
+					},{
+						title: "签名",align: "center",
+						field: "sign",
+					},{
+						title: "创建时间",align: "center",
+						field: "created_at",
+					},{
+						title: "操作",
+						toolbar: "#table-bar",
+						align: "center",
+						fixed: "right",
+						width: 180,
+					}
+				];
+				
+				// 渲染表格
+				table.render({
+				    elem: "#data-table",
+				    url: SELECT_API,
+				    page: true,
+				    cols: [cols],
+				    skin: "line",
+				    size: "lg",
+				    toolbar: "#table-toolbar",
+				    autoSort: false,
+				    defaultToolbar: [{
+				        title: "刷新",
+				        layEvent: "refresh",
+				        icon: "layui-icon-refresh",
+				    }],
+				    done: function () {
+				        layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
+				    }
+				});
+				
+				
+                // 编辑或删除行事件
+                table.on("tool(data-table)", function(obj) {
+                    if (obj.event === "remove") {
+                        remove(obj);
+                    } else if (obj.event === "test") {
+                        test(obj);
+                    } else if (obj.event === "edit") {
+                        edit(obj);
+                    }
+                });
+
+                // 表格顶部工具栏事件
+                table.on("toolbar(data-table)", function(obj) {
+                    if (obj.event === "add") {
+                        add();
+                    } else if (obj.event === "refresh") {
+                        refreshTable();
+                    } else if (obj.event === "batchRemove") {
+                        batchRemove(obj);
+                    }
+                });
+
+                // 表格顶部搜索事件
+                form.on("submit(table-query)", function(data) {
+                    table.reload("data-table", {
+                        page: {
+                            curr: 1
+                        },
+                        where: data.field
+                    })
+                    return false;
+                });
+                
+                // 表格顶部搜索重置事件
+                form.on("submit(table-reset)", function(data) {
+                    table.reload("data-table", {
+                        where: []
+                    })
+                });
+                
+                 
+
+                // 表格排序事件
+                table.on("sort(data-table)", function(obj){
+                    table.reload("data-table", {
+                        initSort: obj,
+                        scrollPos: "fixed",
+                        where: {
+                            field: obj.field,
+                            order: obj.type
+                        }
+                    });
+                });
+
+                // 表格新增数据
+                let add = function() {
+                    drawer.open({
+                        legacy: false,
+                        title: ['新增', 'font-size:16px;color:#2d8cf0'],
+                        offset: 'r',
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
+                        maxmin: false,
+                        closeBtn: 1,
+                        iframe: INSERT_URL
+                    }); 
+                     
+                }
+
+                // 表格编辑数据
+                let edit = function(obj) {
+                    let value = obj.data[PRIMARY_KEY];
+                    drawer.open({
+                        legacy: false,
+                        title: ['修改', 'font-size:16px;color:#2d8cf0'],
+                        offset: 'r',
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
+                        maxmin: false,
+                        closeBtn: 1,
+                        iframe: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                    });
+                }
+
+                // 表格编辑数据
+                let test = function(obj) {
+                    let value = obj.data[PRIMARY_KEY];
+                    let index = layer.open({
+                        type: 1,
+                        title: "测试邮件",
+                        shade: 0.1,
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"60%"],
+                        content:$('#ID-test-layer-wrapper'),
+                        success: function(){
+                            // 对弹层中的表单进行初始化渲染
+                             
+                            form.render();
+                            form.val('demo-val-filter', {
+                                "sign": obj.data['sign'],
+                                "template_id": obj.data['template_id'], 
+                            });
+                            // 字段允许为空
+                            form.verify({
+                                phone: [/(^$)|^1\d{10}$/, "请输入正确的手机号"], 
+                            });
+                             
+                            // 表单提交事件
+                            form.on('submit(save)', function(data){
+                                var field = data.field; // 获取表单字段值
+                                let loading = layer.load();
+                                $.ajax({
+                                    url: TEST_API,
+                                    data: field,
+                                    dataType: "json",
+                                    type: "post",
+                                    success: function(res) {
+                                        layer.close(loading);
+                                        if (res.code) {
+                                            return layui.popup.failure(res.msg);
+                                        }
+                                         
+                                        return layui.popup.success("操作成功", function(){
+                                            layer.close(index);
+                                        });
+                                    }
+                                }) 
+                                return false; // 阻止默认 form 跳转
+                            });
+                            $('#closeIframe').click(function(){
+                                layer.close(index);
+                            });
+                             
+                        }
+                    });
+                     
+                }
+
+                jsonArea({
+                    el: "#jsondata",
+                    change: function(data) {
+                        console.log(data);
+                    }
+                });
+                 
+
+                // 删除一行
+                let remove = function(obj) {
+                    return doRemove(obj.data[PRIMARY_KEY]);
+                }
+
+                // 删除多行
+                let batchRemove = function(obj) {
+                    let checkIds = common.checkField(obj, PRIMARY_KEY);
+                    if (checkIds === "") {
+                        layui.popup.warning("未选中数据");
+                        return false;
+                    }
+                    doRemove(checkIds.split(","));
+                }
+
+                // 执行删除
+                let doRemove = function (ids) {
+                    let data = {};
+                    data[PRIMARY_KEY] = ids;
+                    layer.confirm("确定删除?", {
+                        icon: 3,
+                        title: "提示"
+                    }, function(index) {
+                        layer.close(index);
+                        let loading = layer.load();
+                        $.ajax({
+                            url: DELETE_API,
+                            data: data,
+                            dataType: "json",
+                            type: "post",
+                            success: function(res) {
+                                layer.close(loading);
+                                if (res.code) {
+                                    return layui.popup.failure(res.msg);
+                                }
+                                return layui.popup.success("操作成功", refreshTable);
+                            }
+                        })
+                    });
+                }
+
+                // 刷新表格数据
+                window.refreshTable = function(param) {
+                    table.reloadData("data-table", {
+                        scrollPos: "fixed"
+                    });
+                }
+            })
+
+        </script>
+    </body>
+</html>

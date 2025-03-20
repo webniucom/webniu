@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="/app/webniu/component/layui/css/layui.css" />
+        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/webniu/admin/css/pages/config.css" />
+    </head>
+    <body class="pear-container">
+         
+        <div class="layui-card">
+            <div class="layui-card-body layui-padding-top-5">
+
+                <div class="layui-tab layui-tab-brief" lay-filter="test-hash">
+                <ul class="layui-tab-title">
+                    <li lay-id="base" class="layui-this">基本信息</li>
+                    <li lay-id="user">账户设置</li>
+                    <li lay-id="atta">附件设置</li>
+                    <li lay-id="pic">图片水印</li>
+                    <li lay-id="menu,tab,theme">页面样式</li> 
+                    <li lay-id="api">接口配置</li>
+                </ul>
+                <div class="layui-tab-content">
+
+                    <!-- 基本信息 -->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" lay-filter="baseinfo">
+                             
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">后台名称</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="base[title]" required  lay-verify="required" lay-reqtext="请输入网站名称" placeholder="请输入网站名称" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="全局站点标题"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">关键字</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="base[keyword]" required  lay-verify="required" lay-reqtext="请输入关键字" placeholder="请输入关键字" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="全局关键字"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">后台描述</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <textarea placeholder="请输入内容" class="layui-textarea" name="base[description]"></textarea>
+                                </div> 
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">站点域名</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="base[siteurl]" required  lay-verify="required" lay-reqtext="请输入站点域名" placeholder="请输入网站域名" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="全局主站点绑定域名以http://开头/结尾"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item img_layui-form-item">
+                                <label class="layui-form-label">后台Logo</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <img class="img-3" src=""/>
+                                    <input type="text" style="display:none" name="base[image]" value="" />
+                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="image" permission="app.webniu.upload.image">
+                                        <i class="layui-icon layui-icon-upload"></i>上传图片
+                                    </button>
+                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-image" permission="app.webniu.upload.attachment">
+                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
+                                    </button>
+                                </div>
+                            </div>
+                             
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">备案号</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="base[ipcbeian]" placeholder="请输入备案号" autocomplete="off" class="layui-input">
+                                </div> 
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">版权信息</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="base[copyright]" placeholder="请输入版权信息" autocomplete="off" class="layui-input">
+                                </div> 
+                            </div> 
+                            
+                             
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="savebaseinfo">
+                                        提交
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <!-- 账户设置 -->
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form" lay-filter="userinfo">
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>后端注册配置</legend>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">管理注册</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="user[managereg]" id="managereg" title="开启|关闭" lay-skin="switch" lay-filter="user-managereg" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="后台管理身份注册"></i>
+                                </div>
+                            </div>
+                            <div class="managereg">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">初始角色</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <div name="user[roles]" id="roles" value=""></div>
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="注册管理默认分配的角色"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">图形验证</label>
+                                    <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                        <input type="checkbox" name="user[m_image_verify]" id="m_image_verify" title="开启|关闭" value="on" lay-skin="switch" />
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="后台登录图形验证"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">手机验证</label>
+                                    <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                        <input type="checkbox" name="user[m_phone_verify]" id="m_phone_verify" title="开启|关闭" value="on" lay-skin="switch" />
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="后台注册手机验证"></i>
+                                    </div>
+                                </div>
+
+                                
+                            </div>
+                            <div class="layui-form-item img_layui-form-item">
+                                <label class="layui-form-label">登录页封面</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <img class="img-3" src=""/>
+                                    <input type="text" style="display:none" name="user[background_image]" value="" />
+                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="background_image" permission="app.webniu.upload.image">
+                                        <i class="layui-icon layui-icon-upload"></i>上传图片
+                                    </button>
+                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-background_image" permission="app.webniu.upload.attachment">
+                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
+                                    </button>
+                                </div>
+                            </div>
+                            
+
+
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>前端注册配置</legend>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">会员注册</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="user[userreg]" id="userreg" title="开启|关闭" lay-skin="switch" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="前端会员用户注册"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图形验证</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="user[u_image_verify]" id="u_image_verify" title="开启|关闭" lay-skin="switch" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="前端登录图形验证"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">手机验证</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="user[u_phone_verify]" id="u_phone_verify" title="开启|关闭" lay-skin="switch" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="前端注册手机验证"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">邮箱验证</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="user[u_email_verify]" id="u_email_verify" title="开启|关闭" lay-skin="switch" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="前端注册邮箱验证"></i>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="saveuserinfo">
+                                        提交
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                     
+
+                    <!-- 附件设置 -->
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form apiclass-apiinfo" lay-filter="attainfo">
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>默认上传</legend>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">保存路径</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[dirname]" required  lay-verify="required" lay-reqtext="请输入保存路径" placeholder="请输入保存路径" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="不熟悉建议默认即可！"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">时间目录风格</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[path_style]" required  lay-verify="required" lay-reqtext="请输入保存风格" placeholder="请输入保存风格" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="不熟悉建议默认即可！"></i>
+                                </div>
+                            </div>
+                             
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">被允许上传类型</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[include]" required  lay-verify="required" lay-reqtext="请输入被允许的类型" placeholder="请输入被允许的类型" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="上传的文件类型支持如:jpg,jpeg,png,gif多个以英文逗号分隔"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">不被允许的类型</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[exclude]" required  lay-verify="required" lay-reqtext="请输入不被允许的类型" placeholder="请输入不被允许的类型" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="不被允许的类型如:exe,php"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">单文件上传限制</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[single_limit]" required  lay-verify="required" lay-reqtext="请输入单文件上传限制" placeholder="请输入单文件上传限制" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="单个文件的大小限制单位M;"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">多文件总传限制</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[total_limit]" required  lay-verify="required" lay-reqtext="请输入多文件总传限制" placeholder="请输入多文件总传限制" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="单个文件的大小限制单位M"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">文件数量限制</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <input type="text" name="atta[nums]" required  lay-verify="required" lay-reqtext="请输入文件数量限制" placeholder="请输入文件数量限制" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="同时上传数量，建议设置1，单文件上传最佳！"></i>
+                                </div>
+                            </div>
+ 
+
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>远程上传</legend>
+                            </fieldset>
+
+                             
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">是否启用</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <select name="atta[storage_type]" lay-filter="atta-storage_type">
+                                        <option value="0">关闭</option>
+                                        <option value="1">FTP附件</option> 
+                                        <option value="2">七牛云存储</option>
+                                        <option value="3">阿里云OSS</option>
+                                        <option value="4">腾讯云存储</option> 
+                                    </select>
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="关闭后采用服务器本地上传"></i>
+                                </div>
+                            </div>
+
+
+                            <div class="defaul_type ftp_type">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">FTP地址</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Ftp][ip]" required  lay-verify="required" lay-reqtext="请输入FTP地址" placeholder="请输入FTP地址" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="配置完信息后上传图片卡死说明远程服务器有问题！"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">FTP端口</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Ftp][port]" required  lay-verify="required" lay-reqtext="请输入FTP端口" placeholder="请输入FTP端口" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="FTP端口"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">被动模式</label>
+                                    <div class="layui-input-inline layui-input-wrap" style="width: auto;">
+                                        <input type="radio" name="atta[Ftp][pasv]" value="0" title="关闭">
+                                        <input type="radio" name="atta[Ftp][pasv]" value="1" title="开启" checked>
+                                    </div> 
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="如果上传无响应切换开启被动模式。"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">FTP用户名</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Ftp][username]" required  lay-verify="required" lay-reqtext="请输入FTP用户名" placeholder="请输入FTP用户名" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="FTP用户名"></i>
+                                    </div>
+                                </div>
+    
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">FTP密码</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="password" name="atta[Ftp][password]" required  lay-verify="required" lay-reqtext="请输入FTP密码" placeholder="请输入FTP密码" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="FTP密码"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">远程图片地址</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Ftp][domain]" required  lay-verify="required" lay-reqtext="请输入远程图片地址" placeholder="请输入远程图片地址" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="远程图片地址"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="defaul_type qiniu_type">
+                                 
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Accesskey</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Qiniu][accessKey]" required  lay-verify="required" lay-reqtext="请输入Accesskey" placeholder="请输入Accesskey" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="用于签名的公钥"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Secretkey</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="password" name="atta[Qiniu][secretKey]" required  lay-verify="required" lay-reqtext="请输入Secretkey" placeholder="请输入Secretkey" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="用于签名的私钥"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Bucket</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Qiniu][bucket]" required  lay-verify="required" lay-reqtext="请输入Bucket" placeholder="请输入Bucket" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="请保证bucket为可公共读取的"></i>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Url</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Qiniu][domain]" required  lay-verify="required" lay-reqtext="请输入Url" placeholder="请输入Url" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="注:url开头加http://或https://结尾不加 ‘/’例:http://xxxx.com"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="defaul_type aliyun_type">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">KeyID</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Oss][accessKeyId]" required  lay-verify="required" lay-reqtext="请输入KeyID" placeholder="请输入KeyID" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="登录阿里云官网获取账户对应的KeyID"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">KeySecret</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="password" name="atta[Oss][accessKeySecret]" required  lay-verify="required" lay-reqtext="请输入KeySecret" placeholder="请输入KeySecret" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="登录阿里云官网获取账户对应的KeySecret"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">内网上传</label>
+                                    <div class="layui-input-inline layui-input-wrap" style="width: auto;">
+                                        <input type="radio" name="atta[Oss][local]" value="0" title="关闭" checked>
+                                        <input type="radio" name="atta[Oss][local]" value="1" title="开启">
+                                    </div> 
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="同为阿里云ecs服务器并且服务器与bucket在同一地区可以使用内网上传节省流量！"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Bucket</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Oss][bucket]" required  lay-verify="required" lay-reqtext="请输入Bucket" placeholder="请输入Bucket" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="请保证bucket为可公共读取的"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Endpoint</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Oss][endpoint]" required  lay-verify="required" lay-reqtext="请输入Endpoint" placeholder="请输入Endpoint" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="请保证Endpoint可用"></i>
+                                    </div>
+                                </div>
+                                 
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">自定义URL</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Oss][domain]" required  lay-verify="required" lay-reqtext="请输入远程图片地址" placeholder="请输入远程图片地址" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="阿里云oss默认有生成url,用户可以自定义url，注:url开头加http://或https://结尾不加 ‘/’例:http://xxxx.com"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="defaul_type tencent_type">
+                                 
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SecretID</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Cos][secretId]" required  lay-verify="required" lay-reqtext="请输入SecretID" placeholder="请输入SecretID" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="SecretID"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SecretKEY</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="password" name="atta[Cos][secretKey]" required  lay-verify="required" lay-reqtext="请输入SecretKEY" placeholder="请输入SecretKEY" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="SecretKEY"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Bucket</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Cos][bucket]" required  lay-verify="required" lay-reqtext="请输入Bucket" placeholder="请输入Bucket" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="Bucket"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">REGION</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Cos][region]" required  lay-verify="required" lay-reqtext="请输入region" placeholder="请输入region" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="region"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">Url</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="atta[Cos][domain]" required  lay-verify="required" lay-reqtext="请输入Url" placeholder="请输入Url" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="注:url开头加http://或https://结尾不加 ‘/’例:http://xxxx.com"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                             
+ 
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="saveattainfo">
+                                        提交
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <!-- 图片水印 -->
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form apiclass-apiinfo" lay-filter="picinfo">
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>图片压缩</legend>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图片大小压缩</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="pic[pic_thumb_type]" id="pic_thumb_type" title="开启|关闭" lay-skin="switch" lay-filter="pic-pic_thumb_type"  />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="缩略图"></i>
+                                </div>
+                            </div>
+                            <div class="pic_thumb_type">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">宽度</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="pic[pic_thumb_width]" required  lay-verify="required" lay-reqtext="请输入宽度" placeholder="请输入宽度" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="图片宽度超过指定宽度执行比例压缩！"></i>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">缩放比例</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="text" name="pic[pic_thumb_percent]" required  lay-verify="required" lay-reqtext="请输入高度" placeholder="请输入高度" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-text-em">
+                                        <i class="layui-icon layui-icon-tips" lay-tips="图片超过指定宽度执行对应比例压缩！格式0.1~1。比如0.5代表等比例缩放50%"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <fieldset class="layui-elem-field layui-field-title">
+                                <legend>图片水印</legend>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图片水印</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="pic[pic_mark_type]" id="pic_mark_type" title="开启|关闭" lay-skin="switch" lay-filter="pic-pic_mark_type" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="图片水印"></i>
+                                </div>
+                            </div>
+                            <div class="pic_mark_type">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">水印类型</label>
+                                    <div class="layui-input-inline layui-input-wrap">
+                                        <input type="radio" name="pic[pic_mark_style]" value="0" title="文字水印" checked lay-filter="demo-radio-filter">
+                                        <input type="radio" name="pic[pic_mark_style]" value="1" title="图片水印" lay-filter="demo-radio-filter">
+                                    </div> 
+                                </div>
+                                <div class="pic_mark_style_0">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">水印文字</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <input type="text" name="pic[pic_thumb_text]" required  lay-verify="required" lay-reqtext="请输入水印文字" placeholder="请输入水印文字" autocomplete="off" class="ok_input layui-input">
+                                        </div> 
+                                        <div class="layui-form-mid layui-text-em">
+                                            <i class="layui-icon layui-icon-tips" lay-tips="文字水印固定在图片右下角！"></i>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">文字大小</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <input type="text" name="pic[pic_thumb_size]" required  lay-verify="required" lay-reqtext="请输入文字大小" placeholder="请输入文字大小" autocomplete="off" class="ok_input layui-input">
+                                        </div> 
+                                    </div>
+        
+                                    <div class="layui-form-item" style="margin-bottom: 5px;">
+                                        <label class="layui-form-label">文字颜色</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <input type="text" name="pic[pic_thumb_color]" value="" placeholder="请选择文字颜色" class="ok_input layui-input" id="ID-colorpicker-demo-form-color">
+                                        </div> 
+                                        <div class="layui-inline" style="left: -11px;">
+                                            <div id="ID-colorpicker-demo-form"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 
+                                <div class="pic_mark_style_1">
+                                    <div class="layui-form-item img_layui-form-item">
+                                        <label class="layui-form-label">水印图片</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <img class="img-3" src=""/>
+                                            <input type="text" style="display:none" name="pic[pic_thumb_img]" value="" required  lay-verify="required" lay-reqtext="请输入水印图片" />
+                                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="pic_thumb_img">
+                                                <i class="layui-icon layui-icon-upload"></i>上传图片
+                                            </button> 
+                                        </div>
+                                        <div class="layui-form-mid layui-text-em">
+                                            <i class="layui-icon layui-icon-tips" lay-tips="水印图片120x120像素。"></i>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">水印位置</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <div class="layui-row layui-col-space1">
+        
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="top-left" title="顶部居左" checked>
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="top-center" title="顶部居中" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="top-right" title="顶部居右" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="middle-left" title="左边居中" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="middle-center" title="图片中心" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="middle-right" title="右边居中" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="bottom-left" title="底部居左" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="bottom-center" title="底部居中" >
+                                                </div>
+                                                <div class="layui-col-xs4">
+                                                    <input type="radio" name="pic[pic_mark_weizhi]" value="bottom-right" title="底部居右" >
+                                                </div>
+                                                 
+                                              
+                                              </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                 
+    
+                                 
+                            </div>
+                             
+
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="savepicinfo">
+                                        提交
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+ 
+
+                     
+
+
+                    <!-- 菜单设置 -->
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form apiclass-apiinfo" lay-filter="menuinfo">
+                            <div class="layui-collapse" lay-accordion>
+                                <div class="layui-colla-item">
+                                    <div class="layui-colla-title">菜单配置</div>
+                                    <div class="layui-colla-content layui-show">
+                                         
+                                        <div class="layui-form-item layui-hide">
+                                            <label class="layui-form-label">菜单url</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="hidden" name="menu[data]" required  lay-verify="required" placeholder="请输入菜单url" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">菜单宽度</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="number" name="menu[controlWidth]" required  lay-verify="required" placeholder="请输入宽度" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">菜单高度</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="menu[controlHeight]" required  lay-verify="required" placeholder="请输入高度" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="支持百分比，默认100%"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">默认菜单ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="number" name="menu[select]" required  lay-verify="required" placeholder="请输入默认菜单ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">开启手风琴</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="menu[accordion]" id="accordion" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">折叠菜单</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" id="collapse" name="menu[collapse]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-colla-item">
+                                    <div class="layui-colla-title">页面配置</div>
+                                    <div class="layui-colla-content">
+                                        
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">保持标签</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="tab[keepState]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">记住标签</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="tab[session]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">预加载标签</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="tab[preload]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">最大标签数</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="number" name="tab[max]" required  lay-verify="required" placeholder="请输入最大标签数" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">主标签标题</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="tab[index][title]" required  lay-verify="required" placeholder="请输入主页标签标题" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">主标签URL</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="tab[index][href]" required  lay-verify="required" placeholder="请输入菜单url" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">主标签ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="number" name="tab[index][id]" required  lay-verify="required" placeholder="请输入主页标签ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-colla-item">
+                                    <div class="layui-colla-title">风格配置</div>
+                                    <div class="layui-colla-content">
+                                         
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">允许自定义</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="theme[allowCustom]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">菜单风格</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <select name="theme[defaultMenu]">
+                                                    <option value="dark-theme">样式一</option>
+                                                    <option value="light-theme">样式二</option>  
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">顶部风格</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <select name="theme[defaultHeader]">
+                                                    <option value="dark-theme">样式一</option>
+                                                    <option value="light-theme">样式二</option>  
+                                                </select>
+                                            </div>
+                                        </div> 
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">菜单分级</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <select name="theme[defaultAside]">
+                                                    <option value="double-theme">样式一</option>
+                                                    <option value="single-theme">样式二</option>  
+                                                </select>
+                                            </div>
+                                        </div> 
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">默认通栏</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="theme[banner]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div> 
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">默认页脚</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="checkbox" name="theme[footer]" title="开启|关闭" lay-skin="switch" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="savemenu,tab,themeinfo">
+                                        提交
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    
+
+                    <!-- 接口设置 -->
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form apiclass-apiinfo" lay-filter="apiinfo">
+                             
+                            <div class="layui-collapse" lay-accordion>
+                            <div class="layui-colla-item">
+                                <div class="layui-colla-title">SMTP邮件</div>
+                                <div class="layui-colla-content layui-show">
+
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">是否启用</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <input type="checkbox" name="api[smtp][type]" title="开启|关闭" lay-skin="switch" lay-filter="api-smtp_type" />
+                                        </div>
+                                    </div>                   
+                                    <div class="smtp_type">
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SMTP服务器</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[smtp][ip]" required  lay-verify="required" lay-reqtext="请输入SMTP服务器" placeholder="请输入SMTP服务器" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="全局站点标题"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SMTP端口</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[smtp][port]" required  lay-verify="required" lay-reqtext="请输入SMTP端口" placeholder="请输入SMTP端口" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="全局站点标题"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SMTP用户名</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[smtp][username]" required  lay-verify="required" lay-reqtext="请输入SMTP用户名" placeholder="请输入SMTP用户名" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="用于发送邮件显示，默认为管理员。"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SMTP密码</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[smtp][password]" required  lay-verify="required" lay-reqtext="请输入SMTP密码" placeholder="请输入SMTP密码" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="全局站点标题"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SMTP验证方式</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <select name="api[smtp][secure]">
+                                                    <option value="">无</option>
+                                                    <option value="ssl">SSL</option>
+                                                    <option value="tsl">TSL</option>  
+                                                </select>
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="SMTP验证方式"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">默认发件人</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[smtp][from]" required  lay-verify="required" lay-reqtext="请输入默认发件人" placeholder="请输入默认发件人" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="用于发送邮件显示，默认为管理员。"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">测试邮箱</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[smtp][test]" lay-reqtext="请输入SMTP邮件测试邮箱" placeholder="请输入SMTP邮件测试邮箱" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em" style="padding:0px !important;">
+                                                <button type="button" class="pear-btn pear-btn-primary pear-btn-md" lay-on="smtp-test">点击测试</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                     
+                                </div>
+                            </div>
+                            <div class="layui-colla-item">
+                                <div class="layui-colla-title">社会化登录</div>
+                                <div class="layui-colla-content">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">是否启用</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <input type="checkbox" name="api[login][type]" title="开启|关闭" lay-skin="switch" lay-filter="api-open_login_type" />
+                                        </div>
+                                    </div>
+                                    <div class="open_login_type">
+                                        <fieldset class="layui-elem-field layui-field-title">   
+                                            <legend>微信登录</legend>
+                                        </fieldset>
+                                        
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">APP_ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[login][wechat][appid]" required  lay-verify="required" lay-reqtext="请输入微信登录APP_ID" placeholder="请输入微信登录APP_ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="APP_ID"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">APP_KEY</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[login][wechat][appkey]" required  lay-verify="required" lay-reqtext="请输入微信登录APP_KEY" placeholder="请输入微信登录APP_KEY" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="APP_KEY"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">callback地址</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[login][wechat][callback]" required  lay-verify="required" lay-reqtext="请输入微信登录callback地址" placeholder="请输入微信登录callback地址" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="callback地址"></i>
+                                            </div>
+                                        </div>
+                                        <fieldset class="layui-elem-field layui-field-title">
+                                            <legend>QQ登录</legend>
+                                        </fieldset>
+                                        
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">APP_ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[login][qq][appid]" required  lay-verify="required" lay-reqtext="请输入QQ登录APP_ID" placeholder="请输入QQ登录APP_ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="APP_ID"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">APP_KEY</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[login][qq][appkey]" required  lay-verify="required" lay-reqtext="请输入QQ登录APP_KEY" placeholder="请输入QQ登录APP_KEY" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="APP_KEY"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">callback地址</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[login][qq][callback]" required  lay-verify="required" lay-reqtext="请输入QQ登录callback地址" placeholder="请输入QQ登录callback地址" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="callback地址"></i>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                     
+
+                                </div>
+                            </div>
+                             
+                            <div class="layui-colla-item">
+                                <div class="layui-colla-title">短信SMS接口</div>
+                                <div class="layui-colla-content">
+                                    
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">是否启用</label>
+                                        <div class="layui-input-inline layui-input-wrap">
+                                            <select name="api[sms][type]" lay-filter="api-sms_type">
+                                                <option value="0">关闭</option>
+                                                <option value="aliyun">阿里SMS短信</option>
+                                                <option value="qcloud">腾讯SMS短信</option> 
+                                              </select>
+                                        </div>
+                                    </div>
+                                    <div class="sms_type aliyun">
+                                        <fieldset class="layui-elem-field layui-field-title">
+                                            <legend>阿里SMS短信</legend>
+                                        </fieldset>
+                                        
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">ACCESS_ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][aliyun][access_key_id]" required  lay-verify="required" lay-reqtext="请输入阿里SMS短信ACCESS_ID" placeholder="请输入阿里SMS短信ACCESS_ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="阿里云-AccessKey管理-AccessKey ID"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">ACCESS_SECRET</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][aliyun][access_key_secret]" required  lay-verify="required" lay-reqtext="请输入阿里SMS短信ACCESS_SECRET" placeholder="请输入阿里SMS短信ACCESS_SECRET" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="阿里云-AccessKey管理-ACCESS_SECRET"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">签名名称</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][aliyun][sign_name]" required  lay-verify="required" lay-reqtext="请输入阿里SMS短信APP_SIGN" placeholder="请输入阿里SMS短信APP_SIGN" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="阿里云-签名管理-签名名称复制到这里"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sms_type qcloud">
+                                        <fieldset class="layui-elem-field layui-field-title">
+                                            <legend>腾讯SMS短信</legend>
+                                        </fieldset>
+                                        
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SDK_APP_ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][qcloud][sdk_app_id]" required  lay-verify="required" lay-reqtext="请输入腾讯SMS短信APP_ID" placeholder="请输入腾讯SMS短信APP_ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="腾讯SMS短信APP_ID"></i>
+                                            </div>
+                                        </div>
+                                         
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SECRET_ID</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][qcloud][secret_id]" required  lay-verify="required" lay-reqtext="请输入腾讯SMS短信SECRET_ID" placeholder="请输入腾讯SMS短信SECRET_ID" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="腾讯SMS短信SECRET_ID"></i>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">SECRET_KEY</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][qcloud][secret_key]" required  lay-verify="required" lay-reqtext="请输入腾讯SMS短信SECRET_KEY" placeholder="请输入腾讯SMS短信SECRET_KEY" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="腾讯SMS短信SECRET_KEY"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">签名名称</label>
+                                            <div class="layui-input-inline layui-input-wrap">
+                                                <input type="text" name="api[sms][qcloud][sign_name]" required  lay-verify="required" lay-reqtext="请输入腾讯SMS短信APP_SIGN" placeholder="请输入腾讯SMS短信APP_SIGN" autocomplete="off" class="layui-input">
+                                            </div>
+                                            <div class="layui-form-mid layui-text-em">
+                                                <i class="layui-icon layui-icon-tips" lay-tips="腾讯SMS短信APP_SIGN"></i>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                     
+
+                                </div>
+                            </div>
+                            
+
+
+                            </div>
+ 
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="saveapiinfo">
+                                        提交
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+
+        <script src="/app/webniu/component/layui/layui.js"></script>
+        <script src="/app/webniu/component/pear/pear.js"></script>
+        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script>
+ 
+            // 菜单设置
+            layui.use(["upload", "layer", "popup","form","laydate","util","xmSelect","jquery","toast","colorpicker","slider","element"], function() {
+                let $       = layui.$;
+                let form    = layui.form; 
+                var layer   = layui.layer; 
+                var laydate = layui.laydate;
+                var util    = layui.util;
+                var toast   = layui.toast; 
+                var colorpicker = layui.colorpicker;
+                var slider  = layui.slider; 
+                var globalre= null;
+                var element = layui.element; 
+                $('.layui-icon-tips').on("click", function() {
+                    let value   = $(this).attr("lay-tips");
+                    let offset  = $(this).offset(); 
+                    let left    = offset.left; 
+                    let index   = layer.tips(value, this, {
+                        tips: 1,
+                        time: 1500,
+                        success: function(layero, index, that){
+                            $('.layui-layer-tips').css('left',left-12);
+                        }
+                    });
+                    
+                }); 
+                
+                // 初始切换
+                element.tabChange('test-hash','base');
+                // 切换事件
+                element.on('tab(test-hash)', function(){
+                    let layid = this.getAttribute('lay-id'); 
+                    read_get(layid);
+                });
+                 
+                util.on('lay-on', {
+                    'make-apptoken': function(){ 
+                        let str = generateRandomString(32);
+                        $('*[name="wechat_open_apptoken"]').val(str);
+                    },
+                    'copy-apptoken': function(){ 
+                        var input = $('*[name="wechat_open_apptoken"]');  
+                        input.select();  
+                        document.execCommand('copy');
+                        toast.success({message:'复制成功',position: 'topCenter'});
+                    },
+                    'make-encodingkey': function(){ 
+                        let str = generateRandomString(43);
+                        $('*[name="wechat_open_encodingkey"]').val(str);
+                    },
+                    'copy-encodingkey': function(){ 
+                        var input = $('*[name="wechat_open_encodingkey"]');  
+                        input.select();  
+                        document.execCommand('copy');
+                        toast.success({message:'复制成功',position: 'topCenter'});
+                    },
+                    'copy-apiurl': function(){ 
+                        var input = $('*[name="wechat_open_apiurl"]'); 
+                        input.select();  
+                        document.execCommand('copy');
+                        toast.success({message:'复制成功',position: 'topCenter'});
+                    },
+                    'copy-ticketurl': function(){ 
+                        var input = $('*[name="wechat_open_ticketurl"]');  
+                        input.select();  
+                        document.execCommand('copy');
+                        toast.success({message:'复制成功',position: 'topCenter'});
+                    },
+                    'smtp-test': function(){ 
+                        
+                        toast.success({message:'发送成功',position: 'topCenter'});
+                    },
+                });
+                let image       = layui.$("#image").prev();
+                let background_image   = layui.$("#background_image").prev();
+                let read_get = function(name){
+                    var index = layer.load(0, {shade: true});
+                    $.ajax({
+                        url: "/app/webniu/web/config/get",
+                        dataType: "json",
+                        type: "GET",
+                        data: {name},
+                        success: function (res) {
+                            layer.close(index);
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            } 
+                            globalre = res; 
+                            if(name=='base'){
+                                form.val("baseinfo",flattenObject({base:res.base}));
+                                image.val(res.base.image).prev().attr("src", res.base.image);
+                            }
+
+                            if(name=='core'){
+                                form.val("coreinfo",flattenObject({core:res.core})); 
+                            }
+
+                            if(name=='user'){
+                                form.val("userinfo",flattenObject({user:res.user})); 
+                                background_image.val(res.user.background_image).prev().attr("src", res.user.background_image);
+                                //账户设置 后台开放注册控件
+                                if(res.user.managereg){
+                                    $(".managereg").css('display','block');
+                                    $(".managereg input.ok_input").attr("required", "required").attr("lay-verify", "required");
+                                }else{
+                                    $(".managereg").css('display','none');
+                                    $(".managereg input.ok_input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                form.on('switch(user-managereg)', function(data){
+                                    var elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                                    if(elem.checked){
+                                        $(".managereg").css('display','block');
+                                        $(".managereg input.ok_input").attr("required", "required").attr("lay-verify", "required");
+                                    }else{
+                                        $(".managereg").css('display','none');
+                                        $(".managereg input.ok_input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                }); 
+                                //读取角色权限
+                                layui.$.ajax({
+                                    url: "/app/webniu/web/role/select?format=tree",
+                                    dataType: "json",
+                                    success: function (r) {
+                                        let value       = res.user.roles;
+                                        let initValue   = value ? value.split(",") : [];
+                                        if (!top.Admin.Account.isSupperAdmin) {
+                                            layui.each(r.data, function (k, v) {
+                                                v.disabled = true;
+                                            });
+                                        }
+                                        layui.xmSelect.render({
+                                            el: "#roles",
+                                            name: "user[roles]",
+                                            initValue: initValue,
+                                            data: r.data,
+                                            layVerify: "required",
+                                            layReqText: "请至少分配一个角色！",
+                                            tree: {show: true, expandedKeys: true, strict: false},
+                                            toolbar: {show: true, list: ["ALL","CLEAR","REVERSE"]},
+                                        })
+                                        if (r.code) {
+                                            layui.popup.failure(r.msg);
+                                        }
+                                    }
+                                });
+                            }
+
+                            if(name=='atta'){
+                                form.val("attainfo",flattenObject({atta:res.atta}));
+                                //附件 ftp 控件
+                                if(res.atta.storage_type=='0'){
+                                    $(".defaul_type").css('display','none'); 
+                                    $(".defaul_type input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                if(res.atta.storage_type=='1'){
+                                    $(".defaul_type").css('display','none'); 
+                                    $(".defaul_type input").removeAttr("required").removeAttr("lay-verify");
+                                    $(".ftp_type").css('display','block');
+                                    $(".ftp_type input").attr("required", "required").attr("lay-verify", "required");
+                                }
+
+                                if(res.atta.storage_type=='2'){
+                                    $(".defaul_type").css('display','none'); 
+                                    $(".defaul_type input").removeAttr("required").removeAttr("lay-verify");
+                                    $(".qiniu_type").css('display','block');
+                                    $(".qiniu_type input").attr("required", "required").attr("lay-verify", "required");
+                                }
+
+                                if(res.atta.storage_type=='3'){
+                                    $(".defaul_type").css('display','none'); 
+                                    $(".defaul_type input").removeAttr("required").removeAttr("lay-verify");
+                                    $(".aliyun_type").css('display','block');
+                                    $(".aliyun_type input").attr("required", "required").attr("lay-verify", "required");
+                                }
+
+                                if(res.atta.storage_type=='4'){
+                                    $(".defaul_type").css('display','none'); 
+                                    $(".defaul_type input").removeAttr("required").removeAttr("lay-verify");
+                                    $(".tencent_type").css('display','block');
+                                    $(".tencent_type input").attr("required", "required").attr("lay-verify", "required");
+                                }
+                                
+                                form.on('select(atta-storage_type)', function(data){
+                                    var value = data.value; // 获得被选中的值
+                                    if(value=='0'){
+                                        $(".defaul_type").css('display','none'); 
+                                        $(".defaul_type input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                    if(value=='1'){
+                                        $(".defaul_type").css('display','none'); 
+                                        $(".defaul_type input").removeAttr("required").removeAttr("lay-verify"); 
+                                        $(".ftp_type").css('display','block');
+                                        $(".ftp_type input").attr("required", "required").attr("lay-verify", "required");
+                                    }
+                                    if(value=='2'){
+                                        $(".defaul_type").css('display','none'); 
+                                        $(".defaul_type input").removeAttr("required").removeAttr("lay-verify"); 
+                                        $(".qiniu_type").css('display','block');
+                                        $(".qiniu_type input").attr("required", "required").attr("lay-verify", "required");
+                                    }
+                                    if(value=='3'){
+                                        $(".defaul_type").css('display','none'); 
+                                        $(".defaul_type input").removeAttr("required").removeAttr("lay-verify"); 
+                                        $(".aliyun_type").css('display','block');
+                                        $(".aliyun_type input").attr("required", "required").attr("lay-verify", "required");
+                                    }
+                                    if(value=='4'){
+                                        $(".defaul_type").css('display','none'); 
+                                        $(".defaul_type input").removeAttr("required").removeAttr("lay-verify"); 
+                                        $(".tencent_type").css('display','block');
+                                        $(".tencent_type input").attr("required", "required").attr("lay-verify", "required");
+                                    }
+                                });
+                            }
+
+                            if(name=='pic'){
+                                form.val("picinfo",flattenObject({pic:res.pic}));
+                                //附近 缩略图 控件
+                                if(res.pic.pic_thumb_type){
+                                    $(".pic_thumb_type").css('display','block');
+                                    $(".pic_thumb_type input").attr("required", "required").attr("lay-verify", "required");
+                                }else{
+                                    $(".pic_thumb_type").css('display','none');
+                                    $(".pic_thumb_type input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                form.on('switch(pic-pic_thumb_type)', function(data){
+                                    var elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                                    if(elem.checked){
+                                        $(".pic_thumb_type").css('display','block');
+                                        $(".pic_thumb_type input").attr("required", "required").attr("lay-verify", "required");
+                                    }else{
+                                        $(".pic_thumb_type").css('display','none');
+                                        $(".pic_thumb_type input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                });
+                                //附近 图片水印 控件
+                                if(res.pic.pic_mark_type){
+                                    $(".pic_mark_type").css('display','block');
+                                    $(".pic_mark_type input.ok_input").attr("required", "required").attr("lay-verify", "required");
+                                }else{
+                                    $(".pic_mark_type").css('display','none');
+                                    $(".pic_mark_type input.ok_input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                form.on('switch(pic-pic_mark_type)', function(data){
+                                    var elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                                    if(elem.checked){
+                                        $(".pic_mark_type").css('display','block');
+                                        $(".pic_mark_type input.ok_input").attr("required", "required").attr("lay-verify", "required");
+                                    }else{
+                                        $(".pic_mark_type").css('display','none');
+                                        $(".pic_mark_type input.ok_input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                });
+
+                                if(res.pic.pic_mark_style=='1'){
+                                    $(".pic_mark_style_1").css('display','block');
+                                    $(".pic_mark_style_0").css('display','none');
+                                }else{
+                                    $(".pic_mark_style_1").css('display','none');
+                                    $(".pic_mark_style_0").css('display','block');
+                                }
+                                form.on('radio(demo-radio-filter)', function(data){
+                                    var elem = data.elem; 
+                                    if(elem.value =='1'){
+                                        $(".pic_mark_style_1").css('display','block');
+                                        $(".pic_mark_style_0").css('display','none');
+                                    }else{
+                                        $(".pic_mark_style_1").css('display','none');
+                                        $(".pic_mark_style_0").css('display','block');
+                                    } 
+                                });
+ 
+
+                                let pic_thumb_img = layui.$("#pic_thumb_img").prev();
+                                pic_thumb_img.prev().attr("src", pic_thumb_img.val());
+
+                                layui.upload.render({
+                                    elem: "#pic_thumb_img",
+                                    url: "/app/webniu/web/upload/avatar?type=localupload",
+                                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                    field: "__file__",
+                                    done: function (rese) {
+                                        if (rese.code > 0) return layui.layer.msg(rese.msg);
+                                        this.item.prev().val(rese.data.url).prev().attr("src", rese.data.url);
+                                    }
+                                });
+                            }
+
+                            if(name=='menu,tab,theme'){
+                                form.val("menuinfo",flattenObject({menu:res.menu,tab:res.tab,theme:res.theme}));
+                            }
+                            
+                            if(name=='api'){
+                                form.val("apiinfo",flattenObject({api:res.api}));
+                                //接口 smtp 控件
+                                if(res.api.smtp.type){
+                                    $(".smtp_type").css('display','block');
+                                    $(".smtp_type input").attr("required", "required").attr("lay-verify", "required");
+                                    $(".smtp_type input[name='api[smtp][test]']").removeAttr("required").removeAttr("lay-verify");
+                                }else{
+                                    $(".smtp_type").css('display','none');
+                                    $(".smtp_type input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                form.on('switch(api-smtp_type)', function(data){
+                                    var elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                                    if(elem.checked){
+                                        $(".smtp_type").css('display','block');
+                                        $(".smtp_type input").attr("required", "required").attr("lay-verify", "required");
+                                        $(".smtp_type input[name='api[smtp][test]']").removeAttr("required").removeAttr("lay-verify");
+                                    }else{
+                                        $(".smtp_type").css('display','none');
+                                        $(".smtp_type input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                });
+                                //接口 社会化登录 控件
+                                if(res.api.login.type){
+                                    $(".open_login_type").css('display','block');
+                                    $(".open_login_type input").attr("required", "required").attr("lay-verify", "required");
+                                }else{
+                                    $(".open_login_type").css('display','none');
+                                    $(".open_login_type input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                form.on('switch(api-open_login_type)', function(data){
+                                    var elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                                    if(elem.checked){
+                                        $(".open_login_type").css('display','block');
+                                        $(".open_login_type input").attr("required", "required").attr("lay-verify", "required");
+                                    }else{
+                                        $(".open_login_type").css('display','none');
+                                        $(".open_login_type input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                });
+                                 
+                                //接口 短信 控件
+                                if(res.api.sms.type=='0' || res.api.sms.type==''){
+                                    $(".aliyun").css('display','none');
+                                    $(".aliyun input").removeAttr("required").removeAttr("lay-verify");
+                                    $(".qcloud").css('display','none'); 
+                                    $(".qcloud input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                if(res.api.sms.type=='aliyun'){
+                                    $(".aliyun").css('display','block');
+                                    $(".aliyun input").attr("required", "required").attr("lay-verify", "required");
+                                    $(".qcloud").css('display','none');
+                                    $(".qcloud input").removeAttr("required").removeAttr("lay-verify");
+                                }
+                                if(res.api.sms.type=='qcloud'){
+                                    $(".aliyun").css('display','none');
+                                    $(".aliyun input").removeAttr("required").removeAttr("lay-verify");
+
+                                    $(".qcloud").css('display','block');
+                                    $(".qcloud input").attr("required", "required").attr("lay-verify", "required");
+                                }
+
+                                form.on('select(api-sms_type)', function(data){
+                                    var value = data.value; // 获得被选中的值
+                                    if(value=='0'){
+                                        $(".aliyun").css('display','none');
+                                        $(".aliyun input").removeAttr("required").removeAttr("lay-verify");
+                                        $(".qcloud").css('display','none');
+                                        $(".qcloud input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                    if(value=='aliyun'){
+                                        $(".aliyun").css('display','block');
+                                        $(".aliyun input").attr("required", "required").attr("lay-verify", "required");
+
+                                        $(".qcloud").css('display','none');
+                                        $(".qcloud input").removeAttr("required").removeAttr("lay-verify");
+                                    }
+                                    if(value=='qcloud'){
+                                        $(".aliyun").css('display','none');
+                                        $(".aliyun input").removeAttr("required").removeAttr("lay-verify");
+
+                                        $(".qcloud").css('display','block');
+                                        $(".qcloud input").attr("required", "required").attr("lay-verify", "required");
+                                    }
+
+                                });
+                            };
+
+
+                            form.on("submit(save"+name+"info)", function(data){
+                                 
+                                delete data.field.__file__;
+                                let objects     = {};
+                                    objects     = data.field;
+                                    if(name=='core'){
+                                        if (!/^\/[a-zA-Z]+$/.test(data.field["core[entrance]"])) {
+                                            layui.popup.failure('必须以“/”开头,字母组合的字符串。');
+                                            $("input[name='core[entrance]']").focus();
+                                            return false; 
+                                        }
+                                    } 
+                                    console.log(objects);
+                                $.ajax({
+                                    url: "/app/webniu/web/config/update",
+                                    dataType: "json",
+                                    type: "POST",
+                                    data: objects,
+                                    success: function (res) {
+                                        if (res.code) {
+                                            return layui.popup.failure(res.msg);
+                                        }
+                                        return layui.popup.success("操作成功",function() { 
+                                            if(name=='core' && globalre.core.entrance!=data.field["core[entrance]"]){
+                                                if(data.field.entrance==''){ 
+                                                    window.top.location.href = "/app/webniu/web/";
+                                                }else{ 
+                                                    window.top.location.href = data.field["core[entrance]"];
+                                                }
+                                            }
+
+                                        });
+                                        
+                                    }
+                                }); 
+                                sessionStorage.clear();
+                                return false;
+                            });
+                             
+
+
+                        }
+                    });
+
+                }
+                //执行基础加载
+                read_get('base');
+                 
+                
+                //加载颜色选择器
+                colorpicker.render({
+                    elem: '#ID-colorpicker-demo-form',
+                    color: '#1c97f5',
+                    done: function(color){
+                        layui.$('#ID-colorpicker-demo-form-color').val(color);
+                    }
+                });
+
+                 
+                 
+                layui.$("#attachment-choose-image").on("click", function() {
+                    parent.layer.open({
+                        type: 2,
+                        title: "选择附件",
+                        content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                        area: ["75%", "70%"],
+                        success: function (layero, index) {
+                            parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                image.val(data.url).prev().attr("src", data.url);
+                            });
+                        }
+                    });
+                });
+                layui.upload.render({
+                    elem: "#image",
+                    url: "/app/webniu/web/upload/avatar",
+                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                    field: "__file__",
+                    done: function (res) {
+                        if (res.code > 0) return layui.layer.msg(res.msg);
+                        this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                    }
+                });
+
+
+                 
+
+                layui.$("#attachment-choose-background_image").on("click", function() {
+                    parent.layer.open({
+                        type: 2,
+                        title: "选择附件",
+                        content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                        area: ["75%", "70%"],
+                        success: function (layero, index) {
+                            parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                background_image.val(data.url).prev().attr("src", data.url);
+                            });
+                        }
+                    });
+                });
+                layui.upload.render({
+                    elem: "#background_image",
+                    url: "/app/webniu/web/upload/avatar",
+                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                    field: "__file__",
+                    done: function (res) {
+                        if (res.code > 0) return layui.layer.msg(res.msg);
+                        this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                    }
+                });
+
+                 
+                 
+
+                //生成一些字符串
+                function generateRandomString(length) {  
+                    var result = '';  
+                    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';  
+                    var charactersLength = characters.length;  
+                    for (var i = 0; i < length; i++) {  
+                        result += characters.charAt(Math.floor(Math.random() * charactersLength));  
+                    }  
+                    return result;  
+                }   
+
+                //递归函数 方法把json对象转换layui 赋值的格式；
+                function flattenObject(obj, prefix = '', result = {}) {
+                    for (const key in obj) {
+                        const newKey = prefix ? `${prefix}[${key}]` : key;
+                        if (typeof obj[key] === 'object' && obj[key] !== null) {
+                        flattenObject(obj[key], newKey, result);
+                        } else {
+                        result[newKey] = obj[key];
+                        }
+                    }
+                    return result;
+                }
+
+
+                
+            });
+
+            
+
+ 
+
+        </script>
+
+    </body>
+</html>
