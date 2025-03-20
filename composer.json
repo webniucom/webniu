@@ -4,6 +4,7 @@
   "license": "MIT",
   "description": "WEBNIU 网牛",
   "require": {
+    "php": ">=8.1",
     "workerman/webman-framework": ">=2.1",
     "webman/database": ">=2.1",
     "illuminate/pagination": ">=7.30",

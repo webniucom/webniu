@@ -18,6 +18,7 @@ class Install
      */
     public static function install()
     {
+        echo "webniu.com...";
         static::installByRelation();
     }
 
@@ -36,6 +37,8 @@ class Install
      */
     public static function installByRelation()
     {
+        echo "copy - webniu.com...
+        ";
         foreach (static::$pathRelation as $source => $dest) {
             if ($pos = strrpos($dest, '/')) {
                 $parent_dir = base_path().'/'.substr($dest, 0, $pos);
@@ -43,7 +46,6 @@ class Install
                     mkdir($parent_dir, 0777, true);
                 }
             }
-            //symlink(__DIR__ . "/$source", base_path()."/$dest");
             copy_dir(__DIR__ . "/$source", base_path()."/$dest");
             echo "Create $dest
 ";
