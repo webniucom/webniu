@@ -28,7 +28,7 @@
                     </div>
                     
                     <div class="layui-form-item">
-                        <label class="layui-form-label">权限</label>
+                        <label class="layui-form-label required">权限</label>
                         <div class="layui-input-block">
                             <div name="rules" id="rules" value="" ></div>
                         </div>
@@ -50,31 +50,92 @@
             </div>
             
         </form>
-
-        <script src="/app/webniu/component/layui/layui.js?v=2.8.12"></script>
+        <style>
+            xm-select .xm-body{
+                padding: 0;
+                border: none;
+                background-color: usnet;
+                box-shadow: none;
+            }
+        </style>
+        <script src="/app/webniu/component/layui/layui.js"></script>
         <script src="/app/webniu/component/pear/pear.js"></script>
         <script src="/app/webniu/admin/js/permission.js"></script>
         
         <script>
 
             // 相关接口
-            const INSERT_API = "/app/webniu/web/role/insert";
-            
+            const INSERT_API    = "/app/webniu/web/role/insert";
+            var varxmSelect;
+            var glid    = 1;
+            var ddSelect= [];
             // 字段 权限 rules
             layui.use(["jquery", "xmSelect", "popup"], function() {
+                 
+                 
                 layui.$.ajax({
                     url: "/app/webniu/web/role/rules?id=1",
                     dataType: "json",
                     success: function (res) {
-                        let value = layui.$("#rules").attr("value");
+                        ddSelect    = res.data;
+                        let value   = layui.$("#rules").attr("value");
                         let initValue = value ? value.split(",") : [];
-                        layui.xmSelect.render({
+                        let current = layui.xmSelect.render({
                             el: "#rules",
                             name: "rules",
                             initValue: initValue,
-                            data: res.data,
+                            data: ddSelect, 
                             tree: {"show":true,expandedKeys:initValue},
                             toolbar: {show:true,list:["ALL","CLEAR","REVERSE"]},
+                            content: "<div id='transfer'></div>",
+                            on: function(data){
+                                
+                            },
+                            show: function(data){
+                                parent.layer.open({
+                                    type: 1,
+                                    title:false,
+                                    offset: 'r',
+                                    anim: 'slideLeft', // 从右往左
+                                    area: ['320px', '100%'],
+                                    shade: 0.1,
+                                    closeBtn:0,
+                                    shadeClose: true,
+                                    id: 'ID-demo-layer-direction-r',
+                                    content: '<div id="rulesp" class="xm-select-demo-alert"></div>',
+                                    success: function(layero, index){
+                                        initValue       = current.getValue('value');
+                                        var height_dom  = parent.layui.$('#ID-demo-layer-direction-r').height()-37;
+                                        parent.document.getElementById('layui-layer' + index).getElementsByClassName('layui-layer-content')[0].style.overflow = 'unset';
+                                        varxmSelect = parent.layui.xmSelect.render({
+                                            el: '#rulesp',
+                                            name: "rulesp", 
+                                            initValue: initValue,
+                                            model: {
+                                                type: 'relative',
+                                            }, 
+                                            height:height_dom+'px',
+                                            style:{'overflow':'auto'},
+                                            data: ddSelect,
+                                            tree: {"show":true,expandedKeys:initValue},
+                                            toolbar: {show:true,list:["ALL","CLEAR","REVERSE"]}, 
+                                            on:function(arr){
+                                                if(arr.change.length){
+                                                    current.delete(arr.change);
+                                                }
+                                                if(arr.arr.length){
+                                                    current.append(arr.arr);
+                                                }
+                                                initValue = arr.arr;
+                                            }
+                                        });
+                                        
+                                    },
+                                    end: function(){
+                                        current.closed(); 
+                                    }
+                                });
+                            }
                         })
                     }
                 });
@@ -109,7 +170,7 @@
                                         if (res.code) {
                                             return layui.popup.failure(res.msg);
                                         }
-                                        layui.xmSelect.get('#rules')[0].update({data:res.data});
+                                        ddSelect    = res.data; 
                                     }
                                 });
                             }

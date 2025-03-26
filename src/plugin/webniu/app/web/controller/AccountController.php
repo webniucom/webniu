@@ -5,6 +5,8 @@ namespace plugin\webniu\app\web\controller;
 use plugin\webniu\app\common\Auth;
 use plugin\webniu\app\common\Util;
 use plugin\webniu\app\model\Admin;
+use plugin\webniu\app\model\AdminRole;
+use plugin\webniu\api\Captcha;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
@@ -21,7 +23,7 @@ class AccountController extends Crud
      * 不需要登录的方法
      * @var string[]
      */
-    protected $noNeedLogin = ['login', 'logout', 'captcha'];
+    protected $noNeedLogin = ['login', 'logout', 'captcha','register'];
 
     /**
      * 不需要鉴权的方法
@@ -61,11 +63,18 @@ class AccountController extends Crud
     public function login(Request $request): Response
     {
         $this->checkDatabaseAvailable();
-        $captcha = $request->post('captcha', '');
-        if (strtolower($captcha) !== session('captcha-login')) {
-            return $this->json(1, '验证码错误');
+        $config = options(['user']);
+        if ($config['user']['m_image_verify']) {
+            $captcha    = $request->post('captcha', '');
+            try {
+                Captcha::verify(null,strtolower($captcha),session('captcha-image-login'));
+            } catch (BusinessException $exception) {
+                return json(['code' => 1, 'msg' => '图形验证码错误', 'data' => [
+                    'field' => 'captcha'
+                ]]);
+            }
+            $request->session()->forget('captcha-image-login');
         }
-        $request->session()->forget('captcha-login');
         $username = $request->post('username', '');
         $password = $request->post('password', '');
         if (!$username) {
@@ -126,6 +135,62 @@ class AccountController extends Crud
             'token' => $request->sessionId(),
         ];
         return $this->json(0, 'ok', $info);
+    }
+
+    /**
+     * 后台注册
+     * @param Request $request
+     * @return Response
+     */
+    public function register(Request $request): Response
+    {
+        if ($request->method() === 'POST') {
+            $config     = options(['user']); 
+            if(!$config['user']['managereg']){
+                return $this->json(1, '未开启注册功能！');
+            }
+            // 图形验证码验证
+            $captcha    = $request->post('captcha','');
+            try {
+                Captcha::verify(null,strtolower($captcha),session('captcha-image-login'));
+            } catch (BusinessException $exception) {
+                return json(['code' => 1, 'msg' => '图形验证码错误', 'data' => [
+                    'field' => 'image_code'
+                ]]);
+            }
+            $request->session()->forget('captcha-image-login');
+            // 手机验证
+            if ($config['user']['m_phone_verify']) {
+                $mobile     = $request->post('mobile');
+                $mobileCode = $request->post('mobile_code');
+                $mobileCode = $config['user']['m_phone_verify'] ? $mobileCode : false;
+                Captcha::validate('mobile',$mobile, $mobileCode, session("captcha-mobile-register"));
+                $request->session()->forget('captcha-mobile-register');
+            }
+
+            $data       = $this->insertInput($request); 
+            $where[]    = ['username', '=', $data['username']];
+            $where[]    = ['mobile',   '=', $data['mobile']];
+
+            if ($this->model->orWhere($where)->first()) {
+                return $this->json(1, '该用户名或手机号已被注册！'); 
+            }
+
+            $admin_id   = $this->doInsert($data); 
+            $role_ids   = $config['user']['roles'];
+            $role_ids   = $role_ids ? explode(',', $role_ids) : [];
+            if (!$role_ids) {
+                return $this->json(1, '至少选择一个角色组');
+            }
+            AdminRole::where('admin_id', $admin_id)->delete();
+            foreach ($role_ids as $id) {
+                $admin_role = new AdminRole;
+                $admin_role->admin_id   = $admin_id;
+                $admin_role->role_id    = $id;
+                $admin_role->save();
+            }
+            return $this->json(0, 'ok', ['id'=>$admin_id,'username'=>$data['username']]);
+        }
     }
 
     /**

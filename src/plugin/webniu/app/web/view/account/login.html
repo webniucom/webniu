@@ -30,33 +30,82 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> 
         <div class="layui-col-xs12 layui-col-md8 grid-login-div">
-
-            <form class="layui-form">
+            <div class="mini-login-bg layui-hide-md" style="background-image: url({$data.user.background_image});"></div>
+           
+            <div class="layui-form-div">
                 <div class="layui-form-item login-title">
                     <img class="logo" src="{$data.base.image}" />
                     <div class="title pear-text">{$data.base.title}</div>
                 </div>
-                <div class="layui-form-item">
-                    <input lay-verify="required" hover class="layui-input" type="text" name="username" value=""
-                        placeholder="用户名" />
+                <div class="layui-login">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <input lay-verify="required" hover class="layui-input" type="text" name="username" value="" lay-reqtext="请填写用户名" placeholder="用户名" />
+                        </div>
+                        <div class="layui-form-item">
+                            <input lay-verify="required|pass" hover class="layui-input" type="password" name="password" value="" lay-reqtext="请填写密码" placeholder="密码" />
+                        </div>
+                        {if $data.user.m_image_verify}
+                        <div class="layui-form-item">
+                            <input hover lay-verify="required" class="code layui-input layui-input-inline" name="captcha" placeholder="验证码" lay-reqtext="请填写验证码"/>
+                            <img class="codeImage" width="120px" />
+                        </div>
+                        {/if}
+                        <div class="layui-form-item">
+                            <button type="submit" class="pear-btn pear-btn-primary login" lay-submit lay-filter="login">
+                                登 入
+                            </button>
+                        </div>
+                        <div class="layui-form-item login-box-register-link">
+                            {if $data.user.managereg}
+                            <a href="JavaScript:;" lay-on="register">注册账户</a>
+                            {/if}
+                        </div>
+                    </form>
                 </div>
-                <div class="layui-form-item">
-                    <input lay-verify="required" hover class="layui-input" type="password" name="password" value=""
-                        placeholder="密码" />
+                <div class="layui-register layui-hide">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <input lay-verify="required|username" hover class="layui-input" type="text" name="username" value="" placeholder="用户名" lay-reqtext="请填写用户名" />
+                        </div>
+                        <div class="layui-form-item">
+                            <input lay-verify="required|pass" hover class="layui-input" type="password" name="password" value="" placeholder="密码" lay-reqtext="请填写密码" />
+                        </div>
+                        <div class="layui-form-item">
+                            <input lay-verify="required|pass" hover class="layui-input" type="password" name="password" value="" placeholder="重复密码" lay-reqtext="请填写重复密码" />
+                        </div>
+                        <div class="layui-form-item">
+                            <input lay-verify="required|phone" hover class="layui-input" type="tel" name="mobile" value="" placeholder="手机号" lay-reqtext="请填写手机号" />
+                        </div>
+                        {if $data.user.m_phone_verify=='1'} 
+                        <div class="layui-form-item">
+                            <input lay-verify="required" lay-reqtext="请输入短信码" hover class="layui-input layui-input-inline" style="display: inline-block;" type="text" name="mobile_code" value="" placeholder="短信码" />
+                            <div class="layui-btn fluid layui-bg-blue" lay-on="register-smscode">获取短信</div>
+                        </div> 
+                        {/if}
+                        <div class="layui-form-item">
+                            <input lay-verify="required" hover class="layui-input" type="text" name="nickname" value="" placeholder="昵称" lay-reqtext="请填写昵称" />
+                        </div>
+                         
+                        <div class="layui-form-item">
+                            <input hover lay-verify="required" class="code layui-input layui-input-inline" name="captcha" placeholder="验证码" lay-reqtext="请填写验证码" />
+                            <img class="codeImage" width="120px" />
+                        </div>
+                        <div class="layui-form-item">
+                            <button type="submit" class="pear-btn pear-btn-primary" lay-submit lay-filter="register">
+                                注 册
+                            </button>
+                        </div>
+                        <div class="layui-form-item login-box-register-link">
+                            <a href="JavaScript:;" lay-on="login">点击登录</a>
+                        </div>
+                    </form>
                 </div>
-                <div class="layui-form-item">
-                    <input hover lay-verify="required" class="code layui-input layui-input-inline" name="captcha"
-                        placeholder="验证码" />
-                    <img class="codeImage" width="120px" />
-                </div>
-                <div class="layui-form-item">
-                    <button type="submit" class="pear-btn pear-btn-primary login" lay-submit lay-filter="login">
-                        登 入
-                    </button>
-                </div>
-            </form>
+ 
+                 
+            </div>
 
         </div>
     </div>
@@ -71,17 +120,100 @@
         }
     </script>
     <!-- 资 源 引 入 -->
-    <script src="/app/webniu/component/layui/layui.js?v=2.8.12"></script>
-    <script>
-        var jQuery = layui.$;
-    </script>
+    <script src="/app/webniu/component/layui/layui.js"></script>
     <script src="/app/webniu/component/pear/pear.js"></script>
     <script>
-        layui.use(['form', 'button', 'popup', 'layer', 'theme', 'admin'], function () {
+        layui.use(['form', 'button', 'popup', 'layer', 'theme', 'admin','toast'], function () {
 
-            var $ = layui.$, layer = layui.layer, form = layui.form;
+            var $       = layui.$, layer = layui.layer, form = layui.form;
+            var util    = layui.util;
+            var toast   = layui.toast;
             function switchCaptcha() {
-                $('.codeImage').attr("src", "/app/webniu/web/account/captcha/login?v=" + new Date().getTime());
+                var captcha = $('input[name="captcha"]');
+                captcha.val('');
+                $('.codeImage').attr("src", "/app/webniu/web/captcha/image/login?v=" + new Date().getTime());
+            }
+             
+            util.on('lay-on', {
+                register: function(){
+                    $(".layui-login").addClass("layui-hide");
+                    $(".layui-register").removeClass("layui-hide");
+                },
+                login: function(){
+                    $(".layui-login").removeClass("layui-hide");
+                    $(".layui-retrieve").addClass("layui-hide");
+                    $(".layui-register").addClass("layui-hide");
+                },
+                'register-smscode':function(){
+                    let mobile = $('input[name="mobile"]').val();
+                    if(isPhoneNumberValid(mobile)){
+                        layer.load();
+                        $.ajax({
+                            url: '/app/webniu/web/captcha/mobile/register',
+                            type: "POST",
+                            data: {'mobile':mobile},
+                            success: function (res) {
+                                layer.closeAll('loading');
+                                if (!res.code) {
+                                    layui.popup.success('短信发送成功', function () {
+                                        var now = new Date(); // 获取当前时间
+                                        now.setSeconds(now.getSeconds() +60);
+                                        var timestamp = now.getTime();
+                                        var newdate = util.toDateString(timestamp,'yyyy-MM-dd HH:mm:ss');
+                                    
+                                        var countdown = util.countdown({
+                                            date:newdate, // 目标时间值
+                                            now: new Date(), // 当前时间，一般为服务器时间，此处以本地时间为例
+                                            ready: function(){ // 初始操作
+                                                clearTimeout(util.countdown.timer);
+                                            },
+                                            clock: function(obj, inst){  // 计时中
+                                                var str = [obj.s,'秒'].join(' ');
+                                                lay('button.fluid').html(str);
+                                                lay('button.fluid').addClass('layui-btn-disabled');
+                                                lay('button.fluid').removeClass('pear-btn-primary');
+                                                $('button.fluid').prop("disabled", true);
+                                                $('input[name="mobile"]').prop("readonly", true);
+
+                                                util.countdown.timer = inst.timer;
+                                            },
+                                            done: function(obj, inst){ 
+                                                $('input[name="mobile"]').prop("readonly", false);
+                                                lay('button.fluid').html('获取短信码');
+                                                lay('button.fluid').removeClass('layui-btn-disabled');
+                                                lay('button.fluid').addClass('pear-btn-primary');
+                                                $('button.fluid').prop("disabled", false);
+                                            }
+                                        });
+                                    })
+                                } else {
+                                    layui.popup.failure(res.msg)
+                                }
+                            }
+                        });
+
+
+                    }else{
+                        layui.popup.failure('请输入正确的手机号！');
+                    }
+
+                }
+            });
+            form.verify({
+                pass: function(value) {
+                    if (!/(.+){5,32}$/.test(value)) {
+                        return '密码必须 5 到 32 位';
+                    }
+                },
+                username: function(value) {
+                    if (!/(.+){5,32}$/.test(value)) {
+                        return '账户必须 5 到 32 位';
+                    }
+                }
+            });
+            function isPhoneNumberValid(phoneNumber) {
+                const regExp = /^1[3-9]\d{9}$/;
+                return regExp.test(phoneNumber);
             }
             switchCaptcha();
             // 登 录 提 交
@@ -94,17 +226,45 @@
                     success: function (res) {
                         layer.closeAll('loading');
                         if (!res.code) {
-                            layui.popup.success('登录成功', function () {
+                            toast.success({message:'登录成功',position: 'topCenter',onOpened:function(){
                                 location.reload();
-                            })
+                            }});
                         } else {
-                            layui.popup.failure(res.msg)
-                            switchCaptcha();
+                            toast.error({message:res.msg,position: 'topCenter',onOpened:function(){
+                                switchCaptcha();
+                            }}); 
                         }
                     }
                 });
                 return false;
             });
+            // 注 册 提 交
+            form.on('submit(register)', function (data) {
+                layer.load(); 
+                $.ajax({
+                    url: '/app/webniu/web/account/register',
+                    type: "POST",
+                    data: data.field,
+                    success: function (res) {
+                        layer.closeAll('loading');
+                        if (!res.code) {
+                            toast.success({message:'注册成功',position: 'topCenter',onOpened:function(){
+                                $(".layui-register input").val("");
+                                $(".layui-login").removeClass("layui-hide");
+                                $(".layui-register").addClass("layui-hide");
+                                $("input[name='username']").val(res.data.username);
+                                switchCaptcha();
+                            }});
+                        } else {
+                            toast.error({message:res.msg,position: 'topCenter',onOpened:function(){
+                                switchCaptcha();
+                            }});
+                        }
+                    }
+                });
+                return false;
+            });
+             
 
             $('.codeImage').on('click', function () {
                 switchCaptcha();

@@ -106,6 +106,31 @@
 
                         <form class="layui-form" lay-filter="userinfo">
                             <fieldset class="layui-elem-field layui-field-title">
+                                <legend>后端登录配置</legend>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图形验证</label>
+                                <div class="layui-input-inline layui-input-wrap" style="width:auto;">
+                                    <input type="checkbox" name="user[m_image_verify]" id="m_image_verify" title="开启|关闭" value="on" lay-skin="switch" />
+                                </div>
+                                <div class="layui-form-mid layui-text-em">
+                                    <i class="layui-icon layui-icon-tips" lay-tips="后台登录图形验证"></i>
+                                </div>
+                            </div>
+                            <div class="layui-form-item img_layui-form-item">
+                                <label class="layui-form-label">登录页封面</label>
+                                <div class="layui-input-inline layui-input-wrap">
+                                    <img class="img-3" src=""/>
+                                    <input type="text" style="display:none" name="user[background_image]" value="" />
+                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="background_image" permission="app.webniu.upload.image">
+                                        <i class="layui-icon layui-icon-upload"></i>上传图片
+                                    </button>
+                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-background_image" permission="app.webniu.upload.attachment">
+                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
+                                    </button>
+                                </div>
+                            </div>
+                            <fieldset class="layui-elem-field layui-field-title">
                                 <legend>后端注册配置</legend>
                             </fieldset>
                             <div class="layui-form-item">
@@ -128,15 +153,6 @@
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">图形验证</label>
-                                    <div class="layui-input-inline layui-input-wrap" style="width:auto;">
-                                        <input type="checkbox" name="user[m_image_verify]" id="m_image_verify" title="开启|关闭" value="on" lay-skin="switch" />
-                                    </div>
-                                    <div class="layui-form-mid layui-text-em">
-                                        <i class="layui-icon layui-icon-tips" lay-tips="后台登录图形验证"></i>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
                                     <label class="layui-form-label">手机验证</label>
                                     <div class="layui-input-inline layui-input-wrap" style="width:auto;">
                                         <input type="checkbox" name="user[m_phone_verify]" id="m_phone_verify" title="开启|关闭" value="on" lay-skin="switch" />
@@ -148,19 +164,7 @@
 
                                 
                             </div>
-                            <div class="layui-form-item img_layui-form-item">
-                                <label class="layui-form-label">登录页封面</label>
-                                <div class="layui-input-inline layui-input-wrap">
-                                    <img class="img-3" src=""/>
-                                    <input type="text" style="display:none" name="user[background_image]" value="" />
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="background_image" permission="app.webniu.upload.image">
-                                        <i class="layui-icon layui-icon-upload"></i>上传图片
-                                    </button>
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-background_image" permission="app.webniu.upload.attachment">
-                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
-                                    </button>
-                                </div>
-                            </div>
+                             
                             
 
 
@@ -1248,6 +1252,7 @@
                             }
 
                             if(name=='user'){
+                                let user_roles;
                                 form.val("userinfo",flattenObject({user:res.user})); 
                                 background_image.val(res.user.background_image).prev().attr("src", res.user.background_image);
                                 //账户设置 后台开放注册控件
@@ -1261,9 +1266,15 @@
                                 form.on('switch(user-managereg)', function(data){
                                     var elem = data.elem; // 获得 checkbox 原始 DOM 对象
                                     if(elem.checked){
+                                        user_roles.update({
+                                            layVerify:"required"
+                                        });
                                         $(".managereg").css('display','block');
                                         $(".managereg input.ok_input").attr("required", "required").attr("lay-verify", "required");
                                     }else{
+                                        user_roles.update({
+                                            layVerify:""
+                                        });
                                         $(".managereg").css('display','none');
                                         $(".managereg input.ok_input").removeAttr("required").removeAttr("lay-verify");
                                     }
@@ -1280,12 +1291,11 @@
                                                 v.disabled = true;
                                             });
                                         }
-                                        layui.xmSelect.render({
+                                        user_roles = layui.xmSelect.render({
                                             el: "#roles",
                                             name: "user[roles]",
                                             initValue: initValue,
                                             data: r.data,
-                                            layVerify: "required",
                                             layReqText: "请至少分配一个角色！",
                                             tree: {show: true, expandedKeys: true, strict: false},
                                             toolbar: {show: true, list: ["ALL","CLEAR","REVERSE"]},
@@ -1542,8 +1552,7 @@
                                             $("input[name='core[entrance]']").focus();
                                             return false; 
                                         }
-                                    } 
-                                    console.log(objects);
+                                    }  
                                 $.ajax({
                                     url: "/app/webniu/web/config/update",
                                     dataType: "json",

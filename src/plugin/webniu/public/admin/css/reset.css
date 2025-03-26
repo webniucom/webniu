@@ -244,3 +244,41 @@ a {
 .layui-card-body .layui-table-view{
     margin-top:0px;
 }
+.img_list_div ul li{
+    float: left;
+    width: 48px;
+    height: 48px;
+    position: relative;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+}
+.img_list_div ul li img{
+    width: 100%;
+    height: 100%;
+}
+.img_list_div ul li i{
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: aliceblue;
+}
+.img_control ul li{
+    float: left;
+    width: 48px;
+    height: 48px;
+    position: relative;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    text-align: center;
+    line-height: 48px;
+    color: #ccc;
+    cursor: pointer;
+}
+ 
+.img_control ul li i{
+    width: 100%;
+    height: 100%;
+    font-size: 30px;
+    cursor: pointer;
+}

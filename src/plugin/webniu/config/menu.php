@@ -167,14 +167,6 @@ return [
         'type'  => 0,
         'children' => [
             [
-                'title' => '应用商城',
-                'key' => 'appstore',
-                'icon' => 'layui-icon-auz',
-                'href' => '//mp.webniu.com/appstore',
-                'type' => 1,
-                'weight' => 888,
-            ],
-            [
                 'title' => '应用管理',
                 'key'   => 'appmanage',
                 'type' => 0,

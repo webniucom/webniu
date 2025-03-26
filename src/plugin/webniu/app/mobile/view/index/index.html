@@ -1,117 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-cn">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Demo</title>
-    <!-- 请勿在项目正式环境中引用该 layui.css 地址 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>index</title>
+    <!-- 样 式 文 件 -->
     <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-    <link rel="stylesheet" href="/app/webniu/muiplayer/release/mui-player/dist/mui-player.min.css">
-    
-    <script src="/app/webniu/muiplayer/release/mui-player/dist/mui-player.min.js"></script> 
+    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
 </head>
+<!-- 代 码 结 构 -->
 
-<body>
-    <div class="layui-timeline" style="padding:20px;">
-        <div class="layui-timeline-item">
-            <i class="layui-icon layui-timeline-axis"></i>
-            <div class="layui-timeline-content layui-text">
-                <h3 class="layui-timeline-title">8月18日</h3>
-                <p>
-                    多年前，Layui 2.0 的发布前夜，记录着这样的一段心理活动。
-                    <br>这是一个怎样的版本？它将受众如何？
-                    <br>又是谁在指引着我去创作，是基于成就感的驱动，还是试图建立我与客观世界的某种沟通 <i class="layui-icon"></i>
-                </p>
-            </div>
-        </div>
-        <div class="layui-timeline-item">
-            <i class="layui-icon layui-timeline-axis"></i>
-            <div class="layui-timeline-content layui-text">
-                <h3 class="layui-timeline-title">8月16日</h3>
-                <p>Layui 使用率最高的组件有</p>
-                <ul>
-                    <li>layer</li>
-                    <li>table</li>
-                    <li>form</li>
-                </ul>
-            </div>
-        </div>
-        <div class="layui-timeline-item">
-            <i class="layui-icon layui-timeline-axis"></i>
-            <div class="layui-timeline-content layui-text">
-                <h3 class="layui-timeline-title">8月16日</h3>
-                <div id="mui-player" style="max-width: 700px;margin: auto"></div>
-            </div>
-        </div>
-        <div class="layui-timeline-item">
-            <i class="layui-icon layui-timeline-axis"></i>
-            <div class="layui-timeline-content layui-text">
-                <h3 class="layui-timeline-title">8月15日</h3>
-                <p>
-                    这片广袤的土地孕育了璀璨的华夏文化，和我们这个饱受沧桑的民族。
-                    <br>勤劳、淳朴、善良而又充满智慧的国人，一代又一代人的艰苦奋斗，古老的文明重新焕发出光彩。
-                </p>
-            </div>
-        </div>
-        <div class="layui-timeline-item">
-            <i class="layui-icon layui-timeline-axis"></i>
-            <div class="layui-timeline-content layui-text">
-                <h3 class="layui-timeline-title">8月16日</h3>
-                <div id="mui-player1" style="max-width: 700px;margin: auto"></div>
-            </div>
-        </div>
-        <div class="layui-timeline-item">
-            <i class="layui-icon layui-timeline-axis"></i>
-            <div class="layui-timeline-content layui-text">
-                <div class="layui-timeline-title">过去</div>
-            </div>
-        </div>
-    </div>
-    <script>
-        
-        var mp = new MuiPlayer({
-            container:'#mui-player',
-            title:'Your Title',
-            src:'http://ww.webniu.com/app/webniu/a9512c2f2795cc0fbb86cce1f6eed947.mp4',
-            poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
-            videoAttribute:[
-                {attrKey:'webkit-playsinline',attrValue:''},
-                {attrKey:'playsinline',attrValue:''},
-                {attrKey:'x5-playsinline',attrValue:''},
-                {attrKey:'t7-video-player-type',attrValue:'inline'},
-                {attrKey:'x5-video-player-type',attrValue:'h5-page'},
-                {attrKey:'x-webkit-airplay',attrValue:'allow'},
-                {attrKey:'controlslist',attrValue:'nodownload'},
-            ],
-        });
-        new MuiPlayer({
-            container:'#mui-player1',
-            title:'Your Title',
-            src:'http://ww.webniu.com/app/webniu/media.mp4',
-            poster:'https://muiplayer.oss-cn-shanghai.aliyuncs.com/static/image/poster.jpg',
-            videoAttribute:[
-                {attrKey:'webkit-playsinline',attrValue:''},
-                {attrKey:'playsinline',attrValue:''},
-                {attrKey:'x5-playsinline',attrValue:''},
-                {attrKey:'t7-video-player-type',attrValue:'inline'},
-                {attrKey:'x5-video-player-type',attrValue:'h5-page'},
-                {attrKey:'x-webkit-airplay',attrValue:'allow'},
-                {attrKey:'controlslist',attrValue:'nodownload'},
-            ],
-        });
-         
-    </script>
+<body class="pear-container">
+    <blockquote class="layui-elem-quote">
+        <h2>欢迎使用 webniu 网牛后台管理系统</h2>
+        <p>前端基于 Layui 开发，请参考 <a href="https://layui.dev/" target="_blank" >https://layui.dev/</a></p>
+    </blockquote>
  
-    <!-- HTML Content -->
+    <!-- 资 源 引 入 -->
     <script src="/app/webniu/component/layui/layui.js"></script>
+    <script src="/app/webniu/component/pear/pear.js"></script>
+     
     <script>
-        // Usage
-        layui.use(function () {
-            var layer = layui.layer;
+        layui.use(['form'], function () {
+            let $       = layui.$;
+            var layer   = layui.layer;
             // Welcome
-            layer.msg('Hello World', { icon: 6 });
-        });
+            layer.msg('Hello Webniu', {icon: 6});
+             
+ 
+        })
     </script>
 </body>
 

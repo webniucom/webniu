@@ -13,11 +13,11 @@
         "entrance": "/webniu"
     },
     "user": {
-        "managereg": true,
+        "managereg": false,
         "background_image": "/app/webniu/admin/images/auth_banner.jpg",
         "roles": "3,5",
         "m_phone_verify": false,
-        "userreg": true,
+        "userreg": false,
         "u_phone_verify": false,
         "u_email_verify": false,
         "m_image_verify": true,
@@ -99,7 +99,7 @@
     },
     "theme": {
         "defaultColor": "2",
-        "defaultMenu": "dark-theme",
+        "defaultMenu": "light-theme",
         "defaultHeader": "light-theme",
         "defaultAside": "double-theme",
         "allowCustom": true,

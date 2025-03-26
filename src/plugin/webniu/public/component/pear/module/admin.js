@@ -214,9 +214,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 					if (option.theme.allowCustom === false) {
 						aside = option.theme.defaultAside;
 					}
-				}
-				console.log(option);
-				console.log(aside);
+				} 
 				var banner = localStorage.getItem("theme-banner");
 				if (banner === null) {
 					banner = option.theme.banner;
@@ -465,8 +463,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				//webniu-xhl 2025年3月10日13:51:13 修改
 				if(aside=='double-theme'){
 					$(".pear-admin .layui-side").addClass("double-theme")
-				}
-				console.log('aaa');
+				} 
 				left.addClass("layui-icon-shrink-right")
 				left.removeClass("layui-icon-spread-left")
 				admin.removeClass("pear-mini");
