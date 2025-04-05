@@ -45,6 +45,39 @@ http://ip地址:8787/webniu
 2. 第二步会检查目录权限，可以忽略跳过不影响安装；
 3. 如需重新安装可删除config/database.php、thinkorm.php文件，然后重新安装；
 ```
+## 绑定域名访问
+```
+绑定域名后，需要在配置文件中设置伪静态参数：
+```
+```
+# 将请求转发到webman
+  location ^~ / {
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Forwarded-For $remote_addr;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      if (!-f $request_filename){
+          proxy_pass http://127.0.0.1:8787;
+      }
+  }
+
+  # 拒绝访问所有以 .php 结尾的文件
+  location ~ \.php$ {
+      return 404;
+  }
+
+  # 允许访问 .well-known 目录
+  location ~ ^/\.well-known/ {
+    allow all;
+  }
+
+  # 拒绝访问所有以 . 开头的文件或目录
+  location ~ /\. {
+      return 404;
+  }
+```
 ## 使用文档
 ```
 https://help.webniu.com 制作中未上线
