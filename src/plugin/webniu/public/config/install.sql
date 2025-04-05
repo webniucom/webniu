@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__email_temp`(
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='email模板';
 
-CREATE TABLE `__PREFIX__plugin` (
+CREATE TABLE IF NOT EXISTS `__PREFIX__plugin`(
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `plugin_type` varchar(32) DEFAULT NULL COMMENT '类型',
   `plugin_class` int(3) DEFAULT NULL COMMENT '分类id',
@@ -204,4 +204,8 @@ UNLOCK TABLES;
 
 LOCK TABLES `__PREFIX__article_category` WRITE;
 INSERT INTO `__PREFIX__article_category` VALUES (NULL,'系统公告');
+UNLOCK TABLES;
+
+LOCK TABLES `__PREFIX__plugin` WRITE;
+INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu','1','网牛引擎','网牛引擎','webniu','webniu','/app/webniu/avatar.png','','/app/webniu/web/index/dashboard','0','1.0.2','1','','0','1.0.2','1988-06-15 23:59:59', '1988-06-15 23:59:59');
 UNLOCK TABLES;
