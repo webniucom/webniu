@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <title>应用插件</title>
+    <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+</head>
+
+<body class="pear-container">
+
+    <!-- 顶部查询表单 -->
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form top-search-from">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">类型</label>
+                    <div class="layui-input-block">
+                        <div name="plugin_type" id="plugin_type" value=""></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类</label>
+                    <div class="layui-input-block">
+                        <div name="plugin_class" id="plugin_class" value=""></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-block">
+                        <input type="hidden" name="plugin_name[]" value="like" class="layui-input">
+                        <input type="text" name="plugin_name[]" value="" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label"></label>
+                    <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="table-query">
+                        <i class="layui-icon layui-icon-search"></i>查询
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md" lay-submit lay-filter="table-reset">
+                        <i class="layui-icon layui-icon-refresh"></i>重置
+                    </button>
+                </div>
+                <div class="toggle-btn">
+                    <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
+                    <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 数据表格 -->
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table id="data-table" lay-filter="data-table"></table>
+        </div>
+    </div>
+    <style>
+        .images-container{
+            max-width:32px;
+            max-height: 32px;
+            background-color: #ffffff;
+            position: absolute;
+            margin: 4px 0px 0px -8%;
+        } 
+        .pointer_style{
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+
+
+    <script src="/app/webniu/component/layui/layui.js"></script>
+    <script src="/app/webniu/component/pear/pear.js"></script>
+    <script src="/app/webniu/admin/js/permission.js"></script>
+    <script src="/app/webniu/admin/js/common.js"></script>
+    <script>
+
+        // 相关常量
+        const PRIMARY_KEY   = "id";
+        const SELECT_API    = "/app/webniu/web/plugin/select"; 
+        const UNINSTALL_API = "/app/webniu/web/plugin/uninstall";
+        const INSTALL_URL   = "/app/webniu/web/plugin/install";
+        const UPDATE_URL    = "/app/webniu/web/plugin/update";
+        var apiResults      = {};
+
+
+
+        // 表格渲染
+        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery"], function () {
+            let table       = layui.table;
+            let layer       = layui.layer;
+            let form        = layui.form;
+            let $           = layui.$;
+            let common      = layui.common;
+            let util        = layui.util;
+            var drawer      = layui.drawer;
+            var updatedate  = {};
+            var colsone     = {
+                title: "图标",
+                field: "plugin_logo",
+                align: "center",
+                templet: function (d) {
+                    let field = "plugin_logo";
+                    if (typeof d[field] == "undefined") return "";
+                    let items = [];
+                    let html = '';
+                    layui.each((d[field] + "").split(","), function (k, v) {
+                        html += '<img src="' + encodeURI(v) + '" class="images-container" alt="" />';
+                    });
+                    return html;
+                }
+            };
+            layui.$.ajax({
+                url: "/app/webniu/web/plugin/typeclass",
+                dataType: "json",
+                success: function (res) {
+                    if (res.code) {
+                        layui.popup.failure(res.msg);
+                    }
+                    layui.xmSelect.render({
+                        el: "#plugin_type",
+                        name: "plugin_type",
+                        initValue: [],
+                        data: res.data.plugin_type,
+                        model: { "icon": "hidden", "label": { "type": "text" } },
+                        clickClose: true,
+                        radio: true,
+                    });
+                    layui.xmSelect.render({
+                        el: "#plugin_class",
+                        name: "plugin_class",
+                        initValue: [],
+                        data: res.data.plugin_class,
+                        model: { "icon": "hidden", "label": { "type": "text" } },
+                        clickClose: true,
+                        radio: true,
+                    });
+                    apiResults["plugin_type"] = res.data.plugin_type ?? [];
+                    apiResults["plugin_class"] = res.data.plugin_class ?? [];
+                    render();
+
+                }
+            });
+            // 表头参数
+            let cols = [
+                colsone,{
+                    title: "名称",
+                    field: "plugin_name",
+                }, {
+                    title: "类别",
+                    field: "plugin_type",
+                    templet: function (d) {
+                        let field = "plugin_type";
+                        if (typeof d[field] == "undefined") return "";
+                        let value = d[field];
+                        let found = $.map(apiResults[field], function (item) {
+                            if (item.value === value) {
+                                return item.name;
+                            }
+                        });
+                        return found;
+                    }
+                }, {
+                    title: "分类",
+                    field: "plugin_class",
+                    templet: function (d) {
+                        let field = "plugin_class";
+                        if (typeof d[field] == "undefined") return "";
+                        let value = d[field];
+                        let found = $.map(apiResults[field], function (item) {
+                            if (item.value == value) {
+                                return item.name;
+                            }
+                        });
+                        return found;
+                    }
+                }, {
+                    title: "描述",
+                    field: "plugin_desc",
+                }, {
+                    title: "标识",
+                    field: "plugin_identifier",
+                }, {
+                    title: "版本号",
+                    align: "center",
+                    field: "version",
+                    templet: function (d) {
+                        return '<div class="version_'+d['plugin_identifier']+'">'+d['version']+'</div>';
+                    }
+                }, {
+                    title: "安装时间",
+                    field: "created_at",
+                    hide: true,
+                }, {
+                    title: "操作",
+                    toolbar: "#table-bar",
+                    align: "center",
+                    fixed: "right",
+                    width: 170,
+                }
+            ];
+
+            // 渲染表格
+            function render() {
+                table.render({
+                    elem: "#data-table",
+                    url: SELECT_API,
+                    page: true,
+                    cols: [cols],
+                    skin: "line",
+                    size: "lg", 
+                    installedtype: 'installed',
+                    toolbar: "#table-toolbar",
+                    autoSort: false,
+                    defaultToolbar: [{
+                        title: "刷新",
+                        layEvent: "refresh",
+                        icon: "layui-icon-refresh",
+                    }],
+                    done: function (res) {
+                        let thisOptions = this; 
+                        if(thisOptions.installedtype=='installed'){
+                            getversion(res.data);
+                        } 
+                         
+                    }
+                });
+            }
+
+
+
+            // 编辑或删除行事件
+            table.on("tool(data-table)", function (obj) {
+                if (obj.event === "remove") {
+                    remove(obj);
+                } else if (obj.event === "edit") {
+                    edit(obj);
+                } else if (obj.event === "installed") { 
+                    installed(obj.data);
+                } else if (obj.event === "update") { 
+                    update(obj.data);
+                }
+
+                 
+            });
+
+            // 表格顶部工具栏事件
+            table.on("toolbar(data-table)", function (obj) {
+                if (obj.event === "installed") {
+                    installist(obj);
+                } else if (obj.event === "refresh") {
+                    refreshTable();
+                } else if (obj.event === "waitapps") {
+                    waitapps(obj);
+                } else if (obj.event === "localapps") {
+                    localapps(obj);
+                }
+            });
+
+            // 表格顶部搜索事件
+            form.on("submit(table-query)", function (data) {
+                table.reload("data-table", {
+                    page: {
+                        curr: 1
+                    },
+                    where: data.field
+                })
+                return false;
+            });
+
+            // 表格顶部搜索重置事件
+            form.on("submit(table-reset)", function (data) {
+                table.reload("data-table", {
+                    where: []
+                })
+            });
+
+            // 表格排序事件
+            table.on("sort(data-table)", function (obj) {
+                table.reload("data-table", {
+                    initSort: obj,
+                    scrollPos: "fixed",
+                    where: {
+                        field: obj.field,
+                        order: obj.type
+                    }
+                });
+            });
+            let installist = function (obj) {
+                cols[0] = colsone;
+                table.reload("data-table", {
+                    page: {
+                        curr: 1
+                    },
+                    cols: [cols],
+                    installedtype: 'installed',
+                    where: {
+                        installedtype: 'installed'
+                    }
+                })
+            }
+            let waitapps = function (obj) {
+                table.reload("data-table", {
+                    page: {
+                        curr: 1
+                    },
+                    installedtype: 'waitapps',
+                    where: {
+                        installedtype: 'waitapps'
+                    }
+                })
+            }
+            let localapps = function (obj) {
+                let cols_local  = cols;
+                cols_local[0]   = {
+                    title: "图标",
+                    field: "plugin_logo",
+                    align: "center",
+                    templet: function (d) {
+                        return '<i class="layui-icon layui-icon-app" style="font-size: 24px;"></i>';
+                    }
+                };
+                table.reload("data-table", {
+                    page: {
+                        curr: 1
+                    },
+                    cols: [cols_local],
+                    installedtype: 'localapps',
+                    where: {
+                        installedtype: 'localapps'
+                    },
+                    done: function (res) {
+                    }
+                })
+            }
+            let installed = function(data){
+                    layer.confirm("确定要安装?", {
+                        icon: 3,
+                        title: "提示"
+                    }, function(index) { 
+                        let loading = layer.load();
+                        $.ajax({
+                            url: INSTALL_URL,
+                            type: "POST",
+                            dataType: "json",
+                            data:data,
+                            success: function (res) {
+                                if (res.code === 0) {
+                                    return layui.popup.success("安装成功", function () {
+                                        parent.location.reload();
+                                    }); 
+                                }
+
+                                return layui.popup.failure(res.msg);
+                                
+                                 
+                            },
+                            complete: function () {
+                                layer.close(loading);
+                            }
+                        });
+                    });
+                }
+            // 表格新增数据
+           
+
+            // 表格编辑数据
+            let edit = function (obj) {
+                let value = obj.data[PRIMARY_KEY];
+
+                drawer.open({
+                    legacy: false,
+                    title: ['配置', 'font-size:16px;color:#2d8cf0'],
+                    offset: 'r',
+                    area: [common.isModile() ? "100%" : "40%", common.isModile() ? "100%" : "100%"],
+                    maxmin: false,
+                    closeBtn: 1,
+                    iframe: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                });
+            }
+
+            let update = function (obj) {
+                let data = updatedate[obj.plugin_identifier];
+                data['installedtype'] = data.installedtype??'localapps';
+                layer.confirm("确定要升级?", {
+                    icon: 3,
+                    title: "提示"
+                }, function(index) { 
+                    let loading = layer.load();
+                    $.ajax({
+                        url: INSTALL_URL,
+                        type: "POST",
+                        dataType: "json",
+                        data:data,
+                        success: function (res) {
+                            if (res.code === 0) {
+                                return layui.popup.success("升级成功", function () {
+                                    parent.location.reload();
+                                }); 
+                            }
+
+                            return layui.popup.failure(res.msg);
+                        },
+                        complete: function () {
+                            layer.close(loading);
+                        }
+                    });
+                });
+            }
+             
+
+            // 删除一行
+            let remove = function (obj) {
+                return doRemove(obj.data[PRIMARY_KEY]);
+            }
+
+            // 删除多行
+            let batchRemove = function (obj) {
+                let checkIds = common.checkField(obj, PRIMARY_KEY);
+                if (checkIds === "") {
+                    layui.popup.warning("未选中数据");
+                    return false;
+                }
+                doRemove(checkIds.split(","));
+            }
+
+            // 执行删除
+            let doRemove = function (ids) {
+                let data = {};
+                data[PRIMARY_KEY] = ids;
+                layer.confirm("确定卸载?", {
+                    icon: 3,
+                    title: "提示"
+                }, function (index) {
+                    layer.close(index);
+                    let loading = layer.load(); 
+                    $.ajax({
+                        url: UNINSTALL_API,
+                        data: data,
+                        dataType: "json",
+                        type: "post",
+                        success: function (res) {
+                            layer.close(loading);
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            return layui.popup.success("卸载成功",function(){
+                                parent.location.reload();
+                            });
+                        }
+                    })
+                });
+            }
+
+            function getversion(arr){ 
+                let version = arr.map(item => ({
+                    'name': item.plugin_identifier,
+                    'version': item.version
+                }));
+                layui.$.ajax({
+                    url: "/app/webniu/web/plugin/version", 
+                    data:{version},
+                    type: "POST",
+                    dataType: "json",
+                    cache: true,
+                    success: function (res) { 
+                        updatedate = res.data;
+                        $.each(res.data,function(k,v){
+                            $('.version_'+v.plugin_identifier).append('<span class="layui-badge layui-bg-red pointer_style" lay-event="update">发现新版本</span>');   
+                        });
+                        
+                    }
+                });
+                return false;
+                    
+            }
+
+            
+
+            // 刷新表格数据
+            window.refreshTable = function () {
+                table.reloadData("data-table", {
+                    scrollPos: "fixed",
+                    done: function (res, curr) {
+                        if (curr > 1 && res.data && !res.data.length) {
+                            curr = curr - 1;
+                            table.reloadData("data-table", {
+                                page: {
+                                    curr: curr
+                                },
+                            })
+                        }
+                        let thisOptions = this; 
+                        if(thisOptions.installedtype=='installed'){
+                            getversion(res.data);
+                        } 
+                    }
+                });
+            }
+        })
+
+    </script>
+
+    <!-- 表格顶部工具栏 -->
+    <script type="text/html" id="table-toolbar">
+            <div class="layui-btn-group">
+                <button type="button" class="pear-btn pear-btn-sm {{= d.installedtype =='installed' ? 'pear-btn-primary' : 'layui-btn-primary' }}" lay-event="installed">已安装</button>
+                <button type="button" class="pear-btn pear-btn-sm {{= d.installedtype =='waitapps' ? 'pear-btn-primary' : 'layui-btn-primary' }}" lay-event="waitapps">待安装</button>
+                <button type="button" class="pear-btn pear-btn-sm {{= d.installedtype =='localapps' ? 'pear-btn-primary' : 'layui-btn-primary' }}" lay-event="localapps">本地包</button>
+            </div>
+        </script>
+
+    <!-- 表格行工具栏 -->
+    <script type="text/html" id="table-bar">
+            {{# if(d.installed == '1'){ }}
+            <div class="layui-btn-group">
+            
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">
+                    <i class="layui-icon layui-icon-set-sm"></i>配置
+                </button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" lay-event="remove">
+                    <i class="layui-icon layui-icon-delete"></i>卸载
+                </button>
+            
+            </div>
+            {{# }else{ }}
+            <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="installed">安装应用</button>
+            {{# } }}
+    </script>
+</body>
+
+</html>

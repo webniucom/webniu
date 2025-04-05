@@ -590,6 +590,7 @@ body,
 .double-theme #sideMenu ul.pear-nav-tree li.layui-nav-item>a span{
 	letter-spacing: 0.5px;
 	font-size: 12px;
+	text-align: center;
 }
 .double-theme #sideMenu ul.pear-nav-tree li.layui-nav-item>dl:first-of-type.layui-nav-child{
 	position: absolute;

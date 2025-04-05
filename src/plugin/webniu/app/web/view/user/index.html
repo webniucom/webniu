@@ -270,8 +270,16 @@
 					},{
 						title: "头像",
 						field: "avatar",
+                        align: "center",
 						templet: function (d) {
-							return '<img src="'+encodeURI(d['avatar'])+'" style="max-width:32px;max-height:32px;" alt="" />'
+                            let field = "avatar";
+							if (typeof d[field] == "undefined") return "";
+							let items   = [];
+                            let html    = '';
+							layui.each((d[field] + "").split(","), function (k , v) {
+                                html += '<img src="'+encodeURI(v)+'" style="max-width:32px;max-height:32px;" alt="" />';
+							});
+							return html;
 						}
 					},{
 						title: "邮箱",
@@ -483,7 +491,7 @@
                         legacy: false,
                         title: ['新增', 'font-size:16px;color:#2d8cf0'],
                         offset: 'r',
-                        area: "40%",
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
                         maxmin: false,
                         closeBtn: 1,
                         iframe: INSERT_URL
@@ -500,13 +508,15 @@
                     //     area: [common.isModile()?"100%":"500px", common.isModile()?"100%":"450px"],
                     //     content: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
                     // });
-                    layer.open({
-                        type: 2,
-                        title: "修改",
-                        shade: 0.1,
-                        area: [common.isModile()?"100%":"60%", common.isModile()?"100%":"80%"],
-                        content: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
-                    });
+                    drawer.open({
+                        legacy: false,
+                        title: ['修改', 'font-size:16px;color:#2d8cf0'],
+                        offset: 'r',
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
+                        maxmin: false,
+                        closeBtn: 1,
+                        iframe: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                    }); 
                 }
 
                 // 删除一行

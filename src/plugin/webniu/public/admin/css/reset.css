@@ -282,3 +282,32 @@ a {
     font-size: 30px;
     cursor: pointer;
 }
+
+/* 上传样式 */
+.wn_images_upload_dom .pear-btn{
+	float: left;
+    width: 45px;
+    height: 45px;
+    line-height: 44px;
+    margin-right: 5px;
+}
+.wn_images_upload_dom li{
+	width: 43px;
+    height: 43px;
+    position: relative;
+    margin-right: 5px;
+    border: 1px solid #e2e2e2;
+    float: left;
+}
+.wn_images_upload_dom li img{
+	width: 43px;
+    height: 43px;
+}
+.wn_images_upload_dom li i{
+	position: absolute;
+    top: 0;
+    right: 0;
+    background-color: aliceblue;
+    cursor: pointer;
+    line-height: 16px;
+}

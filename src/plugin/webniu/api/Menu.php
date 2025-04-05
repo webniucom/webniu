@@ -73,11 +73,29 @@ class Menu
     }
 
     /**
+     * 准备删除菜单
+     * @param $key
+     * @return void
+     */
+    public static function delete($menu_tree)
+    {
+        if(!isset($menu_tree[0]['key'])){
+            $menu_tree = $menu_tree[0];
+            if(!isset($menu_tree[0]['key'])){
+                $menu_tree = $menu_tree[0];
+            }
+        } 
+        foreach ($menu_tree as $menu) { 
+            static::impdelete($menu['key']);
+        }
+    }
+
+    /**
      * 删除菜单
      * @param $key
      * @return void
      */
-    public static function delete($key)
+    public static function impdelete($key)
     {
         $item = Rule::where('key', $key)->first();
         if (!$item) {
@@ -91,8 +109,7 @@ class Menu
         }
         Rule::whereIn('id', $delete_ids)->delete();
     }
-
-
+  
     /**
      * 获取菜单中某个(些)字段的值
      * @param $menu

@@ -7,7 +7,7 @@
     "workerman/webman-framework": ">=2.1",
     "webman/database": ">=2.1",
     "illuminate/pagination": ">=7.30",
-    "illuminate/events": ">=7.30",
+    "illuminate/events": "^12.6",
     "intervention/image": "^2.7",
     "webman/event": "^1.0",
     "webman/captcha": "^1.0.0",
@@ -16,7 +16,8 @@
     "ext-json": "*",
     "topthink/think-template": "^3.0",
     "overtrue/easy-sms": "^3.1",
-    "phpmailer/phpmailer": "^6.9"
+    "phpmailer/phpmailer": "^6.9",
+    "webman/redis": "^2.1"
   },
   "autoload": {
     "psr-4": {

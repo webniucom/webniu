@@ -7,7 +7,9 @@ use plugin\webniu\app\model\Admin;
 use plugin\webniu\app\model\AdminRole;
 use plugin\webniu\app\model\AdminLog;
 use plugin\webniu\app\model\Option;
-
+use plugin\webniu\app\common\Util;
+use Webman\Event\Event;
+use support\Db;
 
 /**
  * 当前管理员id
@@ -199,4 +201,84 @@ if (!function_exists('adminlog')) {
         return true;
     }
 
+}
+
+//分割SQL语句
+if (!function_exists('splitSqlFile')) {
+    function splitSqlFile($sql, $delimiter): array
+    {
+        $tokens = explode($delimiter, $sql);
+        $output = array();
+        $matches = array();
+        $token_count = count($tokens);
+        for ($i = 0; $i < $token_count; $i++) {
+            if (($i != ($token_count - 1)) || (strlen($tokens[$i] > 0))) {
+                $total_quotes = preg_match_all("/'/", $tokens[$i], $matches);
+                $escaped_quotes = preg_match_all("/(?<!\\\\)(\\\\\\\\)*\\\\'/", $tokens[$i], $matches);
+                $unescaped_quotes = $total_quotes - $escaped_quotes;
+
+                if (($unescaped_quotes % 2) == 0) {
+                    $output[] = $tokens[$i];
+                    $tokens[$i] = "";
+                } else {
+                    $temp = $tokens[$i] . $delimiter;
+                    $tokens[$i] = "";
+
+                    $complete_stmt = false;
+                    for ($j = $i + 1; (!$complete_stmt && ($j < $token_count)); $j++) {
+                        $total_quotes = preg_match_all("/'/", $tokens[$j], $matches);
+                        $escaped_quotes = preg_match_all("/(?<!\\\\)(\\\\\\\\)*\\\\'/", $tokens[$j], $matches);
+                        $unescaped_quotes = $total_quotes - $escaped_quotes;
+                        if (($unescaped_quotes % 2) == 1) {
+                            $output[] = $temp . $tokens[$j];
+                            $tokens[$j] = "";
+                            $temp = "";
+                            $complete_stmt = true;
+                            $i = $j;
+                        } else {
+                            $temp .= $tokens[$j] . $delimiter;
+                            $tokens[$j] = "";
+                        }
+
+                    }
+                }
+            }
+        }
+
+        return $output;
+    }
+}
+    
+//检测表是否纯在
+if (!function_exists('pdo_hasTable')) {
+    function pdo_hasTable($tablename){
+        return Util::schema()->hasTable($tablename);
+    }
+}
+//检测表 / 列是否存在
+if (!function_exists('pdo_hasColumn')) {
+    function pdo_hasColumn($tablename,$Column){
+        return Util::schema()->hasColumn($tablename,$Column);
+    }
+}
+//执行SQL
+if (!function_exists('pdo_unprepared')) {
+    function pdo_unprepared($sql){
+        $ret    = $sql;
+        if(!empty($ret = splitSqlFile($ret,";"))){
+            foreach($ret as $k=>$v){
+                Util::db()->unprepared($v);
+            }
+        }else{
+            return Util::db()->unprepared($sql);
+        }
+        return true;
+    }
+}
+//表前缀
+if (!function_exists('pdo_tablename')) {
+    function pdo_tablename($tablename){
+        $prefix = config('plugin.webniu.database.connections.mysql.prefix');
+        return $prefix.$tablename;
+    }    
 }

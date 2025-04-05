@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>更新页面</title>
+    <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+</head>
+
+<body>
+    <style>
+        .layui-tab-title {
+            padding-left: 30px;
+        }
+        .main-container{
+            margin:0px;
+        }
+        .layui-tab-content{
+            padding-right: 30px;
+        }
+        .layui-table-tool-temp{
+            padding-right:0px;
+        }
+    </style>
+    <form class="layui-form" lay-filter="create-dict-form">
+
+        <div class="layui-tab" lay-filter="test-hash">
+            <ul class="layui-tab-title">
+                <li class="layui-this" lay-tab="basics">基础信息</li>
+                <li lay-tab="route">路由配置</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+
+                    <div class="main-container">
+
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label required">标识</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="plugin_identifier" value="" readonly required lay-verify="required"
+                                    class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label required">名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="plugin_name" value="" required lay-verify="required"
+                                    class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label required">描述</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="plugin_desc" value="" required lay-verify="required"
+                                    class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">图标</label>
+                            <div class="layui-input-block">
+                                <div class="wn_images_upload_dom" name="plugin_logo">
+                                    <div class="wn_images_list"></div>
+                                    <div class="pear-btn pear-btn-primary pear-btn-sm upload"
+                                        permission="app.webniu.web.upload.avatar">
+                                        <i class="layui-icon layui-icon-upload"></i>
+                                    </div>
+                                    <div class="pear-btn pear-btn-primary pear-btn-sm attachment"
+                                        permission="app.webniu.web.upload.attachment">
+                                        <i class="layui-icon layui-icon-align-left"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label required">作者</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="plugin_author" readonly value="" required lay-verify="required"
+                                    class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label required">版本</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="version" readonly value="" required lay-verify="required"
+                                    class="layui-input">
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label required">默认入口</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="plugin_href" value="" required lay-verify="required"
+                                    class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">打开方式</label>
+                            <div class="layui-input-block">
+                                <input type="radio"  name="plugin_open"  value="0"  title="原窗口" checked lay-filter="plugin_opentype-radio-filter">
+                                <input type="radio"  name="plugin_open"  value="1"  title="新窗口" lay-filter="plugin_opentype-radio-filter"> 
+                            </div>
+                        </div> 
+                          
+
+                    </div>
+
+                </div>
+                <div class="layui-tab-item">
+                    <div style="padding-left: 30px;">
+
+                        <!-- 字段属性 -->
+                        <table id="column-table" lay-filter="column-table"></table>
+    
+                        <script type="text/html" id="column-toolbar">
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+                                <i class="layui-icon layui-icon-add-1"></i>新增
+                            </button>
+                            <button type="button" class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+                                <i class="layui-icon layui-icon-delete"></i>删除
+                            </button>
+                        </script>
+                        <input type="hidden" name="laytab" value="route">
+                        <script type="text/html" id="col-value">
+                            <input type="text" name="value[{{ d.LAY_NUM-1 }}][value]" placeholder="路径规则" autocomplete="off" class="layui-input" value="{{ d.value }}">
+                            <input type="hidden" name="value[{{ d.LAY_NUM-1 }}][_field_id]" value="{{ d._field_id }}">
+                        </script>
+                        <script type="text/html" id="col-name">
+                            <input type="text" name="value[{{ d.LAY_NUM-1 }}][name]" placeholder="控制器" autocomplete="off" class="layui-input" value="{{ d.name }}">
+                        </script>
+                        <script type="text/html" id="col-action">
+                            <input type="text" name="value[{{ d.LAY_NUM-1 }}][action]" placeholder="方法名" autocomplete="off" class="layui-input" value="{{ d.action }}">
+                        </script>
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom">
+            <div class="button-container">
+                <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                    提交
+                </button>
+                <button type="reset" class="pear-btn pear-btn-md closeIframe">
+                    关闭
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+    <script src="/app/webniu/component/layui/layui.js"></script>
+    <script src="/app/webniu/component/pear/pear.js"></script>
+    <script src="/app/webniu/admin/js/permission.js"></script>
+    <script>
+
+        // 相关接口
+        const PRIMARY_KEY = "id";
+        const SELECT_API = "/app/webniu/web/plugin/select" + location.search;
+        const UPDATE_API = "/app/webniu/web/plugin/update";
+
+        // 获取数据库记录
+        layui.use(["form", "util", "popup","upload", "layer","table","common"], function () {
+            let $       = layui.$;
+            var element = layui.element;
+            let table   = layui.table;
+            let common  = layui.common;
+            var form    = layui.form;
+            window._field_id = 0;
+            var routedata   = [];
+            $.ajax({
+                url: SELECT_API,
+                dataType: "json",
+                data: {installedtype:'updateset'},
+                success: function (res) {
+
+                    // 给表单初始化数据
+                     
+                    $('*[name="plugin_logo"]').attr("value",res.data.items.plugin_logo);
+                    form.val('create-dict-form',res.data.items);
+
+
+                    // 上传图片组件 
+                    layui.$(".attachment").on("click", function (e) {
+                        let thisi = layui.$(this);
+                        parent.layer.open({
+                            type: 2,
+                            title: "选择附件",
+                            content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                            area: ["95%", "90%"],
+                            success: function (layero, index) {
+                                parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                    setImagesListValue({
+                                        elem: thisi,
+                                        data: data,
+                                    });
+                                });
+                            }
+                        });
+                    });
+                    var inst = layui.upload.render({
+                        elem: ".upload",
+                        url: "/app/webniu/web/upload/avatar",
+                        acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                        field: "__file__",
+                        done: function (res) {
+                            if (res.code > 0) return layui.layer.msg(res.msg);
+                            setImagesListValue({
+                                elem: $(this.elem),
+                                data: res.data.items,
+                            });
+                        }
+                    });
+                    layui.$('.wn_images_upload_dom').each(function () {
+                        setImagesListValue({
+                            elem: layui.$(this),
+                        });
+                    });
+
+                    //设置图片列表的值
+                    function setImagesListValue(object) {
+                        let newobj = object.elem;
+                        let data = object.data ?? [];
+                        if (!Array.isArray(data)) {
+                            let url = data.url;
+                            let multiple = object.multiple ?? (newobj.parent().attr('multiple') == undefined ? false : true);
+                            let accept = object.accept ?? (newobj.parent().attr('accept') ?? 'image');
+                            if (!multiple) { newobj.parent().find(".wn_images_list").html(''); }
+                            newobj.parent().find(".wn_images_list").prepend(`<li class="wx_images_li">
+                                    <img src="${url}" class="img_class" lay-on="photos" />
+                                    <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
+                                    <input type="hidden" name="${newobj.parent().attr('name')}${multiple ? '[]' : ''}" value="${url}" />
+                                </li>`);
+                        } else {
+                            let multiple = object.multiple ?? (newobj.attr('multiple') == undefined ? false : true);
+                            let accept = object.accept ?? (newobj.attr('accept') ?? 'image');
+                            let value = newobj.attr('value');
+                            if (value != undefined) {
+                                newobj.find(".wn_images_list").html('');
+                                layui.each((value).split(","), function (k, url) {
+                                    newobj.find(".wn_images_list").prepend(`<li class="wx_images_li">
+                                            <img src="${url}" class="img_class" lay-on="photos" />
+                                            <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
+                                            <input type="hidden" name="${newobj.attr('name')}${multiple ? '[]' : ''}" value="${url}" />
+                                        </li>`);
+                                });
+                            }
+                        }
+                        return delete newobj, object, data;
+                    }
+                     
+
+                    layui.util.on('lay-on', {
+                        'photos': function (data) {
+                            parent.layer.photos({
+                                photos: {
+                                    "data": [
+                                        {
+                                            "src": data.attr('src'),
+                                        }
+                                    ]
+                                }
+                            });
+                        }
+                    });
+
+                    element.on('tab(test-hash)', function(obj){
+                        let tab = this.getAttribute('lay-tab');
+                        if(tab === "basics"){
+                            
+                        }
+                        if(tab === "menu"){
+                             
+                        }
+                        if(tab === "route"){
+                            routedata = res.data.rewrite;
+                            layui.each(routedata, function (k, v) {
+                                routedata[k]["_field_id"] = _field_id++;
+                            });
+                            table.reloadData('column-table', {
+                                data: routedata,
+                                scrollPos: true,
+                            });
+                            let options = table.getData("column-table"); 
+                        } 
+                    });
+
+                    
+
+                    // ajax产生错误
+                    if (res.code) {
+                        layui.popup.failure(res.msg);
+                    }
+
+                }
+            });
+
+            let cols = [
+                {
+                    type: "checkbox",
+                    width: 50,
+                },
+                {
+                    title: "路径规则",
+                    field: "value",
+                    templet: "#col-value"
+                },
+                {
+                    title: "控制器",
+                    field: "name",
+                    templet: "#col-name",
+                },
+                {
+                    title: "方法名",
+                    field: "action",
+                    templet: "#col-action",
+                }
+            ]; 
+             
+            table.render({
+                elem: "#column-table",
+                cols: [cols],
+                data: routedata,
+                cellMinWidth: 40,
+                skin: "line",
+                size: "lg",
+                limit: 10000,
+                page: false,
+                toolbar: "#column-toolbar",
+                defaultToolbar: [],
+            });
+            
+            table.on("toolbar(column-table)", function (obj) {
+                if (obj.event === "add") {
+                    add();
+                } else if (obj.event === "batchRemove") {
+                    batchRemove(obj);
+                }
+            });
+            
+            
+            let add = function () {
+                syncTableData();
+                let options = table.getData("column-table"); 
+                options.push({
+                    _field_id: _field_id++,
+                    value: "",
+                    name: "",
+                    action: "",
+                });
+                table.reloadData("column-table", { data: options });
+            }
+
+            let batchRemove = function (obj) {
+                var checkIds = common.checkField(obj, "_field_id");
+                if (checkIds === "") return layui.popup.warning("未选中数据");
+                let data = table.getData("column-table");
+                let newData = [];
+                let deleteIds = checkIds.split(",");
+                layui.each(data, function (index, item) {
+                    if (deleteIds.indexOf(item._field_id + "") === -1) {
+                        newData.push(item);
+                    }
+                });
+                table.reloadData("column-table", { data: newData })
+            }
+
+        });
+
+        //提交事件
+        layui.use(["form", "popup"], function () {
+            layui.form.on("submit(save)", function (data) {
+               
+                data.field[PRIMARY_KEY] = layui.url().search[PRIMARY_KEY];
+               
+                layui.$.ajax({
+                    url: UPDATE_API,
+                    type: "POST",
+                    dateType: "json",
+                    data: data.field,
+                    success: function (res) {
+                        if (res.code) {
+                            return layui.popup.failure(res.msg);
+                        }
+                        return layui.popup.success("操作成功", function () {
+                            parent.refreshTable();
+                            parent.layer.close(parent.layer.getFrameIndex(window.name));
+                        });
+                    }
+                });
+                return false;
+            });
+            layui.$('.closeIframe').click(function(){
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            });
+        });
+        window.syncTableData = function () {
+            let tableData = layui.form.val("create-dict-form");
+            let columnTableData = [];
+            let len = Object.keys(tableData).length;
+            let id = 0;
+            window._key_id = 0;
+            while (id < len) {
+                // column data
+                if (typeof tableData["value[" + id + "][_field_id]"] !== "undefined") {
+                    columnTableData.push({
+                        _field_id: tableData["value[" + id + "][_field_id]"],
+                        name: tableData["value[" + id + "][name]"],
+                        value: tableData["value[" + id + "][value]"],
+                        action: tableData["value[" + id + "][action]"],
+                    });
+                }
+                _key_id++;
+                id++;
+            }
+            layui.table.reloadData("column-table", { data: columnTableData });
+        }
+
+    </script>
+
+</body>
+
+</html>

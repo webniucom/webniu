@@ -52,17 +52,19 @@
                                     <input type="text" name="mobile" placeholder="请输入联系电话" autocomplete="off" class="layui-input">
                                 </div>
                             </div>
+                             
                             <div class="layui-form-item">
                                 <label class="layui-form-label">头像</label>
                                 <div class="layui-input-block">
-                                    <img class="img-3" src=""/>
-                                    <input type="text" name="avatar" style="display: none;" value="" />
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="avatar" permission="app.webniu.web.upload.avatar">
-                                        <i class="layui-icon layui-icon-upload"></i>上传图片
-                                    </button>
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-avatar" permission="app.webniu.web.upload.attachment">
-                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
-                                    </button>
+                                    <div class="wn_images_upload_dom" name="avatar">
+                                        <div class="wn_images_list"></div>
+                                        <div class="pear-btn pear-btn-primary pear-btn-sm upload" permission="app.webniu.web.upload.avatar">
+                                            <i class="layui-icon layui-icon-upload"></i>
+                                        </div>
+                                        <div class="pear-btn pear-btn-primary pear-btn-sm attachment"  permission="app.webniu.web.upload.attachment">
+                                            <i class="layui-icon layui-icon-align-left"></i>
+                                        </div>
+                                    </div> 
                                 </div>
                             </div>
                             <div class="layui-form-item">
@@ -133,10 +135,11 @@
                     url: "/app/webniu/web/account/info",
                     dataType: "json",
                     success: function (res) { 
+                        console.log(res);
                         form.val("baseInfo", res.data);
-                        let input = layui.$("#avatar").prev(); 
-                        input.prev().attr("src", input.val());
-                        layui.$("#attachment-choose-avatar").on("click", function() {
+                        $('*[name="avatar"]').attr("value", res.data.avatar);
+                        layui.$(".attachment").on("click", function(e) { 
+                            let thisi = layui.$(this);
                             parent.layer.open({
                                 type: 2,
                                 title: "选择附件",
@@ -144,21 +147,64 @@
                                 area: ["95%", "90%"],
                                 success: function (layero, index) {
                                     parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                        input.val(data.url).prev().attr("src", data.url);
+                                        setImagesListValue({
+                                            elem: thisi,
+                                            data: data,
+                                        });
                                     });
                                 }
                             });
                         });
-                        layui.upload.render({
-                            elem: "#avatar",
+                        var inst = layui.upload.render({
+                            elem: ".upload",
                             url: "/app/webniu/web/upload/avatar",
                             acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
                             field: "__file__",
                             done: function (res) {
                                 if (res.code > 0) return layui.layer.msg(res.msg);
-                                this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                                setImagesListValue({
+                                    elem: $(this.elem),
+                                    data: res.data,
+                                });
                             }
                         });
+                        layui.$('.wn_images_upload_dom').each(function() { 
+                            setImagesListValue({
+                                elem: layui.$(this),
+                            });
+                        }); 
+                        
+                        //设置图片列表的值
+                        function setImagesListValue(object) { 
+                            let newobj      = object.elem;
+                            let data        = object.data??[];
+                            if (!Array.isArray(data)) {
+                                let url = data.url; 
+                                let multiple    = object.multiple??(newobj.parent().attr('multiple')==undefined?false:true);
+                                let accept      = object.accept??(newobj.parent().attr('accept')??'image');
+                                if(!multiple){newobj.parent().find(".wn_images_list").html('');}
+                                newobj.parent().find(".wn_images_list").prepend(`<li class="wx_images_li">
+                                    <img src="${url}" class="img_class" lay-on="photos" />
+                                    <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
+                                    <input type="hidden" name="${newobj.parent().attr('name')}${multiple?'[]':''}" value="${url}" />
+                                </li>`);
+                            }else{ 
+                                let multiple    = object.multiple??(newobj.attr('multiple')==undefined?false:true);
+                                let accept      = object.accept??(newobj.attr('accept')??'image');
+                                let value       = newobj.attr('value');
+                                if(value!=undefined){
+                                    newobj.find(".wn_images_list").html('');
+                                    layui.each((value).split(","), function (k , url) {
+                                        newobj.find(".wn_images_list").prepend(`<li class="wx_images_li">
+                                            <img src="${url}" class="img_class" lay-on="photos" />
+                                            <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
+                                            <input type="hidden" name="${newobj.attr('name')}${multiple?'[]':''}" value="${url}" />
+                                        </li>`);
+                                    });
+                                }
+                            }
+                            return delete newobj,object,data;
+                        }
                     }
                 });
 

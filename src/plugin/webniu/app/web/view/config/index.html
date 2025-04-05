@@ -62,17 +62,19 @@
                                     <i class="layui-icon layui-icon-tips" lay-tips="全局主站点绑定域名以http://开头/结尾"></i>
                                 </div>
                             </div>
-                            <div class="layui-form-item img_layui-form-item">
+                            
+                            <div class="layui-form-item">
                                 <label class="layui-form-label">后台Logo</label>
-                                <div class="layui-input-inline layui-input-wrap">
-                                    <img class="img-3" src=""/>
-                                    <input type="text" style="display:none" name="base[image]" value="" />
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="image" permission="app.webniu.upload.image">
-                                        <i class="layui-icon layui-icon-upload"></i>上传图片
-                                    </button>
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-image" permission="app.webniu.upload.attachment">
-                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
-                                    </button>
+                                <div class="layui-input-block">
+                                    <div class="wn_images_upload_dom" name="base[image]">
+                                        <div class="wn_images_list"></div>
+                                        <div class="pear-btn pear-btn-primary pear-btn-sm upload" permission="app.webniu.web.upload.avatar">
+                                            <i class="layui-icon layui-icon-upload"></i>
+                                        </div>
+                                        <div class="pear-btn pear-btn-primary pear-btn-sm attachment" permission="app.webniu.web.upload.attachment">
+                                            <i class="layui-icon layui-icon-align-left"></i>
+                                        </div>
+                                    </div> 
                                 </div>
                             </div>
                              
@@ -117,19 +119,24 @@
                                     <i class="layui-icon layui-icon-tips" lay-tips="后台登录图形验证"></i>
                                 </div>
                             </div>
-                            <div class="layui-form-item img_layui-form-item">
+                             
+
+                            <div class="layui-form-item">
                                 <label class="layui-form-label">登录页封面</label>
-                                <div class="layui-input-inline layui-input-wrap">
-                                    <img class="img-3" src=""/>
-                                    <input type="text" style="display:none" name="user[background_image]" value="" />
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="background_image" permission="app.webniu.upload.image">
-                                        <i class="layui-icon layui-icon-upload"></i>上传图片
-                                    </button>
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-background_image" permission="app.webniu.upload.attachment">
-                                        <i class="layui-icon layui-icon-align-left"></i>选择图片
-                                    </button>
+                                <div class="layui-input-block layui-input-wrap">
+                                    <div class="wn_images_upload_dom" name="user[background_image]">
+                                        <div class="wn_images_list"></div>
+                                        <div class="pear-btn pear-btn-primary pear-btn-sm upload" permission="app.webniu.web.upload.avatar">
+                                            <i class="layui-icon layui-icon-upload"></i>
+                                        </div>
+                                        <div class="pear-btn pear-btn-primary pear-btn-sm attachment" permission="app.webniu.web.upload.attachment">
+                                            <i class="layui-icon layui-icon-align-left"></i>
+                                        </div>
+                                    </div> 
                                 </div>
                             </div>
+
+
                             <fieldset class="layui-elem-field layui-field-title">
                                 <legend>后端注册配置</legend>
                             </fieldset>
@@ -585,6 +592,7 @@
                                     <i class="layui-icon layui-icon-tips" lay-tips="图片水印"></i>
                                 </div>
                             </div>
+                             
                             <div class="pic_mark_type">
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">水印类型</label>
@@ -624,17 +632,24 @@
                                 <div class="pic_mark_style_1">
                                     <div class="layui-form-item img_layui-form-item">
                                         <label class="layui-form-label">水印图片</label>
-                                        <div class="layui-input-inline layui-input-wrap">
-                                            <img class="img-3" src=""/>
-                                            <input type="text" style="display:none" name="pic[pic_thumb_img]" value="" required  lay-verify="required" lay-reqtext="请输入水印图片" />
-                                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="pic_thumb_img">
-                                                <i class="layui-icon layui-icon-upload"></i>上传图片
-                                            </button> 
+                                        <div class="layui-input-inline">
+                                            <div class="wn_images_upload_dom" name="pic[pic_thumb_img]">
+                                                <div class="wn_images_list"></div>
+                                                <div class="pear-btn pear-btn-primary pear-btn-sm upload" permission="app.webniu.web.upload.avatar">
+                                                    <i class="layui-icon layui-icon-upload"></i>
+                                                </div>
+                                                <div class="pear-btn pear-btn-primary pear-btn-sm attachment" permission="app.webniu.web.upload.attachment">
+                                                    <i class="layui-icon layui-icon-align-left"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="layui-form-mid layui-text-em">
                                             <i class="layui-icon layui-icon-tips" lay-tips="水印图片120x120像素。"></i>
                                         </div>
                                     </div>
+
+                                    
+
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">水印位置</label>
                                         <div class="layui-input-inline layui-input-wrap">
@@ -1226,12 +1241,11 @@
                         
                         toast.success({message:'发送成功',position: 'topCenter'});
                     },
-                });
-                let image       = layui.$("#image").prev();
-                let background_image   = layui.$("#background_image").prev();
-                let read_get = function(name){
-                    var index = layer.load(0, {shade: true});
-                    $.ajax({
+                }); 
+                var request;
+                let read_get    = function(name){
+                    var index   = layer.load(0, {shade: true});
+                    request     = $.ajax({
                         url: "/app/webniu/web/config/get",
                         dataType: "json",
                         type: "GET",
@@ -1244,7 +1258,8 @@
                             globalre = res; 
                             if(name=='base'){
                                 form.val("baseinfo",flattenObject({base:res.base}));
-                                image.val(res.base.image).prev().attr("src", res.base.image);
+                                $('*[name="base[image]"]').attr("value", res.base.image);
+                                
                             }
 
                             if(name=='core'){
@@ -1254,7 +1269,7 @@
                             if(name=='user'){
                                 let user_roles;
                                 form.val("userinfo",flattenObject({user:res.user})); 
-                                background_image.val(res.user.background_image).prev().attr("src", res.user.background_image);
+                                $('*[name="user[background_image]"]').attr("value", res.user.background_image);
                                 //账户设置 后台开放注册控件
                                 if(res.user.managereg){
                                     $(".managereg").css('display','block');
@@ -1431,21 +1446,9 @@
                                         $(".pic_mark_style_0").css('display','block');
                                     } 
                                 });
+                                
+                                $('*[name="pic[pic_thumb_img]"]').attr("value", res.pic.pic_thumb_img);
  
-
-                                let pic_thumb_img = layui.$("#pic_thumb_img").prev();
-                                pic_thumb_img.prev().attr("src", pic_thumb_img.val());
-
-                                layui.upload.render({
-                                    elem: "#pic_thumb_img",
-                                    url: "/app/webniu/web/upload/avatar?type=localupload",
-                                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
-                                    field: "__file__",
-                                    done: function (rese) {
-                                        if (rese.code > 0) return layui.layer.msg(rese.msg);
-                                        this.item.prev().val(rese.data.url).prev().attr("src", rese.data.url);
-                                    }
-                                });
                             }
 
                             if(name=='menu,tab,theme'){
@@ -1538,8 +1541,12 @@
                                     }
 
                                 });
-                            };
-
+                            }; 
+                            layui.$('[lay-filter="'+name+'info"] .wn_images_upload_dom').each(function() { 
+                                setImagesListValue({
+                                    elem: layui.$(this),
+                                });
+                            });
 
                             form.on("submit(save"+name+"info)", function(data){
                                  
@@ -1578,6 +1585,9 @@
                                 sessionStorage.clear();
                                 return false;
                             });
+                            
+                              
+
                              
 
 
@@ -1587,7 +1597,73 @@
                 }
                 //执行基础加载
                 read_get('base');
-                 
+             
+                  
+                layui.$(".attachment").on("click", function(e) { 
+                    let thisi = layui.$(this);
+                    parent.layer.open({
+                        type: 2,
+                        title: "选择附件",
+                        content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                        area: ["95%", "90%"],
+                        success: function (layero, index) {
+                            parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                setImagesListValue({
+                                    elem: thisi,
+                                    data: data,
+                                });
+                            });
+                        }
+                    });
+                });
+                var inst = layui.upload.render({
+                    elem: ".upload",
+                    url: "/app/webniu/web/upload/avatar",
+                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                    field: "__file__",
+                    done: function (res) {
+                        if (res.code > 0) return layui.layer.msg(res.msg);
+                        setImagesListValue({
+                            elem: $(this.elem),
+                            data: res.data,
+                        });
+                    }
+                });
+                    
+                
+                //设置图片列表的值
+                function setImagesListValue(object) { 
+                    let newobj      = object.elem;
+                    let data        = object.data??[];
+                    if (!Array.isArray(data)) {
+                        let url = data.url; 
+                        let multiple    = object.multiple??(newobj.parent().attr('multiple')==undefined?false:true);
+                        let accept      = object.accept??(newobj.parent().attr('accept')??'image');
+                        if(!multiple){newobj.parent().find(".wn_images_list").html('');}
+                        newobj.parent().find(".wn_images_list").prepend(`<li class="wx_images_li">
+                            <img src="${url}" class="img_class" lay-on="photos" />
+                            <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
+                            <input type="hidden" name="${newobj.parent().attr('name')}${multiple?'[]':''}" value="${url}" />
+                        </li>`);
+                    }else{ 
+                        let multiple    = object.multiple??(newobj.attr('multiple')==undefined?false:true);
+                        let accept      = object.accept??(newobj.attr('accept')??'image');
+                        let value       = newobj.attr('value');
+                        if(value!=undefined){
+                            newobj.find(".wn_images_list").html('');
+                            layui.each((value).split(","), function (k , url) {
+                                newobj.find(".wn_images_list").prepend(`<li class="wx_images_li">
+                                    <img src="${url}" class="img_class" lay-on="photos" />
+                                    <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
+                                    <input type="hidden" name="${newobj.attr('name')}${multiple?'[]':''}" value="${url}" />
+                                </li>`);
+                            });
+                        }
+                    }
+                    return delete newobj,object,data;
+                }
+                    
+              
                 
                 //加载颜色选择器
                 colorpicker.render({
@@ -1599,59 +1675,7 @@
                 });
 
                  
-                 
-                layui.$("#attachment-choose-image").on("click", function() {
-                    parent.layer.open({
-                        type: 2,
-                        title: "选择附件",
-                        content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
-                        area: ["75%", "70%"],
-                        success: function (layero, index) {
-                            parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                image.val(data.url).prev().attr("src", data.url);
-                            });
-                        }
-                    });
-                });
-                layui.upload.render({
-                    elem: "#image",
-                    url: "/app/webniu/web/upload/avatar",
-                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
-                    field: "__file__",
-                    done: function (res) {
-                        if (res.code > 0) return layui.layer.msg(res.msg);
-                        this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
-                    }
-                });
-
-
-                 
-
-                layui.$("#attachment-choose-background_image").on("click", function() {
-                    parent.layer.open({
-                        type: 2,
-                        title: "选择附件",
-                        content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
-                        area: ["75%", "70%"],
-                        success: function (layero, index) {
-                            parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                background_image.val(data.url).prev().attr("src", data.url);
-                            });
-                        }
-                    });
-                });
-                layui.upload.render({
-                    elem: "#background_image",
-                    url: "/app/webniu/web/upload/avatar",
-                    acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
-                    field: "__file__",
-                    done: function (res) {
-                        if (res.code > 0) return layui.layer.msg(res.msg);
-                        this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
-                    }
-                });
-
-                 
+                
                  
 
                 //生成一些字符串

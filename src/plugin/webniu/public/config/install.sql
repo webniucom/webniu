@@ -168,6 +168,29 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__email_temp`(
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='email模板';
 
+CREATE TABLE `__PREFIX__plugin` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `plugin_type` varchar(32) DEFAULT NULL COMMENT '类型',
+  `plugin_class` int(3) DEFAULT NULL COMMENT '分类id',
+  `plugin_name` varchar(255) DEFAULT NULL COMMENT '应用标题',
+  `plugin_desc` varchar(255) DEFAULT NULL COMMENT '描述',
+  `plugin_author` varchar(100) DEFAULT NULL COMMENT '作者',
+  `plugin_identifier` varchar(100) DEFAULT NULL COMMENT '应用标识',
+  `plugin_logo` varchar(255) DEFAULT NULL COMMENT '应用图标',
+  `plugin_icon` varchar(255) DEFAULT NULL COMMENT 'icon图标',
+  `plugin_href` varchar(255) DEFAULT NULL COMMENT '应用入口',
+  `plugin_open` varchar(50) DEFAULT NULL COMMENT '打开方式',
+  `version` varchar(255) DEFAULT '0' COMMENT '当前版本',
+  `installed` int(2) DEFAULT NULL COMMENT '是否安装',
+  `disabled` int(2) DEFAULT NULL COMMENT '是否禁用',
+  `jump` int(3) DEFAULT '0' COMMENT '跳转入口',
+  `releases` varchar(255) DEFAULT '0' COMMENT '历史版本',
+  `created_at` datetime DEFAULT NULL COMMENT '插入时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `installed` (`installed`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='应用插件';
+
 LOCK TABLES `__PREFIX__options` WRITE;
 INSERT INTO `__PREFIX__options` VALUES (NULL,NULL, 'dict_upload','[{\"value\":\"0\",\"name\":\"无分类\"},{\"value\":\"1\",\"name\":\"图片\"},{\"value\":\"2\",\"name\":\"媒体\"},{\"value\":\"3\",\"name\":\"文件\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
 INSERT INTO `__PREFIX__options` VALUES (NULL,NULL, 'dict_sex','[{\"value\":\"0\",\"name\":\"女\"},{\"value\":\"1\",\"name\":\"男\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');

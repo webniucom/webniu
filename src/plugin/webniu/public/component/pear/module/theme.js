@@ -93,6 +93,7 @@ layui.define(["jquery","layer"], function (exports) {
 		style += '.light-theme .pear-nav-tree .layui-this a:hover,.light-theme .pear-nav-tree .layui-this,.light-theme .pear-nav-tree .layui-this a {background-color:'+second+'!important;color:'+color+'!important;}'
 		style += '.light-theme .pear-nav-tree .layui-this{ border-right: 3px solid '+color+'!important}'
 		style += '.loader:after {background:'+color+'}'
+		style += '.layui-btn-group .layui-btn-primary:hover {color:'+color+'}'
 		style += '.layui-form-checkbox[lay-skin=primary]>.layui-icon-indeterminate {border-color:'+color+'}'
 		style += '.layui-form-checkbox[lay-skin=primary]>.layui-icon-indeterminate:before {background-color:'+color+'}'
 		style += '.layui-table-checked {background-color:' + second + ' !important;}'
