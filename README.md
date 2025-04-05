@@ -11,7 +11,7 @@ webniu 网牛是一个基于workerman的开发的中后台管理系统，它兼�
 * 7、前端会员管理、权限管理，可扩展API。
 * 8、应用插件，可快速配置生成打包出zip应用包，支持本地安装、升级、卸载。
 * 9、应用权限，可灵活配置应用权限，独立登录。
-* 最后更新日期：2025年3月20日16:34:38
+* 最后更新v1.0.2版本日期：2025年4月5日14:03:27；
 ## 先安装 webman
 ```
 composer create-project workerman/webman:~2.0
@@ -26,8 +26,8 @@ composer require webniucom/webniu
 ```
 ## 注意事项
 ```
-1. 安装后请检查目录权限，
-2. 宝塔异步项目运行需要检查运行权限账户
+1. 安装后给目录权限，否则启动容易报错！；
+2. 宝塔异步项目运行需要检查运行权限账户；
 3. 安装后默认webman的端口在根目录config/process.php查看
 4. 默认端口是：8787
 ```
@@ -39,13 +39,19 @@ php start.php start
 ```
 http://ip地址:8787/webniu
 ```
+## 安装事项
+```
+1. 首次会弹出安装向导，按照提示安装即可；
+2. 第二步会检查目录权限，可以忽略跳过不影响安装；
+3. 如需重新安装可删除config/database.php、thinkorm.php文件，然后重新安装；
+```
 ## 使用文档
 ```
-https://help.webniu.com 未上线
+https://help.webniu.com 制作中未上线
 ```
 ## 更多插件
 ```
-https://app.webniu.com 未上线
+https://app.webniu.com 制作中未上线
 ```
 
  

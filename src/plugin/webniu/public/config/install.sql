@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__email_temp`(
 CREATE TABLE IF NOT EXISTS `__PREFIX__plugin`(
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `plugin_type` varchar(32) DEFAULT NULL COMMENT '类型',
-  `plugin_class` int(3) DEFAULT NULL COMMENT '分类id',
+  `plugin_class` int(3) DEFAULT '0' COMMENT '分类id',
   `plugin_name` varchar(255) DEFAULT NULL COMMENT '应用标题',
   `plugin_desc` varchar(255) DEFAULT NULL COMMENT '描述',
   `plugin_author` varchar(100) DEFAULT NULL COMMENT '作者',
@@ -181,8 +181,8 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__plugin`(
   `plugin_href` varchar(255) DEFAULT NULL COMMENT '应用入口',
   `plugin_open` varchar(50) DEFAULT NULL COMMENT '打开方式',
   `version` varchar(255) DEFAULT '0' COMMENT '当前版本',
-  `installed` int(2) DEFAULT NULL COMMENT '是否安装',
-  `disabled` int(2) DEFAULT NULL COMMENT '是否禁用',
+  `installed` int(2) DEFAULT '0' COMMENT '是否安装',
+  `disabled` int(2) DEFAULT '0' COMMENT '是否禁用',
   `jump` int(3) DEFAULT '0' COMMENT '跳转入口',
   `releases` varchar(255) DEFAULT '0' COMMENT '历史版本',
   `created_at` datetime DEFAULT NULL COMMENT '插入时间',
@@ -207,5 +207,5 @@ INSERT INTO `__PREFIX__article_category` VALUES (NULL,'系统公告');
 UNLOCK TABLES;
 
 LOCK TABLES `__PREFIX__plugin` WRITE;
-INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu','1','网牛引擎','网牛引擎','webniu','webniu','/app/webniu/avatar.png','','/app/webniu/web/index/dashboard','0','1.0.2','1','','0','1.0.2','1988-06-15 23:59:59', '1988-06-15 23:59:59');
+INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu','1','网牛引擎','网牛引擎','webniu','webniu','/app/webniu/avatar.png',NULL,'/app/webniu/web/index/dashboard','0','1.0.2',1,0,0,'1.0.2','1988-06-15 23:59:59', '1988-06-15 23:59:59');
 UNLOCK TABLES;
