@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__admin_log` (
   `user_agent` varchar(512) DEFAULT NULL COMMENT '浏览器 UA',
   `user_os` varchar(255) DEFAULT NULL COMMENT '操作系统',
   `user_browser` varchar(120) DEFAULT NULL COMMENT '浏览器',
+  `admin_id` int(11) DEFAULT NULL COMMENT '身份',
   `error` varchar(255) DEFAULT NULL COMMENT '错误信息',
   `status` tinyint(4) DEFAULT NULL COMMENT '登录状态',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
