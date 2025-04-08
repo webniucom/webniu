@@ -135,7 +135,6 @@
                     url: "/app/webniu/web/account/info",
                     dataType: "json",
                     success: function (res) { 
-                        console.log(res);
                         form.val("baseInfo", res.data);
                         $('*[name="avatar"]').attr("value", res.data.avatar);
                         layui.$(".attachment").on("click", function(e) { 

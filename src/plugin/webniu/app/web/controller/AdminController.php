@@ -114,6 +114,8 @@ class AdminController extends Crud
                 $admin_role->role_id = $id;
                 $admin_role->save();
             }
+            // 统计ADMIN数据
+            statistics('admin');
             return $this->json(0, 'ok', ['id' => $admin_id]);
         }
         return raw_view('admin/insert');

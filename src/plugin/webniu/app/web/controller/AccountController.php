@@ -7,6 +7,7 @@ use plugin\webniu\app\common\Util;
 use plugin\webniu\app\model\Admin;
 use plugin\webniu\app\model\AdminRole;
 use plugin\webniu\api\Captcha;
+use support\think\Cache;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
@@ -114,6 +115,17 @@ class AccountController extends Crud
     }
 
     /**
+     * 清除缓存
+     * @param Request $request
+     * @return Response
+     */
+    public function cacheclear(Request $request): Response
+    {
+        Cache::clear();
+        return $this->json(0);
+    }
+
+    /**
      * 获取登录信息
      * @param Request $request
      * @return Response
@@ -189,6 +201,7 @@ class AccountController extends Crud
                 $admin_role->role_id    = $id;
                 $admin_role->save();
             }
+            statistics('admin');
             return $this->json(0, 'ok', ['id'=>$admin_id,'username'=>$data['username']]);
         }
     }

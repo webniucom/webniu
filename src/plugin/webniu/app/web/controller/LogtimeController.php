@@ -16,6 +16,18 @@ class LogtimeController extends Crud
     protected $model = null;
 
     /**
+     * 只返回当前管理员数据
+     * @var string
+     */
+    protected $dataLimit = 'personal';
+
+    /**
+     * 不需要鉴权的方法
+     * @var string[]
+     */
+    protected $noNeedAuth = ['select'];
+
+    /**
      * 构造函数
      * @return void
      */

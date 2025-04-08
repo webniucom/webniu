@@ -503,9 +503,9 @@ layui.define(['jquery', 'element'], function(exports) {
 
 		title += '</ul>';
 		content += '</div>';
-		control += '<dd id="closeThis"><a href="#">关 闭 当 前</a></dd>'
-		control += '<dd id="closeOther"><a href="#">关 闭 其 他</a></dd>'
-		control += '<dd id="closeAll"><a href="#">关 闭 全 部</a></dd>'
+		control += '<dd id="closeThis"><a href="JavaScript:;">关 闭 当 前</a></dd>'
+		control += '<dd id="closeOther"><a href="JavaScript:;">关 闭 其 他</a></dd>'
+		control += '<dd id="closeAll"><a href="JavaScript:;">关 闭 全 部</a></dd>'
 		control += '</dl></li></ul></li></div>';
 
 		tab += title;

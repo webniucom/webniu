@@ -28,15 +28,15 @@
                 </div>
                 <!-- 顶 部 左 侧 功 能 -->
                 <ul class="layui-nav layui-layout-left">
-                    <li class="collapse layui-nav-item"><a href="#" class="layui-icon layui-icon-shrink-right"></a></li>
-                    <li class="refresh layui-nav-item"><a href="#" class="layui-icon layui-icon-refresh-1" loading = 600></a></li>
+                    <li class="collapse layui-nav-item"><a href="JavaScript:;" class="layui-icon layui-icon-shrink-right"></a></li>
+                    <li class="refresh layui-nav-item"><a href="JavaScript:;" class="layui-icon layui-icon-refresh-1" loading = 600></a></li>
                 </ul>
                 <!-- 多 系 统 菜 单 -->
                 <div id="control" class="layui-layout-control"></div>
                 <!-- 顶 部 右 侧 菜 单 -->
                 <ul class="layui-nav layui-layout-right">
-                    <li class="layui-nav-item layui-hide-xs"><a href="#" class="menuSearch layui-icon layui-icon-search"></a></li>
-                    <li class="layui-nav-item layui-hide-xs"><a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a></li>
+                    <li class="layui-nav-item layui-hide-xs"><a href="JavaScript:;" class="menuSearch layui-icon layui-icon-search"></a></li>
+                    <li class="layui-nav-item layui-hide-xs"><a href="JavaScript:;" class="fullScreen layui-icon layui-icon-screen-full"></a></li>
                     <li class="layui-nav-item layui-hide-xs message"></li>
                     <li class="layui-nav-item user">
                         <!-- 头 像 -->
@@ -44,11 +44,12 @@
                         <!-- 功 能 菜 单 -->
                         <dl class="layui-nav-child">
                             <dd><a user-menu-url="/app/webniu/web/account/index" user-menu-id="10" user-menu-title="基本资料">基本资料</a></dd>
+                            <dd><a href="javascript:void(0);" class="cacheclear">清理缓存</a></dd>
                             <dd><a href="javascript:void(0);" class="logout">注销登录</a></dd>
                         </dl>
                     </li>
                     <!-- 主 题 配 置 -->
-                    <li class="layui-nav-item setting"><a href="#" class="layui-icon layui-icon-more-vertical"></a></li>
+                    <li class="layui-nav-item setting"><a href="JavaScript:;" class="layui-icon layui-icon-more-vertical"></a></li>
                 </ul>
             </div>
             <!-- 侧 边 区 域 -->
@@ -87,7 +88,7 @@
         </div>
         <!-- 移 动 端 便 捷 操 作 -->
         <div class="pear-collapsed-pe collapse">
-            <a href="#" class="layui-icon layui-icon-shrink-right"></a>
+            <a href="JavaScript:;" class="layui-icon layui-icon-shrink-right"></a>
         </div>
         <!-- 依 赖 脚 本 -->
         <script src="/app/webniu/component/layui/layui.js"></script>
@@ -100,28 +101,50 @@
                 Account: {}
             };
 
-            layui.use(["admin","jquery","popup","drawer"], function() {
-                var $ = layui.$;
-                var admin = layui.admin;
-                var popup = layui.popup;
-
+            layui.use(["admin","jquery","popup","drawer","toast"], function() {
+                var $       = layui.$;
+                var admin   = layui.admin;
+                var popup   = layui.popup;
+                var toast   = layui.toast;
                 admin.setConfigType("json");
-                admin.setConfigPath("/app/webniu/web/config/get?name=base,core,user,atta,pic,menu,tab,theme,api,header,colors,other");
+                admin.setConfigPath("/app/webniu/web/config/get?name=base,user,atta,pic,menu,tab,theme,api,header,colors,other");
 
-                admin.render();
-
+                let configs = admin.render();
+                if(configs){
+                    $(".layui-footer span.left").html(configs.base.copyright);
+                }
                 // 登出逻辑
                 admin.logout(function(){
                     $.ajax({
                         url: "/app/webniu/web/account/logout",
                         dataType: "json",
                         success: function (res) {
-                            if (res.code) {
-                                return popup.error(res.msg);
+                            if (res.code) { 
+                                return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){
+                                     
+                                }}); 
                             }
-                            popup.success("注销成功",function(){
+                            return toast.success({message:'注销成功',position: 'topCenter',onOpened:function(){
                                 location.reload();
-                            })
+                            }}); 
+                        }
+                    });
+                    return false;
+                })
+
+                admin.cacheclear(function(){
+                    $.ajax({
+                        url: "/app/webniu/web/account/cacheclear",
+                        dataType: "json",
+                        success: function (res) {
+                            if (res.code) {
+                                return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){
+                                   
+                                }}); 
+                            }
+                            return toast.success({message:'清除成功',position: 'topCenter',onOpened:function(){
+                                location.reload();
+                            }}); 
                         }
                     });
                     return false;

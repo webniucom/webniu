@@ -47,8 +47,15 @@ class UserController extends Crud
     public function insert(Request $request): Response
     {
         if ($request->method() === 'POST') {
-            return parent::insert($request);
+            $data   = $this->insertInput($request);
+            $id     = $this->doInsert($data);
+            if ($id) {
+                //统计USER数据
+                statistics('user');
+            }
+            return $this->json(0, 'ok', ['id' => $id]); 
         }
+
         return raw_view('user/insert');
     }
 

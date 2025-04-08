@@ -18,7 +18,8 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 		var sideMenu;
 		var bodyTab;
 		var config;
-		var logout = function() {};
+		var logout 		= function() {};
+		var cacheclear 	= function() {};
 		var msgInstance;
 		var body = $('body');
 
@@ -37,9 +38,9 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 
 			this.render = function(initConfig) {
 				if (initConfig !== undefined) {
-					applyConfig(initConfig);
+					return applyConfig(initConfig);
 				} else {
-					applyConfig(pearAdmin.readConfig());
+					return applyConfig(pearAdmin.readConfig());
 				}
 			}
 
@@ -328,6 +329,10 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				logout = callback;
 			}
 
+			this.cacheclear = function(callback) {
+				cacheclear = callback;
+			}
+
 			this.message = function(callback) {
 				if (callback != null) {
 					msgInstance.click(callback);
@@ -482,6 +487,12 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 
 		body.on("click", ".logout", function() {
 			if (logout() && bodyTab) {
+				bodyTab.clear();
+			}
+		})
+
+		body.on("click", ".cacheclear", function() {
+			if (cacheclear() && bodyTab) {
 				bodyTab.clear();
 			}
 		})
@@ -871,6 +882,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 					form.on('switch(auto-head)', function(data) {
 						localStorage.setItem("auto-head", this.checked);
 						pearTheme.changeTheme(window, this.checked);
+						 
 					})
 
 					form.on('switch(banner)', function(data) {
@@ -924,6 +936,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			$(this).addClass("layui-this");
 			localStorage.setItem("theme-menu", theme);
 			pearAdmin.menuSkin(theme);
+			console.log('aaaa');
 		});
 
 		body.on('click', '[data-select-header]', function() {
@@ -951,6 +964,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			localStorage.setItem("theme-color-color", currentColor.color);
 			localStorage.setItem("theme-color-second", currentColor.second);
 			pearTheme.changeTheme(window, isAutoHead(config));
+			
 		});
 
 		function applyConfig(param) {
@@ -963,6 +977,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			if (param.theme.message != false) {
 				pearAdmin.messageRender(param);
 			}
+			return config;
 		}
 
 		function getColorById(id) {

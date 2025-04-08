@@ -7,8 +7,8 @@ layui.define(["jquery","layer"], function (exports) {
 
 	theme.changeTheme = function (target, autoHead) {
 		this.autoHead = autoHead;
-		var color = localStorage.getItem("theme-color-color");
-		var second = localStorage.getItem("theme-color-second");
+		var color 	= localStorage.getItem("theme-color-color");
+		var second 	= localStorage.getItem("theme-color-second");
 		this.colorSet(color, second);
 		if (target.frames.length == 0) return;
 		for (var i = 0; i < target.frames.length; i++) {

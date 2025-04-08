@@ -16,7 +16,7 @@ return [
                 'href' => '',
                 'children' => [
                     [
-                        'title' => '控制台',
+                        'title' => '数据面板',
                         'key' => 'plugin\\webniu\\app\\web\\controller\\IndexController',
                         'icon' => '',
                         'type' => 1,

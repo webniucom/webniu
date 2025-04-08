@@ -13,7 +13,11 @@ class Install
     public static function install($version)
     {
         // 导入菜单
-        Menu::import(static::getMenus());
+        if($menus[] = static::getMenus()) {
+            Menu::import($menus);
+        }
+        // 导入SQL
+        if(static::getSql('install')) { }
     }
 
     /**
@@ -25,9 +29,11 @@ class Install
     public static function uninstall($version)
     {
         // 删除菜单
-        foreach (static::getMenus() as $menu) {
-            Menu::delete($menu['name']);
+        if($menus[] = static::getMenus()) { 
+            Menu::delete($menus);
         }
+        // 删除SQL
+        if(static::getSql('uninstall')) { }
     }
 
     /**
@@ -45,7 +51,11 @@ class Install
             static::removeUnnecessaryMenus($context['previous_menus']);
         }
         // 导入新菜单
-        Menu::import(static::getMenus());
+        if ($menus = static::getMenus()) {
+            Menu::import($menus);
+        }
+        // 更新SQL
+        if(static::getSql('update')) { }
     }
 
     /**
@@ -77,6 +87,21 @@ class Install
     }
 
     /**
+     * 执行SQL
+     *
+     * @return array|mixed
+     */
+    public static function getSql($type)
+    {
+        clearstatcache();
+        if (is_file($sql_file = __DIR__ ."/../public/config/$type.php")) {
+            include $sql_file;
+            return true;
+        } 
+        return false;
+    }
+
+    /**
      * 删除不需要的菜单
      *
      * @param $previous_menus
@@ -86,7 +111,7 @@ class Install
     {
         $menus_to_remove = array_diff(Menu::column($previous_menus, 'name'), Menu::column(static::getMenus(), 'name'));
         foreach ($menus_to_remove as $name) {
-            Menu::delete($name);
+            Menu::impdelete($name);//直接执行删除
         }
     }
 

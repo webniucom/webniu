@@ -5,6 +5,9 @@ namespace plugin\webniu\app\web\controller;
 use plugin\webniu\app\common\Util;
 use plugin\webniu\app\model\Option;
 use plugin\webniu\app\model\User;
+use plugin\webniu\app\model\Admin;
+use plugin\webniu\app\model\Plugin;
+use plugin\webniu\app\model\Statistics;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
@@ -25,7 +28,7 @@ class IndexController
      * 不需要鉴权的方法
      * @var string[]
      */
-    protected $noNeedAuth = ['dashboard'];
+    protected $noNeedAuth = ['dashboard','readata'];
 
     /**
      * 后台主页
@@ -49,6 +52,8 @@ class IndexController
             }   
             return view('account/login',['data'=>$config]);
         }
+        // 统计访问数据
+        statistics();
         return raw_view('index/index');
     }
 
@@ -60,39 +65,65 @@ class IndexController
      */
     public function dashboard(Request $request): Response
     {
-        // 今日新增用户数
-        $today_user_count = User::where('created_at', '>', date('Y-m-d') . ' 00:00:00')->count();
-        // 7天内新增用户数
-        $day7_user_count = User::where('created_at', '>', date('Y-m-d H:i:s', time() - 7 * 24 * 60 * 60))->count();
-        // 30天内新增用户数
-        $day30_user_count = User::where('created_at', '>', date('Y-m-d H:i:s', time() - 30 * 24 * 60 * 60))->count();
-        // 总用户数
-        $user_count = User::count();
+        // mysql版本
+        $version = Util::db()->select('select VERSION() as version');
+        $mysql_version = $version[0]->version ?? 'unknown'; 
+        return view('index/dashboard', [
+            'php_version'   => PHP_VERSION,
+            'workerman_version' =>  Worker::VERSION,
+            'webman_version'=> Util::getPackageVersion('workerman/webman-framework'),
+            'admin_version' => config('plugin.webniu.app.version'),
+            'mysql_version' => $mysql_version,
+            'think_cache'   => Util::getPackageVersion('webman/think-cache'),
+            'os' => PHP_OS,
+        ]);
+    }
+
+    /**
+     * 拉取数据
+     * @param Request $request
+     * @return Response
+     * @throws Throwable
+     */
+    public function readata(Request $request): Response
+    {
+        $top_data   = [];
+        $top_data['user_count']         = User::count();
+        $top_data['admin_count']        = Admin::count();
+        $top_data['stat_count']         = Statistics::where('model','webniu')->sum('count');
+        $top_data['plugin_count']       = Plugin::count();
+        $plugin = Plugin::where('installed','1')->select('plugin_identifier','plugin_name')->get();
+        $series = [];
+        $labels = [];
+        $top_data['plugin']             = [];
+        if($plugin){
+            foreach($plugin as $key=>$val){
+                $series[] = 1;
+                $labels[] = $val->plugin_name;
+            }
+            $top_data['plugin'] = [
+                'series' => $series,
+                'labels' => $labels,
+            ];
+        }
         // mysql版本
         $version = Util::db()->select('select VERSION() as version');
         $mysql_version = $version[0]->version ?? 'unknown';
 
-        $day7_detail = [];
+        $day15_series = [];
+        $day15_labels = [];
         $now = time();
-        for ($i = 0; $i < 7; $i++) {
+        for ($i = 0; $i < 15; $i++) {
             $date = date('Y-m-d', $now - 24 * 60 * 60 * $i);
-            $day7_detail[substr($date, 5)] = User::where('created_at', '>', "$date 00:00:00")
-                ->where('created_at', '<', "$date 23:59:59")->count();
+            $day15_series[] = Statistics::where('model','=',"webniu")->where('created_at', '=', "$date 00:00:00")->sum('count');
+            $day15_labels[] = substr($date, 5); 
         }
+        $top_data['day15_detail']   = [
+            'series' => array_reverse($day15_series),
+            'labels' => array_reverse($day15_labels),
+        ];
+        return json(['code' => 0, 'data' => $top_data, 'msg' => 'ok']);
 
-        return raw_view('index/dashboard', [
-            'today_user_count' => $today_user_count,
-            'day7_user_count' => $day7_user_count,
-            'day30_user_count' => $day30_user_count,
-            'user_count' => $user_count,
-            'php_version' => PHP_VERSION,
-            'workerman_version' =>  Worker::VERSION,
-            'webman_version' => Util::getPackageVersion('workerman/webman-framework'),
-            'admin_version' => config('plugin.webniu.app.version'),
-            'mysql_version' => $mysql_version,
-            'os' => PHP_OS,
-            'day7_detail' => array_reverse($day7_detail),
-        ]);
     }
 
 }

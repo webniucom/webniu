@@ -236,6 +236,9 @@ a {
 }
 
 /* tinymce 样式优化 End */
+.layui-card{
+    margin-bottom: 10px;
+}
 
 .layui-card-body{
     padding: 14px;

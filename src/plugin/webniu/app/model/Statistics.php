@@ -4,14 +4,14 @@ namespace plugin\webniu\app\model;
 
 use plugin\webniu\app\model\Base;
 
-class AdminLog extends Base
+class Statistics extends Base
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'admin_log';
+    protected $table = 'statistics';
 
     /**
      * The primary key associated with the table.

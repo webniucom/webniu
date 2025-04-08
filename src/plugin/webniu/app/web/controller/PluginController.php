@@ -11,7 +11,7 @@ use support\Log;
 use support\Request;
 use support\Response;
 use plugin\webniu\app\model\Plugin;
-use support\Redis;
+use support\think\Cache;
 use ZIPARCHIVE;
 use function array_diff;
 use function ini_get;
@@ -61,11 +61,13 @@ class PluginController extends Crud
     public function select(Request $request): Response
     {
         $data       = [];
+        $total      = 0;
         $installedtype = $request->get('installedtype','installed');
         [$where, $format, $limit, $field, $order] = $this->selectInput($request); 
         $query      = $this->doSelect($where, $field, $order);
         $paginator  = $query->paginate($limit);
         $items      = $paginator->items();
+         
         switch ($installedtype) {
             case 'localapps': 
                 $localitems         = [];
@@ -83,8 +85,32 @@ class PluginController extends Crud
                 $data   = $localitems;
                 break;
             case 'waitapps':
-                $total  = 0;
-                $data   = []; 
+                $client = $this->httpClient();
+                $query  = $request->get();
+                $query['core']      = options(['core'])['core'];
+                $query['version']   = $this->getAdminVersion();
+                $response   = $client->get('/api/online', ['query'=>$query]);
+                $content    = $response->getBody()->getContents();
+                $content    = json_decode($content, true);
+                if($content){
+                    $total  = $content['count']??0;
+                    $data   = $content['data']??[];
+                    if(!empty($data)){
+                        $plugin_identifier  = array_column($data, 'plugin_identifier');
+                        $list   = $this->model->whereIn('plugin_identifier',$plugin_identifier)->select('plugin_identifier')->get();
+                        if($list){
+                            $list   = $list->toArray();
+                            $list   = array_column($list,'plugin_identifier');
+                            foreach($data as $k=>$v){
+                                if(in_array($v['plugin_identifier'],$list)){
+                                    unset($data[$k]);
+                                }
+                            }
+                            $total  = count($data);
+                        } 
+                    }
+                     
+                }  
                 break;
             case 'updateset': 
                 $total              = $paginator->total();
@@ -159,20 +185,20 @@ EOF;
      * @throws BusinessException
      */
     public function typeclass(Request $request): Response
-    {
-        $redis  = Redis::connection('plugin.webniu.default');
+    { 
         $key    = 'typeclass';
-        $data   = $redis->get($key);
+        $data   = Cache::get($key);
         if ($data) {
             return $this->json(0, 'ok', json_decode($data, true));
         };
         $client = $this->httpClient();
-        $query  = $request->get();
-        $query['version'] = $this->getAdminVersion();
-        $response   = $client->get('/app/webniu/api/typeclass', ['query'=>$query]);
+        $query              = $request->get();
+        $query['core']      = options(['core'])['core'];
+        $query['version']   = $this->getAdminVersion();
+        $response   = $client->get('/api/typeclass', ['query'=>$query]);
         $content    = $response->getBody()->getContents();
-        $data       = json_decode($content, true);
-        $redis->set($key,json_encode($data['data']??[]),60*60*24*7);
+        $data       = json_decode($content, true); 
+        Cache::set($key,json_encode($data['data']??[]),60*60*24*7);
         return  $this->json(0,'ok',$data['data']??[]);
     }
 
@@ -191,13 +217,15 @@ EOF;
         }
         $names  = array_column($version, 'name');
         $name   = implode(',', $names);
-        $client     = $this->httpClient();
-        $response   = $client->post('/app/webniu/api/listapp', ['form_params'=>$version]);
+        $client     = $this->httpClient(); 
+        $form_params['version'] = $version;
+        $form_params['core']    = options(['core'])['core'];
+        $response   = $client->post('/api/local', ['form_params'=>$form_params]);
         $content    = $response->getBody()->getContents();
         $content    = json_decode($content, true);
-
+        
         foreach ($version as $item) {
-            if(is_array($content['data']) && array_key_exists($item['name'], $content['data'])){
+            if(isset($content['data']) && is_array($content['data']) && array_key_exists($item['name'], $content['data'])){
                 $data[$item['name']] = $content['data'][$item['name']];  
             }
             $installed = $this->getPluginApp($item['name']);
@@ -206,6 +234,14 @@ EOF;
             }
         }
         return json(['code' => 0, 'msg' => 'ok', 'data' => $data]);
+    }
+
+    public function system(Request $request): Response
+    { 
+        $key = 'test_key';
+        Cache::set($key, rand());
+        return response(Cache::get($key));
+        return json(['code' => 0, 'msg' => 'ok', 'data' => []]);
     }
 
     /**

@@ -6,10 +6,9 @@
 use plugin\webniu\app\model\Admin;
 use plugin\webniu\app\model\AdminRole;
 use plugin\webniu\app\model\AdminLog;
+use plugin\webniu\app\model\Statistics;
 use plugin\webniu\app\model\Option;
-use plugin\webniu\app\common\Util;
-use Webman\Event\Event;
-use support\Db;
+use plugin\webniu\app\common\Util; 
 
 /**
  * 当前管理员id
@@ -194,10 +193,62 @@ if (!function_exists('adminlog')) {
             $user_os = '未知';
         } 
         $AdminLog->user_os      = $user_os;
+        $AdminLog->admin_id     = $a_session['id'];
         $AdminLog->user_browser = preg_replace('/[^(]+\((.*?)[^)]+\) .*?/', '$1', $userAgent);
-        $AdminLog->error        = '登录成功';
+        $AdminLog->error        = '成功';
         $AdminLog->status       = '1';
         $AdminLog->save();
+        return true;
+    }
+
+}
+
+function getDirectorySize($dir) {
+    $size = 0;
+    // 创建 RecursiveDirectoryIterator 对象
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
+    foreach ($iterator as $file) {
+        if ($file->isFile()) {
+            $size += $file->getSize();
+        }
+    }
+    return $size;
+}
+
+function formatSizeUnits($bytes) {
+    if ($bytes >= 1099511627776) {
+        $bytes = ($bytes / 1099511627776);
+        return round($bytes, 2) . ' TB';
+    } elseif ($bytes >= 1073741824) {
+        $bytes = ($bytes / 1073741824);
+        return round($bytes, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        $bytes = ($bytes / 1048576);
+        return round($bytes, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        $bytes = ($bytes / 1024);
+        return round($bytes, 2) . ' KB';
+    } elseif ($bytes > 1) {
+        return $bytes . ' bytes';
+    } elseif ($bytes == 1) {
+        return $bytes . ' byte';
+    } else {
+        return '0 bytes';
+    }
+}
+
+//统计数据
+if (!function_exists('statistics')) {
+    function statistics($model='webniu'): bool
+    {
+        $AdminLog   = new Statistics;
+        $timestamp  = date("Y-m-d", time());
+        if(!$AdminLog->where('model', $model)->whereDate('created_at', $timestamp)->increment('count')){
+            $AdminLog->model       = $model;
+            $AdminLog->count       = 1;
+            $AdminLog->created_at  = $timestamp;
+            $AdminLog->save();
+        };
         return true;
     }
 
