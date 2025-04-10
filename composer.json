@@ -7,7 +7,7 @@
     "workerman/webman-framework": ">=2.1",
     "webman/database": ">=2.1",
     "illuminate/pagination": ">=7.30",
-    "illuminate/events": "^12.7",
+    "illuminate/events": ">=7.30",
     "intervention/image": "^2.7",
     "webman/event": "^1.0",
     "webman/captcha": "^1.0.0",

@@ -12,7 +12,24 @@ webniu 网牛引擎是一个基于workerman的开发的中后台管理系统，�
 * 8、应用插件，可快速配置生成打包出zip应用包，支持本地安装、升级、卸载。
 * 9、应用权限，可灵活配置应用权限，独立登录。
 * 最后更新v1.0.2版本日期：2025年4月8日17:42:13；
-## 先安装 webman
+## 安装环境
+```
+PHP >= 8.1
+MySQL >= 5.7
+composer >= 2.5.8
+```
+```
+PHP 需要安装扩展 redis、event、fileinfo
+PHP 需要解除禁用函数找到配置文件 php.ini ，找到 disable_functions 并去掉以下函数前面的分号；
+```
+```
+disable_functions = passthru,system,chroot,chgrp,chown,popen,pcntl_exec,ini_alter,ini_restore,dl,openlog,syslog,readlink,symlink,popepassthru,pcntl_waitpid,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,imap_open,apache_setenv
+```
+## 升级composer
+```
+composer self-update
+```
+## 安装 webman
 ```
 composer create-project workerman/webman:~2.0
 ```
@@ -30,6 +47,7 @@ composer require webniucom/webniu
 2. 宝塔异步项目运行需要检查运行权限账户；
 3. 安装后默认webman的端口在根目录config/process.php查看
 4. 默认端口是：8787
+5. 启动命令可以指定用户启动，例如：sudo -u www php start.php start  以www运行；
 ```
 ## 启动
 ```
