@@ -150,13 +150,13 @@ class ConfigController extends Base
 
                     break;
                 case 'menu':
-                    $data['data']             = Util::filterUrlPath($items['data'] ?? '');
-                    $data['accordion']        = !empty($items['accordion']);
+                    $data['data']             = "/app/webniu/web/rule/get";
+                    $data['accordion']        = true;
                     $data['collapse']         = !empty($items['collapse']);
                     $data['control']          = !empty($items['control']);
-                    $data['controlWidth']     = (int)$items['controlWidth'] ?? 500;
-                    $data['controlHeight']    = $items['controlHeight'] ?? '100%';
-                    $data['select']           = (int)$items['select'] ?? 0;
+                    $data['controlWidth']     = 230;
+                    $data['controlHeight']    = '100%';
+                    $data['select']           = (int)$items['select'] ?? 3;
                     $data['async']            = true;
                     break;
                 case 'tab':

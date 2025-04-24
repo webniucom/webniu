@@ -185,7 +185,7 @@ class RuleController extends Crud
         // 从数据库中删除已经不存在的方法
         $menu_names_to_del = array_diff($methods_in_db, $methods_in_files);
         if ($menu_names_to_del) {
-            //Rule::whereIn('key', $menu_names_to_del)->delete();
+            Rule::whereIn('key', $menu_names_to_del)->delete();
         }
     }
 

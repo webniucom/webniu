@@ -333,3 +333,91 @@ if (!function_exists('pdo_tablename')) {
         return $prefix.$tablename;
     }    
 }
+
+//转换一个安全路径
+if (!function_exists('safe_gpc_path')) {
+    function safe_gpc_path($value, $default = '') {
+        $path = safe_gpc_string($value);
+        $path = str_replace(array('..', '..\\', '\\\\', '\\', '..\\\\'), '', $path);
+    
+        if (empty($path) || $path != $value) {
+            $path = $default;
+        }
+    
+        return $path;
+    }
+}
+
+//转换一个安全字符串
+if (!function_exists('safe_gpc_string')) {
+	function safe_gpc_string($value, $default = '') {
+        $value = safe_bad_str_replace($value);
+        $value = preg_replace('/&((#(\d{3,5}|x[a-fA-F0-9]{4}));)/', '&\\1', $value);
+    
+        if (empty($value) && $default != $value) {
+            $value = $default;
+        }
+    
+        return $value;
+    }
+}
+
+//转换一个安全数字
+if (!function_exists('safe_gpc_int')) {
+    function safe_gpc_int($value, $default = 0) {
+        if (false !== strpos($value, '.')) {
+        $value = floatval($value);
+        $default = floatval($default);
+        } else {
+        $value = intval($value);
+        $default = intval($default);
+        }
+
+        if (empty($value) && $default != $value) {
+        $value = $default;
+        }
+
+        return $value;
+    }
+}
+
+//转换一个安全的字符串型数组
+if (!function_exists('safe_gpc_array')) {
+    function safe_gpc_array($value, $default = array()) {
+        if (empty($value) || !is_array($value)) {
+            return $default;
+        }
+        foreach ($value as &$row) {
+            if (is_numeric($row)) {
+                $row = safe_gpc_int($row);
+            } elseif (is_array($row)) {
+                $row = safe_gpc_array($row, $default);
+            } else {
+                $row = safe_gpc_string($row);
+            }
+        }
+
+        return $value;
+    }
+}
+
+//转换一个安全的布尔值
+if (!function_exists('safe_gpc_boolean')) {
+    function safe_gpc_boolean($value) {
+        return boolval($value);
+    }   
+}
+
+//过滤掉一些不安全的字符串
+if (!function_exists('safe_bad_str_replace')) {
+    function safe_bad_str_replace($string) {
+        if (empty($string)) {
+            return '';
+        }
+        $badstr = array("\0", '%00', '%3C', '%3E', '<?', '<%', '<?php', '{php', '{if', '{loop', '../', '%0D%0A');
+        $newstr = array('_', '_', '&lt;', '&gt;', '_', '_', '_', '_', '_', '_', '.._', '_');
+        $string = str_replace($badstr, $newstr, $string);
+    
+        return $string;
+    }  
+}

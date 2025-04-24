@@ -264,14 +264,14 @@
                                 let newobj      = object.elem;
                                 let data        = object.data??[];
                                 if (!Array.isArray(data)) {
-                                    let url = data.url; 
+                                    let imgurl = data.url; 
                                     let multiple    = object.multiple??(newobj.parent().attr('multiple')==undefined?false:true);
                                     let accept      = object.accept??(newobj.parent().attr('accept')??'image');
                                     if(!multiple){newobj.parent().find(".wn_images_list").html('');}
                                     newobj.parent().find(".wn_images_list").prepend(`<li class="wx_images_li">
-                                        <img src="${url}" class="img_class" lay-on="photos" />
+                                        <img src="${imgurl}" class="img_class" lay-on="photos" />
                                         <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
-                                        <input type="hidden" name="${newobj.parent().attr('name')}${multiple?'[]':''}" value="${url}" />
+                                        <input type="hidden" name="${newobj.parent().attr('name')}${multiple?'[]':''}" value="${imgurl}" />
                                     </li>`);
                                 }else{ 
                                     let multiple    = object.multiple??(newobj.attr('multiple')==undefined?false:true);
@@ -279,11 +279,11 @@
                                     let value       = newobj.attr('value');
                                     if(value!=undefined){
                                         newobj.find(".wn_images_list").html('');
-                                        layui.each((value).split(","), function (k , url) {
+                                        layui.each((value).split(","), function (k , imgurl) {
                                             newobj.find(".wn_images_list").prepend(`<li class="wx_images_li">
-                                                <img src="${url}" class="img_class" lay-on="photos" />
+                                                <img src="${imgurl}" class="img_class" lay-on="photos" />
                                                 <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
-                                                <input type="hidden" name="${newobj.attr('name')}${multiple?'[]':''}" value="${url}" />
+                                                <input type="hidden" name="${newobj.attr('name')}${multiple?'[]':''}" value="${imgurl}" />
                                             </li>`);
                                         });
                                     }

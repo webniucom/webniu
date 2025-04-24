@@ -369,8 +369,9 @@
 						},
 						tooltip: {
 							y: {
-								formatter: function (val) {
-									return '已安装'; // 这里设置显示的单位为百分比
+								formatter: function (val,opts) {
+									let size = res.data.plugin.size[opts.seriesIndex];
+									return `已安装 ${size}`;
 								}
 							}
 						}

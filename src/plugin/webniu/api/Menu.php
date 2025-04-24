@@ -54,6 +54,9 @@ class Menu
     {
         if (is_numeric(key($menu_tree)) && !isset($menu_tree['key'])) {
             foreach ($menu_tree as $item) {
+                if (isset($item['pid']) && !is_numeric($item['pid'])) {
+                    $item['pid'] = $item['pid']!=''?static::get($item['pid'])['id']:0;   
+                }
                 static::import($item);
             }
             return;

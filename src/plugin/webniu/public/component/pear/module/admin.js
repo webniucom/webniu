@@ -936,7 +936,6 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			$(this).addClass("layui-this");
 			localStorage.setItem("theme-menu", theme);
 			pearAdmin.menuSkin(theme);
-			console.log('aaaa');
 		});
 
 		body.on('click', '[data-select-header]', function() {

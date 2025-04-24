@@ -9,7 +9,7 @@ use process\Monitor;
 use support\exception\BusinessException;
 use support\Log;
 use support\Request;
-use support\Response;
+use support\Response; 
 use plugin\webniu\app\model\Plugin;
 use support\think\Cache;
 use ZIPARCHIVE;
@@ -238,9 +238,7 @@ EOF;
 
     public function system(Request $request): Response
     { 
-        $key = 'test_key';
-        Cache::set($key, rand());
-        return response(Cache::get($key));
+         
         return json(['code' => 0, 'msg' => 'ok', 'data' => []]);
     }
 

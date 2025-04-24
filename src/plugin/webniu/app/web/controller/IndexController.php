@@ -9,6 +9,7 @@ use plugin\webniu\app\model\Admin;
 use plugin\webniu\app\model\Plugin;
 use plugin\webniu\app\model\Statistics;
 use support\exception\BusinessException;
+use support\think\Cache;
 use support\Request;
 use support\Response;
 use think\db\Where;
@@ -95,15 +96,24 @@ class IndexController
         $plugin = Plugin::where('installed','1')->select('plugin_identifier','plugin_name')->get();
         $series = [];
         $labels = [];
+        $size   = [];
         $top_data['plugin']             = [];
         if($plugin){
             foreach($plugin as $key=>$val){
                 $series[] = 1;
                 $labels[] = $val->plugin_name;
+                if($sizea = Cache::get('plugin_'.$val->plugin_identifier.'_size')){
+                    $size[] = $sizea;
+                }else{
+                    $sizea = formatSizeUnits(getDirectorySize(base_path().'/plugin/'.$val->plugin_identifier));
+                    Cache::set('plugin_'.$val->plugin_identifier.'_size',$sizea,60*60*24);
+                    $size[] = $sizea;
+                }   
             }
             $top_data['plugin'] = [
                 'series' => $series,
                 'labels' => $labels,
+                'size'   => $size,
             ];
         }
         // mysql版本
@@ -116,7 +126,7 @@ class IndexController
         for ($i = 0; $i < 15; $i++) {
             $date = date('Y-m-d', $now - 24 * 60 * 60 * $i);
             $day15_series[] = Statistics::where('model','=',"webniu")->where('created_at', '=', "$date 00:00:00")->sum('count');
-            $day15_labels[] = substr($date, 5); 
+            $day15_labels[] = substr($date, 5);
         }
         $top_data['day15_detail']   = [
             'series' => array_reverse($day15_series),
