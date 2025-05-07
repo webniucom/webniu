@@ -284,7 +284,6 @@ EOF;
 jsonArea({
     el: "#$field",
     change: function(data) {
-        console.log(data);
     }
 });
 EOF;
@@ -315,14 +314,13 @@ EOF;
 <div class="layui-form-item">
     $label
     <div class="$class">
-        <span>$value</span>
-        <input type="text" style="display:none" name="$field" value="$value" />
-        <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="$id" permission="app.webniu.upload.file">
-            <i class="layui-icon layui-icon-upload"></i>上传文件
-        </button>
-        <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-$id" permission="app.webniu.upload.attachment">
-            <i class="layui-icon layui-icon-align-left"></i>选择文件
-        </button>
+        <div class="wn_upload_dom">
+            <input type="hidden" name="field[$field]" value="$value" accept="file">
+            <div class="wn_list_dom"></div>
+            <div class="layui-btn layui-btn-sm" id="field-$field" permission="app.webniu.web.upload.file">
+                <i class="layui-icon layui-icon-upload"></i>
+            </div>
+        </div> 
     </div>
 </div>
 
@@ -330,27 +328,14 @@ EOF;
         $this->jsContent .= <<<EOF
 
 // 字段 {$options['label']} $field
-layui.use(["upload", "layer", "popup", "util"], function() {
-    let input = layui.$("#$id").prev();
-    input.prev().html(layui.util.escape(input.val()));
-    layui.$("#attachment-choose-$id").on("click", function() {
-        parent.layer.open({
-            type: 2,
-            title: "选择附件",
-            content: "/app/webniu/web/upload/attachment",
-            area: ["95%", "90%"],
-            success: function (layero, index) {
-                parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                    input.val(data.url).prev().html(layui.util.escape(data.url));
-                });
-            }
-        });
-    });
-    layui.upload.render({
-        elem: "#$id",$options_string
+layui.use(["layer","uploads"], function() {
+    let uploads = layui.uploads;
+    uploads.render({
+        elem: "#field-$id",$options_string
         done: function (res) {
-            if (res.code) return layui.popup.failure(res.msg);
-            this.item.prev().val(res.data.url).prev().html(layui.util.escape(res.data.url));
+            if (res.code > 0) return layui.layer.msg(res.msg);
+            let thisimg = layui.$(this.elem);
+            uploads.setUploadListValue(thisimg,res.data);
         }
     });
 });
@@ -381,14 +366,16 @@ EOF;
 <div class="layui-form-item">
     $label
     <div class="$class">
-        <img class="img-3" src=""/>
-        <input type="text" style="display:none" name="$field" value="$value" />
-        <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="$id"  permission="app.webniu.upload.image">
-            <i class="layui-icon layui-icon-upload"></i>上传图片
-        </button>
-        <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-$id"  permission="app.webniu.upload.attachment">
-            <i class="layui-icon layui-icon-align-left"></i>选择图片
-        </button>
+        <div class="wn_upload_dom">
+            <input type="hidden" name="field[$field]" value="$value" $multiple>
+            <div class="wn_list_dom"></div>
+            <div class="layui-btn layui-btn-sm" id="upload-$id" permission="app.webniu.web.upload.image">
+                <i class="layui-icon layui-icon-upload"></i>
+            </div>
+            <div class="layui-btn layui-btn-sm" id="attachment-choose-$id" permission="app.webniu.web.upload.attachment">
+                <i class="layui-icon layui-icon-align-left"></i>
+            </div>
+        </div> 
     </div>
 </div>
 
@@ -396,10 +383,10 @@ EOF;
         $this->jsContent .= <<<EOF
 
 // 字段 {$options['label']} $field
-layui.use(["upload", "layer"], function() {
-    let input = layui.$("#$id").prev();
-    input.prev().attr("src", input.val());
-    layui.$("#attachment-choose-$id").on("click", function() {
+layui.use(["layer","uploads"], function() {
+    let uploads = layui.uploads;
+    layui.$("#attachment-choose-$id").on("click", function(e) { 
+        let thisimg = layui.$(this);
         parent.layer.open({
             type: 2,
             title: "选择附件",
@@ -407,16 +394,17 @@ layui.use(["upload", "layer"], function() {
             area: ["95%", "90%"],
             success: function (layero, index) {
                 parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                    input.val(data.url).prev().attr("src", data.url);
+                    uploads.setUploadListValue(thisimg,data);
                 });
             }
         });
     });
-    layui.upload.render({
-        elem: "#$id",$options_string
+    uploads.render({
+        elem: "#upload-$id",$options_string
         done: function (res) {
             if (res.code > 0) return layui.layer.msg(res.msg);
-            this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+            let thisimg = layui.$(this.elem);
+            uploads.setUploadListValue(thisimg,res.data);
         }
     });
 });
@@ -736,6 +724,7 @@ layui.use(["jquery", "xmSelect", "popup"], function() {
                 el: "#$id",
                 name: "$field",
                 initValue: initValue,
+                theme: {color: localStorage.getItem("theme-color-color")},
                 filterable: true,
                 data: res.data, $options_string
             });
@@ -758,6 +747,7 @@ layui.use(["jquery", "xmSelect"], function() {
         el: "#$id",
         name: "$field",
         filterable: true,
+        theme: {color: localStorage.getItem("theme-color-color")},
         initValue: initValue,$options_string
     })
 });

@@ -3,8 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>新增页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
 
@@ -39,11 +42,10 @@
 
             <div class="bottom">
                 <div class="button-container">
-                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit=""
-                        lay-filter="save">
+                    <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="pear-btn pear-btn-md">
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
                         重置
                     </button>
                 </div>
@@ -58,9 +60,8 @@
                 box-shadow: none;
             }
         </style>
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+        <script src="/app/webniu/skins/component/pear/pear.js"></script>
         
         <script>
 
@@ -85,6 +86,7 @@
                             name: "rules",
                             initValue: initValue,
                             data: ddSelect, 
+                            theme: {color: localStorage.getItem("theme-color-color")},
                             tree: {"show":true,expandedKeys:initValue},
                             toolbar: {show:true,list:["ALL","CLEAR","REVERSE"]},
                             content: "<div id='transfer'></div>",
@@ -117,6 +119,7 @@
                                             height:height_dom+'px',
                                             style:{'overflow':'auto'},
                                             data: ddSelect,
+                                            theme: {color: localStorage.getItem("theme-color-color")},
                                             tree: {"show":true,expandedKeys:initValue},
                                             toolbar: {show:true,list:["ALL","CLEAR","REVERSE"]}, 
                                             on:function(arr){
@@ -159,6 +162,7 @@
                             model: {"icon":"hidden","label":{"type":"text"}},
                             clickClose: true,
                             radio: true,
+                            theme: {color: localStorage.getItem("theme-color-color")},
                             tree: {show: true,"strict":false,"clickCheck":true,"clickExpand":false,expandedKeys:true},
                             on: function(data){
                                 let id = data.arr[0] ? data.arr[0].value : "";

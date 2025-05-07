@@ -3,9 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>新增页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/layui/css/layui.css" />
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
         <style>
@@ -70,10 +72,10 @@
                                 <table id="column-table" lay-filter="column-table"></table>
 
                                 <script type="text/html" id="column-toolbar">
-                                    <button type="button" class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+                                    <button type="button" class="layui-btn layui-btn-sm" lay-event="add">
                                         <i class="layui-icon layui-icon-add-1"></i>新增
                                     </button>
-                                    <button type="button" class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+                                    <button type="button" class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove">
                                         <i class="layui-icon layui-icon-delete"></i>删除
                                     </button>
                                 </script>
@@ -206,20 +208,18 @@
 
             <div class="bottom">
                 <div class="button-container">
-                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit=""
-                        lay-filter="save">
+                    <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="pear-btn pear-btn-md">
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
                         重置
                     </button>
                 </div>
             </div>
         </form>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+        <script src="/app/webniu/skins/component/pear/pear.js"></script> 
         <script>
 
             const MODIFY_API = "/app/webniu/web/table/modify";
@@ -666,6 +666,7 @@
                                             el: dom,
                                             name: name,
                                             initValue: initValue,
+                                            theme: {color: localStorage.getItem("theme-color-color")},
                                             data: data,
                                         })
                                     });

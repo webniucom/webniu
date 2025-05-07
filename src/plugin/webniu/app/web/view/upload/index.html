@@ -3,102 +3,103 @@
 <html lang="zh-cn">
     <head>
         <meta charset="utf-8">
-        <title>浏览页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <title>附件管理</title>
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
-    <body class="pear-container">
+    <body>
     
         <!-- 顶部查询表单 -->
-        <div class="layui-card">
-            <div class="layui-card-body">
-                <form class="layui-form top-search-from">
+        <div class="pear-container">
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">类别</label>
-                        <div class="layui-input-block">
-                            <div name="category" id="category" value="" ></div>
-                        </div>
-                    </div>
+         
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form top-search-from">
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">名字</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="name" value="" class="layui-input">
-                        </div>
-                    </div>
-
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">扩展名</label>
-                        <div class="layui-input-block">
-                            <input type="text" name="ext" value="" class="layui-input">
-                        </div>
-                    </div>
-                    
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">上传时间</label>
-                        <div class="layui-input-block">
-                            <div class="layui-input-block" id="created_at">
-                                <input type="text" autocomplete="off" name="created_at[]" id="created_at-date-start" class="layui-input inline-block" placeholder="开始时间">
-                                -
-                                <input type="text" autocomplete="off" name="created_at[]" id="created_at-date-end" class="layui-input inline-block" placeholder="结束时间">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">类别</label>
+                            <div class="layui-input-block">
+                                <div name="category" id="category" value="" ></div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="layui-form-item layui-inline">
-                        <label class="layui-form-label"></label>
-                        <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="table-query">
-                            <i class="layui-icon layui-icon-search"></i>查询
-                        </button>
-                        <button type="reset" class="pear-btn pear-btn-md" lay-submit lay-filter="table-reset">
-                            <i class="layui-icon layui-icon-refresh"></i>重置
-                        </button>
-                    </div>
-                    <div class="toggle-btn">
-                        <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
-                        <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- 数据表格 -->
-        <div class="layui-card">
-            <div class="layui-card-body">
-                <table id="data-table" lay-filter="data-table"></table>
-            </div>
-        </div>
 
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">名字</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="name" value="" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">扩展名</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="ext" value="" class="layui-input">
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">上传时间</label>
+                            <div class="layui-input-block">
+                                <div class="layui-input-block" id="created_at">
+                                    <input type="text" autocomplete="off" name="created_at[]" id="created_at-date-start" class="layui-input inline-block" placeholder="开始时间">
+                                    -
+                                    <input type="text" autocomplete="off" name="created_at[]" id="created_at-date-end" class="layui-input inline-block" placeholder="结束时间">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item layui-inline">
+                            <label class="layui-form-label"></label>
+                            <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
+                                <i class="layui-icon layui-icon-search"></i>查询
+                            </button>
+                            <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
+                                <i class="layui-icon layui-icon-refresh"></i>重置
+                            </button>
+                        </div>
+                        <div class="toggle-btn">
+                            <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
+                            <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 数据表格 -->
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table id="data-table" lay-filter="data-table"></table>
+                </div>
+            </div>
+        </div>
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="app.webniu.web.upload.insert">
+            <button class="layui-btn layui-btn-sm" lay-event="add" permission="app.webniu.web.upload.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
-            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="app.webniu.web.upload.delete">
+            <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.web.upload.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.upload.update">编辑</button>
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="app.webniu.web.upload.delete">删除</button>
+            <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.upload.update">编辑</button>
+            <button class="layui-btn layui-btn-xs tool-btn layui-bg-red" lay-event="remove" permission="app.webniu.web.upload.delete">删除</button>
         </script>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
-        <script src="/app/webniu/admin/js/common.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+		<script src="/app/webniu/skins/component/pear/pear.js"></script>
+        <script src="/app/webniu/skins/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/admin/js/common.js"></script>
         <script>
 
             // 相关接口
-            const PRIMARY_KEY = "id";
-            const SELECT_API = "/app/webniu/web/upload/select";
-            const UPDATE_API = "/app/webniu/web/upload/update";
-            const DELETE_API = "/app/webniu/web/upload/delete";
-            const INSERT_URL = "/app/webniu/web/upload/insert";
-            const UPDATE_URL = "/app/webniu/web/upload/update";
+             
             
             // 字段 上传时间 created_at
             layui.use(["laydate"], function() {
@@ -122,6 +123,7 @@
                             name: "category",
                             initValue: initValue,
                             data: res.data,
+                            theme: {color: localStorage.getItem("theme-color-color")},
                             model: {"icon":"hidden","label":{"type":"text"}},
                             clickClose: true,
                             radio: true,
@@ -132,9 +134,15 @@
                     }
                 });
             });
-            
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util"], function() {
+            layui.use(["table", "form", "common", "popup", "util","nprogress"], function() {
+                let PRIMARY_KEY = "id";
+                let SELECT_API = "/app/webniu/web/upload/select";
+                let UPDATE_API = "/app/webniu/web/upload/update";
+                let DELETE_API = "/app/webniu/web/upload/delete";
+                let INSERT_URL = "/app/webniu/web/upload/insert";
+                let UPDATE_URL = "/app/webniu/web/upload/update";
+                let nprogress = layui.nprogress;
                 let table = layui.table;
                 let form = layui.form;
                 let $ = layui.$;
@@ -239,7 +247,7 @@
 				            title: "刷新",
 				            layEvent: "refresh",
 				            icon: "layui-icon-refresh",
-				        }, "filter", "print", "exports"],
+				        }],
                         done: function () {
                             layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
                         }
@@ -367,9 +375,15 @@
                     let value = obj.data[PRIMARY_KEY];
                     layer.open({
                         type: 2,
-                        title: "修改",
+                        title: ['编辑', 'font-size:16px;color:#2d8cf0'],
+                        offset: 'r',
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
+                        maxmin: false,
+                        closeBtn: true,
+                        shadeClose: true,
+                        scrollbar: false,
                         shade: 0.1,
-                        area: [common.isModile()?"100%":"500px", common.isModile()?"100%":"380px"],
+                        anim: 'slideLeft',
                         content: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
                     });
                 }
@@ -417,9 +431,11 @@
 
                 // 刷新表格数据
                 window.refreshTable = function() {
+                    nprogress.start();
                     table.reloadData("data-table", {
                         scrollPos: "fixed",
                         done: function (res, curr) {
+                            nprogress.done();
                             if (curr > 1 && res.data && !res.data.length) {
                                 curr = curr - 1;
                                 table.reloadData("data-table", {

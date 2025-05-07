@@ -86,6 +86,17 @@ class IndexController
      * @return Response
      * @throws Throwable
      */
+    public function message(Request $request): Response
+    {
+        return json(['code' => 0, 'data' =>[], 'msg' => 'ok']);
+    }
+
+    /**
+     * 拉取数据
+     * @param Request $request
+     * @return Response
+     * @throws Throwable
+     */
     public function readata(Request $request): Response
     {
         $top_data   = [];

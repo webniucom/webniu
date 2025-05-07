@@ -4,60 +4,65 @@
 <head>
     <meta charset="utf-8">
     <title>应用插件</title>
-    <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
 </head>
 
-<body class="pear-container">
+<body>
 
-    <!-- 顶部查询表单 -->
-    <div class="layui-card">
-        <div class="layui-card-body">
-            <form class="layui-form top-search-from">
+    <div class="pear-container">
+        <!-- 顶部查询表单 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <form class="layui-form top-search-from">
 
-                <div class="layui-form-item">
-                    <label class="layui-form-label">类型</label>
-                    <div class="layui-input-block">
-                        <div name="plugin_type" id="plugin_type" value=""></div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-block">
+                            <div name="plugin_type" id="plugin_type" value=""></div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="layui-form-item">
-                    <label class="layui-form-label">分类</label>
-                    <div class="layui-input-block">
-                        <div name="plugin_class" id="plugin_class" value=""></div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">分类</label>
+                        <div class="layui-input-block">
+                            <div name="plugin_class" id="plugin_class" value=""></div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="layui-form-item">
-                    <label class="layui-form-label">名称</label>
-                    <div class="layui-input-block">
-                        <input type="hidden" name="plugin_name[]" value="like" class="layui-input">
-                        <input type="text" name="plugin_name[]" value="" class="layui-input">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="hidden" name="plugin_name[]" value="like" class="layui-input">
+                            <input type="text" name="plugin_name[]" value="" class="layui-input">
+                        </div>
                     </div>
-                </div>
 
-                <div class="layui-form-item layui-inline">
-                    <label class="layui-form-label"></label>
-                    <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="table-query">
-                        <i class="layui-icon layui-icon-search"></i>查询
-                    </button>
-                    <button type="reset" class="pear-btn pear-btn-md" lay-submit lay-filter="table-reset">
-                        <i class="layui-icon layui-icon-refresh"></i>重置
-                    </button>
-                </div>
-                <div class="toggle-btn">
-                    <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
-                    <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
-                </div>
-            </form>
+                    <div class="layui-form-item layui-inline">
+                        <label class="layui-form-label"></label>
+                        <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
+                            <i class="layui-icon layui-icon-search"></i>查询
+                        </button>
+                        <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
+                            <i class="layui-icon layui-icon-refresh"></i>重置
+                        </button>
+                    </div>
+                    <div class="toggle-btn">
+                        <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
+                        <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- 数据表格 -->
-    <div class="layui-card">
-        <div class="layui-card-body">
-            <table id="data-table" lay-filter="data-table"></table>
+        <!-- 数据表格 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table id="data-table" lay-filter="data-table"></table>
+            </div>
         </div>
     </div>
     <style>
@@ -72,36 +77,37 @@
             margin-left: 5px;
             cursor: pointer;
         }
+        .plugin_btn .layui-btn-plugin{
+            background-color: rgb(from var(--global-primary-color) r g b /20%);
+            color: rgb(from var(--global-primary-color) r g b /80%);
+        }
     </style>
 
 
-    <script src="/app/webniu/component/layui/layui.js"></script>
-    <script src="/app/webniu/component/pear/pear.js"></script>
-    <script src="/app/webniu/admin/js/permission.js"></script>
-    <script src="/app/webniu/admin/js/common.js"></script>
+    <script src="/app/webniu/skins/component/layui/layui.js"></script>
+    <script src="/app/webniu/skins/component/pear/pear.js"></script>
+    <script src="/app/webniu/skins/admin/js/permission.js"></script>
+    <script src="/app/webniu/skins/admin/js/common.js"></script>
     <script>
-
-        // 相关常量
-        const PRIMARY_KEY   = "id";
-        const SELECT_API    = "/app/webniu/web/plugin/select"; 
-        const UNINSTALL_API = "/app/webniu/web/plugin/uninstall";
-        const INSTALL_URL   = "/app/webniu/web/plugin/install";
-        const UPDATE_URL    = "/app/webniu/web/plugin/update";
-        var apiResults      = {};
-
-
 
         // 表格渲染
         layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery"], function () {
+            // 相关常量
+            let PRIMARY_KEY   = "id";
+            let SELECT_API    = "/app/webniu/web/plugin/select"; 
+            let UNINSTALL_API = "/app/webniu/web/plugin/uninstall";
+            let INSTALL_URL   = "/app/webniu/web/plugin/install";
+            let UPDATE_URL    = "/app/webniu/web/plugin/update";
+            let apiResults      = {};
             let table       = layui.table;
             let layer       = layui.layer;
             let form        = layui.form;
             let $           = layui.$;
             let common      = layui.common;
             let util        = layui.util;
-            var drawer      = layui.drawer;
-            var updatedate  = {};
-            var colsone     = {
+            let drawer      = layui.drawer;
+            let updatedate  = {};
+            let colsone     = {
                 title: "图标",
                 field: "plugin_logo",
                 align: "center",
@@ -127,7 +133,8 @@
                         el: "#plugin_type",
                         name: "plugin_type",
                         initValue: [],
-                        data: res.data.plugin_type,
+                        data: res.data.plugin_type??[],
+                        theme: {color: localStorage.getItem("theme-color-color")},
                         model: { "icon": "hidden", "label": { "type": "text" } },
                         clickClose: true,
                         radio: true,
@@ -136,7 +143,8 @@
                         el: "#plugin_class",
                         name: "plugin_class",
                         initValue: [],
-                        data: res.data.plugin_class,
+                        data: res.data.plugin_class??[],
+                        theme: {color: localStorage.getItem("theme-color-color")},
                         model: { "icon": "hidden", "label": { "type": "text" } },
                         clickClose: true,
                         radio: true,
@@ -509,10 +517,10 @@
 
     <!-- 表格顶部工具栏 -->
     <script type="text/html" id="table-toolbar">
-            <div class="layui-btn-group">
-                <button type="button" class="pear-btn pear-btn-sm {{= d.installedtype =='installed' ? 'pear-btn-primary' : 'layui-btn-primary' }}" lay-event="installed">已安装</button>
-                <button type="button" class="pear-btn pear-btn-sm {{= d.installedtype =='waitapps' ? 'pear-btn-primary' : 'layui-btn-primary' }}" lay-event="waitapps">待安装</button>
-                <button type="button" class="pear-btn pear-btn-sm {{= d.installedtype =='localapps' ? 'pear-btn-primary' : 'layui-btn-primary' }}" lay-event="localapps">本地包</button>
+            <div class="layui-btn-group plugin_btn">
+                <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='installed' ? '' : 'layui-btn-plugin' }}" lay-event="installed">已安装</button>
+                <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='waitapps' ? '' : 'layui-btn-plugin' }}" lay-event="waitapps">待安装</button>
+                <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='localapps' ? '' : 'layui-btn-plugin' }}" lay-event="localapps">本地包</button>
             </div>
         </script>
 
@@ -521,16 +529,16 @@
             {{# if(d.installed == '1'){ }}
             <div class="layui-btn-group">
             
-                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">
+                <button type="button" class="layui-btn layui-btn-xs" lay-event="edit">
                     <i class="layui-icon layui-icon-set-sm"></i>配置
                 </button>
-                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" lay-event="remove">
+                <button type="button" class="layui-btn layui-btn-xs layui-bg-red" lay-event="remove">
                     <i class="layui-icon layui-icon-delete"></i>卸载
                 </button>
             
             </div>
             {{# }else{ }}
-            <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="installed">安装应用</button>
+            <button class="layui-btn layui-btn-xs" lay-event="installed">安装应用</button>
             {{# } }}
     </script>
 </body>

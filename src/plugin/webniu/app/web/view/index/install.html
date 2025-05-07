@@ -2,10 +2,13 @@
 <html lang="zh-cn">
 <head>
     <meta charset="utf-8">
-    <title>Webniu 网牛管理系统安装向导</title>
-    <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
-    <link rel="stylesheet" href="/app/webniu/component/pear/css/module/install.css" />
+    <title>网牛引擎（Webniu）安装向导</title>
+    <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/module/install.css" />
     <style>
          
     </style>
@@ -14,19 +17,51 @@
     <div class="layui-panel">
         <span class="copy_vs"></span>
         <div class="layui-card-body" style="padding-top: 40px;">
-            <h1 style="text-align:center;margin: 20px 0 40px">Webniu 网牛管理系统</h1>
+            <h1 style="text-align:center;margin: 20px 0 40px">Webniu 网牛引擎</h1>
     
             <div class="layui-carousel" id="stepForm" lay-filter="stepForm" style="margin: 0 auto;">
                 <div carousel-item>
                     <div>
                         <form class="layui-form width_80b" action="javascript:void(0);">
                             <div class="layui-form-item">
-                                <textarea placeholder="请输入内容" class="layui-textarea" style="height: 350px;">Webniu 网牛管理系统是基于Webman开发的一套开源的中后台管理系统。</textarea>
+<textarea placeholder="请输入内容" class="layui-textarea" style="height: 350px;">
+
+    　　欢迎使用网牛引擎（Webniu）！网牛引擎是基于Webman框架开发的开源中后台管理系统，旨在为开发者提供高效、灵活的解决方案。在使用本软件之前，请仔细阅读以下许可协议（以下简称“协议”）。通过下载、安装或使用网牛引擎的任何部分，您即表示同意接受本协议的所有条款。如果您不同意这些条款，请勿使用本软件。
+    一、定义
+    　　“软件”：指网牛引擎（Webniu）及其相关文档、源代码、二进制文件、库文件等。
+    　　“用户”：指任何下载、安装、复制或使用本软件的个人或组织。
+    　　“授权”：指本协议授予用户的非独占、不可转让的使用权。
+    二、授权许可
+    　　开源许可-网牛引擎基于Webman框架开发，遵循MIT许可证。用户可以自由地使用、修改、复制本软件，但需遵守以下条件：
+    　　保留原始版权声明和许可声明；
+    　　不得删除或篡改任何版权声明或许可信息；
+    　　修改后的软件或衍生作品需明确说明其与原始软件的关系。
+    　　限制性条款
+    　　尽管本软件是开源的，但以下行为仍需获得版权所有者的书面授权：
+    　　将本软件用于商业目的时，需在显著位置注明“基于网牛引擎（Webniu）开发”；
+    　　不得将本软件作为其他闭源软件的一部分进行分发，除非获得明确授权。
+    三、免责声明
+    　　无担保
+    　　本软件按“原样”提供，不包含任何明示或暗示的担保，包括但不限于对适销性、特定用途适用性或非侵权性的担保。用户需自行承担使用本软件的风险。
+    　　无责任
+    　　在任何情况下，版权所有者或贡献者均不对因使用或无法使用本软件导致的直接、间接、附带、特殊或后果性损害承担责任。
+    四、用户义务
+    　　遵守法律
+    　　用户承诺遵守所有适用的法律法规，不得利用本软件从事任何非法活动。
+    　　禁止反向工程
+    　　除非法律明确规定允许，否则用户不得对本软件进行反向工程、反编译或反汇编。
+    　　数据安全
+    　　用户需自行负责其使用本软件过程中产生的数据的安全性，并采取必要的备份措施。
+    五、协议终止
+    　　如果用户违反本协议的任何条款，授权将自动终止。用户需立即停止使用本软件并销毁所有副本。
+    六、协议修改
+    　　版权所有者保留随时修改本协议的权利。修改后的协议将在官方网站（https://webniu.com）发布，用户应定期查阅以了解最新条款。继续使用本软件即视为接受修改后的协议。
+</textarea>
                             </div> 
     
                             <div class="layui-form-item" style="text-align: center;margin-top: 30px;">
-                               <button type="button" class="pear-btn">&emsp;取消&emsp;</button>
-                                <button class="pear-btn pear-btn-primary" lay-submit lay-filter="formDetection">
+                               <button type="button" class="layui-btn layui-btn-sm layui-btn-primary">&emsp;取消&emsp;</button>
+                                <button class="layui-btn layui-btn-sm" lay-submit lay-filter="formDetection">
                                     &emsp;同意&emsp;
                                 </button>
                             </div>
@@ -82,8 +117,8 @@
                                 </div>
                             </div> 
                             <div class="layui-form-item" style="margin-top:20px;text-align: center;">
-                                <button type="button" class="pear-btn pre">&emsp;上一步&emsp;</button>
-                                 <button class="pear-btn pear-btn-primary next">
+                                <button type="button" class="layui-btn layui-btn-sm pre layui-btn-primary">&emsp;上一步&emsp;</button>
+                                 <button class="layui-btn next layui-btn-sm">
                                      &emsp;跳过此步骤&emsp;
                                  </button>
                              </div>
@@ -138,8 +173,8 @@
     
                             <div class="layui-form-item">
                                 <div class="layui-input-block">
-                                    <button type="button" class="pear-btn pre">上一步</button>
-                                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="formStep">
+                                    <button type="button" class="layui-btn pre layui-btn-primary layui-btn-sm">上一步</button>
+                                    <button class="layui-btn layui-btn-sm" lay-submit lay-filter="formStep">
                                         &emsp;下一步&emsp;
                                     </button>
                                 </div>
@@ -168,8 +203,8 @@
                             </div>
                             <div class="layui-form-item">
                                 <div class="layui-input-block">
-                                    <button type="button" class="pear-btn pre">上一步</button>
-                                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="formStep2">
+                                    <button type="button" class="layui-btn pre layui-btn-primary layui-btn-sm">上一步</button>
+                                    <button class="layui-btn layui-btn-sm" lay-submit lay-filter="formStep2">
                                         &emsp;提交&emsp;
                                     </button>
                                 </div>
@@ -185,7 +220,7 @@
                             <div style="font-size: 14px;color: #666;margin-top: 20px;">需要重启才能生效</div>
                         </div>
                         <div style="text-align: center;margin-top: 50px;">
-                            <button class="pear-btn pear-btn-primary finish">进入后台</button>
+                            <button class="layui-btn layui-btn-primary finish layui-btn-sm">进入后台</button>
                         </div>
                     </div>
                 </div>
@@ -196,6 +231,128 @@
         Powered by <a href="//www.webniu.com" style="color:rgb(0 0 0 / 20%);" target="_blank">webniu.com</a> © 2020-2025.
     </div>
 
+     
+
+    <script src="/app/webniu/skins/component/layui/layui.js"></script>
+    <script src="/app/webniu/skins/component/pear/pear.js"></script>
+
+    <script>
+        layui.use(["form", "step","code","element", "popup","table","laytpl"], function() {
+            var $ = layui.$,
+                    form = layui.form,
+                    step = layui.step,table = layui.table,laytpl = layui.laytpl;
+
+            layui.code();
+
+            step.render({
+                elem: "#stepForm",
+                filter: "stepForm",
+                width: "100%",
+                stepWidth: "100%",
+                height: "550px",
+                stepItems: [{
+                    title: "阅读许可协议"
+                },{
+                    title: "环境检查"
+                },{
+                    title: "填写数据库信息"
+                }, {
+                    title: "填写管理员账户"
+                }, {
+                    title: "完成"
+                }]
+            });
+
+            form.on("submit(formDetection)", function(data) {
+                
+                let loading = layer.load();
+                $.ajax({
+                    url: "/app/webniu/web/install/detection",
+                    type: "POST",
+                    dataType: "json",
+                    data: data.field,
+                    success: function (res) {
+                        console.log(res);
+    
+                        laytpl(document.getElementById('TPL-data').innerHTML).render(res, function(str){
+                            document.getElementById('data-table').innerHTML = str;
+                        });
+                        
+                        laytpl(document.getElementById('TPL-dirfile').innerHTML).render(res, function(str){
+                            document.getElementById('dirfile-table').innerHTML = str;
+                        });
+
+                        
+                        
+                        step.next("#stepForm");
+                    },
+                    complete: function () {
+                        layer.close(loading);
+                    }
+                })
+                return false;
+            });
+
+            form.on("submit(formStep)", function(data) {
+                let loading = layer.load();
+                console.log(data.field);
+                $.ajax({
+                    url: "/app/webniu/web/install/step1",
+                    type: "POST",
+                    dataType: "json",
+                    data: data.field,
+                    success: function (res) {
+                        if (res.code) {
+                            return layui.popup.failure(res.msg);
+                        }
+                        layui.popup.success("操作成功", function () {
+                            step.next("#stepForm");
+                        });
+                    },
+                    complete: function () {
+                        layer.close(loading);
+                    }
+                })
+                return false;
+            });
+
+            form.on("submit(formStep2)", function(data) {
+                let loading = layer.load();
+                $.ajax({
+                    url: "/app/webniu/web/install/step2",
+                    type: "POST",
+                    dataType: "json",
+                    data: data.field,
+                    success: function (res) {
+                        if (res.code) {
+                            return layui.popup.failure(res.msg);
+                        }
+                        //layui.popup.success("安装成功");
+                        step.next("#stepForm");
+                        layer.close(loading);
+                    },
+                    complete: function () {
+                        layer.close(loading);
+                    }
+                })
+                return false;
+            });
+
+            $(".pre").click(function() {
+                step.pre("#stepForm");
+                return false;
+            });
+
+            $(".next").click(function() {
+                step.next("#stepForm");
+                return false;
+            });
+
+            $(".finish").click(function() {
+                location.reload();
+            });
+        })
+    </script>
     <script id="TPL-data" type="text/html">
         {{#  layui.each(d.data, function(index, item){ }}
         <tr>
@@ -214,135 +371,14 @@
         </tr>
         {{#  }); }}
     </script>
-     
-<script>
-    var color = localStorage.getItem("theme-color-color");
-    var second = localStorage.getItem("theme-color-second");
-    if (!color || !second) {
-        localStorage.setItem("theme-color-color", "#2d8cf0");
-        localStorage.setItem("theme-color-second", "#ecf5ff");
-    }
-</script>
-
-<script src="/app/webniu/component/layui/layui.js"></script>
-<script src="/app/webniu/component/pear/pear.js"></script>
-
-<script>
-    layui.use(["form", "step","code","element", "popup","table","laytpl"], function() {
-        var $ = layui.$,
-                form = layui.form,
-                step = layui.step,table = layui.table,laytpl = layui.laytpl;
-
-        layui.code();
-
-        step.render({
-            elem: "#stepForm",
-            filter: "stepForm",
-            width: "100%",
-            stepWidth: "100%",
-            height: "550px",
-            stepItems: [{
-                title: "阅读许可协议"
-            },{
-                title: "环境检查"
-            },{
-                title: "填写数据库信息"
-            }, {
-                title: "填写管理员账户"
-            }, {
-                title: "完成"
-            }]
-        });
-
-        form.on("submit(formDetection)", function(data) {
-             
-            let loading = layer.load();
-            $.ajax({
-                url: "/app/webniu/web/install/detection",
-                type: "POST",
-                dataType: "json",
-                data: data.field,
-                success: function (res) {
-                    console.log(res);
- 
-                    laytpl(document.getElementById('TPL-data').innerHTML).render(res, function(str){
-                        document.getElementById('data-table').innerHTML = str;
-                    });
-                    
-                    laytpl(document.getElementById('TPL-dirfile').innerHTML).render(res, function(str){
-                        document.getElementById('dirfile-table').innerHTML = str;
-                    });
-
-                     
-                     
-                    step.next("#stepForm");
-                },
-                complete: function () {
-                    layer.close(loading);
-                }
-            })
-            return false;
-        });
-
-        form.on("submit(formStep)", function(data) {
-            let loading = layer.load();
-            console.log(data.field);
-            $.ajax({
-                url: "/app/webniu/web/install/step1",
-                type: "POST",
-                dataType: "json",
-                data: data.field,
-                success: function (res) {
-                    if (res.code) {
-                        return layui.popup.failure(res.msg);
-                    }
-                    layui.popup.success("操作成功", function () {
-                        step.next("#stepForm");
-                    });
-                },
-                complete: function () {
-                    layer.close(loading);
-                }
-            })
-            return false;
-        });
-
-        form.on("submit(formStep2)", function(data) {
-            let loading = layer.load();
-            $.ajax({
-                url: "/app/webniu/web/install/step2",
-                type: "POST",
-                dataType: "json",
-                data: data.field,
-                success: function (res) {
-                    if (res.code) {
-                        return layui.popup.failure(res.msg);
-                    }
-                    //layui.popup.success("安装成功");
-                    step.next("#stepForm");
-                    layer.close(loading);
-                },
-                complete: function () {
-                    layer.close(loading);
-                }
-            })
-            return false;
-        });
-
-        $(".pre").click(function() {
-            step.pre("#stepForm");
-            return false;
-        });
-
-        $(".next").click(function() {
-            step.next("#stepForm");
-            return false;
-        });
-
-        $(".finish").click(function() {
-            location.reload();
-        });
-    })
-</script>
+    
+    <script>
+        var color = localStorage.getItem("theme-color-color");
+        var second = localStorage.getItem("theme-color-second");
+        if (!color || !second) {
+            localStorage.setItem("theme-color-color", "#2d8cf0");
+            localStorage.setItem("theme-color-second", "#ecf5ff");
+        }
+    </script>
 </body>
 </html>

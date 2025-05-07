@@ -3,7 +3,6 @@
 /vendor
 *.log
 .env
-src/plugin/webniu/public/upload
 src/plugin/webniu/config/database.php
 src/plugin/webniu/config/thinkorm.php
 src/plugin/webniu.zip

@@ -3,8 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>更新页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
 
@@ -25,10 +28,10 @@
 
             <div class="bottom">
                 <div class="button-container">
-                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                    <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="pear-btn pear-btn-md">
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
                         重置
                     </button>
                 </div>
@@ -36,18 +39,18 @@
             
         </form>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+		<script src="/app/webniu/skins/component/pear/pear.js"></script>
         <script>
 
-            // 相关接口
-            const PRIMARY_KEY = "id";
-            const SELECT_API = "/app/webniu/web/upload/select" + location.search;
-            const UPDATE_API = "/app/webniu/web/upload/update";
+             
 
             // 获取数据库记录
             layui.use(["form", "util", "popup"], function () {
+                // 相关接口
+                let PRIMARY_KEY = "id";
+                let SELECT_API = "/app/webniu/web/upload/select" + location.search;
+                 
                 let $ = layui.$;
                 $.ajax({
                     url: SELECT_API,
@@ -89,6 +92,7 @@
                                         el: "#category",
                                         name: "category",
                                         initValue: initValue,
+                                        theme: {color: localStorage.getItem("theme-color-color")},
                                         data: res.data,
                                         model: {"icon":"hidden","label":{"type":"text"}},
                                         clickClose: true,
@@ -111,6 +115,7 @@
 
             //提交事件
             layui.use(["form", "popup"], function () {
+                let UPDATE_API = "/app/webniu/web/upload/update";
                 layui.form.on("submit(save)", function (data) {
                     data.field[PRIMARY_KEY] = layui.url().search[PRIMARY_KEY];
                     layui.$.ajax({

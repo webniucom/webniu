@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__admins` (
   `username` varchar(32) NOT NULL COMMENT '用户名',
   `nickname` varchar(40) NOT NULL COMMENT '昵称',
   `password` varchar(255) NOT NULL COMMENT '密码',
-  `avatar` varchar(255) DEFAULT '/app/webniu/avatar.png' COMMENT '头像',
+  `avatar` varchar(255) DEFAULT '/app/webniu/skins/admin/images/avatar.png' COMMENT '头像',
   `email` varchar(100) DEFAULT NULL COMMENT '邮箱',
   `mobile` varchar(16) DEFAULT NULL COMMENT '手机',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
@@ -25,8 +25,9 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__admins` (
 CREATE TABLE IF NOT EXISTS `__PREFIX__options` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `model` varchar(255) DEFAULT NULL COMMENT '模型',
-  `name` varchar(255) NOT NULL COMMENT '键',
-  `value` longtext NOT NULL COMMENT '值',
+  `group` varchar(100) DEFAULT NULL COMMENT '分组',
+  `name` varchar(255) DEFAULT NULL COMMENT '键',
+  `value` longtext COMMENT '值',
   `created_at` datetime NOT NULL DEFAULT '1988-06-15 00:00:00' COMMENT '创建时间',
   `updated_at` datetime NOT NULL DEFAULT '1988-06-15 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__rules` (
   `updated_at` datetime NOT NULL COMMENT '更新时间',
   `href` varchar(255) DEFAULT NULL COMMENT 'url',
   `type` int(11) NOT NULL DEFAULT '1' COMMENT '类型',
+  `opentype` varchar(100) DEFAULT '_iframe' COMMENT '打开方式',
   `weight` int(11) DEFAULT '0' COMMENT '排序',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='权限规则';
@@ -203,10 +205,10 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__statistics`(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='数据统计';
 
 LOCK TABLES `__PREFIX__options` WRITE;
-INSERT INTO `__PREFIX__options` VALUES (NULL,'dict', 'dict_upload','[{\"value\":\"0\",\"name\":\"无分类\"},{\"value\":\"1\",\"name\":\"图片\"},{\"value\":\"2\",\"name\":\"媒体\"},{\"value\":\"3\",\"name\":\"文件\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
-INSERT INTO `__PREFIX__options` VALUES (NULL,'dict', 'dict_sex','[{\"value\":\"0\",\"name\":\"女\"},{\"value\":\"1\",\"name\":\"男\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
-INSERT INTO `__PREFIX__options` VALUES (NULL,'dict', 'dict_status','[{\"value\":\"1\",\"name\":\"正常\"},{\"value\":\"0\",\"name\":\"禁用\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
-INSERT INTO `__PREFIX__options` VALUES (NULL,'dict', 'dict_dict_name','[{\"value\":\"dict_name\",\"name\":\"字典名称\"},{\"value\":\"status\",\"name\":\"启禁用状态\"},{\"value\":\"sex\",\"name\":\"性别\"},{\"value\":\"upload\",\"name\":\"附件分类\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
+INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_upload','[{\"value\":\"0\",\"name\":\"无分类\"},{\"value\":\"1\",\"name\":\"图片\"},{\"value\":\"2\",\"name\":\"媒体\"},{\"value\":\"3\",\"name\":\"文件\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
+INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_sex','[{\"value\":\"0\",\"name\":\"女\"},{\"value\":\"1\",\"name\":\"男\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
+INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_status','[{\"value\":\"1\",\"name\":\"正常\"},{\"value\":\"0\",\"name\":\"禁用\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
+INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_dict_name','[{\"value\":\"dict_name\",\"name\":\"字典名称\"},{\"value\":\"status\",\"name\":\"启禁用状态\"},{\"value\":\"sex\",\"name\":\"性别\"},{\"value\":\"upload\",\"name\":\"附件分类\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
 UNLOCK TABLES;
  
 LOCK TABLES `__PREFIX__roles` WRITE;

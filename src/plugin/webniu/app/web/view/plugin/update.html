@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>更新页面</title>
-    <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-    <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+    <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
 </head>
 
 <body>
@@ -59,23 +62,22 @@
                                     class="layui-input">
                             </div>
                         </div>
-
                         <div class="layui-form-item">
                             <label class="layui-form-label">图标</label>
                             <div class="layui-input-block">
-                                <div class="wn_images_upload_dom" name="plugin_logo">
-                                    <div class="wn_images_list"></div>
-                                    <div class="pear-btn pear-btn-primary pear-btn-sm upload"
-                                        permission="app.webniu.web.upload.avatar">
+                                <div class="wn_upload_dom">
+                                    <input type="hidden" name="plugin_logo" value="" >
+                                    <div class="wn_list_dom"></div>
+                                    <div class="layui-btn layui-btn-sm upload" permission="app.webniu.web.upload.avatar">
                                         <i class="layui-icon layui-icon-upload"></i>
                                     </div>
-                                    <div class="pear-btn pear-btn-primary pear-btn-sm attachment"
-                                        permission="app.webniu.web.upload.attachment">
+                                    <div class="layui-btn layui-btn-sm attachment" permission="app.webniu.web.upload.attachment">
                                         <i class="layui-icon layui-icon-align-left"></i>
                                     </div>
-                                </div>
+                                </div> 
                             </div>
                         </div>
+                         
 
                         <div class="layui-form-item">
                             <label class="layui-form-label required">作者</label>
@@ -119,10 +121,10 @@
                         <table id="column-table" lay-filter="column-table"></table>
     
                         <script type="text/html" id="column-toolbar">
-                            <button type="button" class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+                            <button type="button" class="layui-btn layui-btn-sm" lay-event="add">
                                 <i class="layui-icon layui-icon-add-1"></i>新增
                             </button>
-                            <button type="button" class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+                            <button type="button" class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove">
                                 <i class="layui-icon layui-icon-delete"></i>删除
                             </button>
                         </script>
@@ -145,10 +147,10 @@
 
         <div class="bottom">
             <div class="button-container">
-                <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                <button type="submit" class="layui-btn layui-btn-md" lay-submit="" lay-filter="save">
                     提交
                 </button>
-                <button type="reset" class="pear-btn pear-btn-md closeIframe">
+                <button type="reset" class="layui-btn layui-btn-md layui-btn-primary" id="closeIframe">
                     关闭
                 </button>
             </div>
@@ -156,9 +158,8 @@
 
     </form>
 
-    <script src="/app/webniu/component/layui/layui.js"></script>
-    <script src="/app/webniu/component/pear/pear.js"></script>
-    <script src="/app/webniu/admin/js/permission.js"></script>
+    <script src="/app/webniu/skins/component/layui/layui.js"></script>
+    <script src="/app/webniu/skins/component/pear/pear.js"></script>
     <script>
 
         // 相关接口
@@ -188,88 +189,34 @@
 
 
                     // 上传图片组件 
-                    layui.$(".attachment").on("click", function (e) {
-                        let thisi = layui.$(this);
-                        parent.layer.open({
-                            type: 2,
-                            title: "选择附件",
-                            content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
-                            area: ["95%", "90%"],
-                            success: function (layero, index) {
-                                parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                    setImagesListValue({
-                                        elem: thisi,
-                                        data: data,
+                    layui.use(["layer","uploads"], function() {
+                        let uploads = layui.uploads;
+                        layui.$(".attachment").on("click", function(e) { 
+                            let thisimg = layui.$(this);
+                            parent.layer.open({
+                                type: 2,
+                                title: "选择附件",
+                                content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                area: ["95%", "90%"],
+                                success: function (layero, index) {
+                                    parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                        uploads.setUploadListValue(thisimg,data);
                                     });
-                                });
-                            }
-                        });
-                    });
-                    var inst = layui.upload.render({
-                        elem: ".upload",
-                        url: "/app/webniu/web/upload/avatar",
-                        acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
-                        field: "__file__",
-                        done: function (res) {
-                            if (res.code > 0) return layui.layer.msg(res.msg);
-                            setImagesListValue({
-                                elem: $(this.elem),
-                                data: res.data.items,
-                            });
-                        }
-                    });
-                    layui.$('.wn_images_upload_dom').each(function () {
-                        setImagesListValue({
-                            elem: layui.$(this),
-                        });
-                    });
-
-                    //设置图片列表的值
-                    function setImagesListValue(object) {
-                        let newobj = object.elem;
-                        let data = object.data ?? [];
-                        if (!Array.isArray(data)) {
-                            let url = data.url;
-                            let multiple = object.multiple ?? (newobj.parent().attr('multiple') == undefined ? false : true);
-                            let accept = object.accept ?? (newobj.parent().attr('accept') ?? 'image');
-                            if (!multiple) { newobj.parent().find(".wn_images_list").html(''); }
-                            newobj.parent().find(".wn_images_list").prepend(`<li class="wx_images_li">
-                                    <img src="${url}" class="img_class" lay-on="photos" />
-                                    <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
-                                    <input type="hidden" name="${newobj.parent().attr('name')}${multiple ? '[]' : ''}" value="${url}" />
-                                </li>`);
-                        } else {
-                            let multiple = object.multiple ?? (newobj.attr('multiple') == undefined ? false : true);
-                            let accept = object.accept ?? (newobj.attr('accept') ?? 'image');
-                            let value = newobj.attr('value');
-                            if (value != undefined) {
-                                newobj.find(".wn_images_list").html('');
-                                layui.each((value).split(","), function (k, url) {
-                                    newobj.find(".wn_images_list").prepend(`<li class="wx_images_li">
-                                            <img src="${url}" class="img_class" lay-on="photos" />
-                                            <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
-                                            <input type="hidden" name="${newobj.attr('name')}${multiple ? '[]' : ''}" value="${url}" />
-                                        </li>`);
-                                });
-                            }
-                        }
-                        return delete newobj, object, data;
-                    }
-                     
-
-                    layui.util.on('lay-on', {
-                        'photos': function (data) {
-                            parent.layer.photos({
-                                photos: {
-                                    "data": [
-                                        {
-                                            "src": data.attr('src'),
-                                        }
-                                    ]
                                 }
                             });
-                        }
-                    });
+                        });
+                        uploads.render({
+                            elem: ".upload",
+                            url: "/app/webniu/web/upload/image",
+                            acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                            field: "__file__",
+                            done: function (res) {
+                                if (res.code > 0) return layui.layer.msg(res.msg);
+                                let thisimg = layui.$(this.elem);
+                                uploads.setUploadListValue(thisimg,res.data);
+                            }
+                        });
+                    }); 
 
                     element.on('tab(test-hash)', function(obj){
                         let tab = this.getAttribute('lay-tab');
@@ -397,7 +344,7 @@
                 });
                 return false;
             });
-            layui.$('.closeIframe').click(function(){
+            layui.$('#closeIframe').click(function(){
                 parent.layer.close(parent.layer.getFrameIndex(window.name));
             });
         });

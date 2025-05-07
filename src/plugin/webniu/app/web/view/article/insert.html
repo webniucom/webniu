@@ -3,15 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>新增页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
-        <style>
-            .button-container{
-                position: initial;
-                margin: auto;
-                width: fit-content;
-            }
-        </style>
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
 
@@ -77,11 +73,10 @@
 
             <div class="bottom">
                 <div class="button-container">
-                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit=""
-                        lay-filter="save">
+                    <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="button" class="pear-btn pear-btn-md" id="closeIframe">
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="closeIframe">
                         关闭
                     </button>
                 </div>
@@ -89,25 +84,24 @@
             
         </form>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+        <script src="/app/webniu/skins/component/pear/pear.js"></script>
         
         <script>
 
             // 相关接口
-            const INSERT_API    = "/app/webniu/web/article/insert";
-            var index           = parent.layer.getFrameIndex(window.name); // 获取窗口索引
-            const CATSELECT_API = "/app/webniu/web/article/catselect";
-            
-            let loading = layer.load();
-            layui.$.ajax({
-                url: CATSELECT_API,
-                dataType: "json",
-                type: "get",
-                success: function(res) {
-                    layer.close(loading);
-                    layui.use(["jquery", "xmSelect"], function() {
+            const INSERT_API    = "/app/webniu/web/article/insert"; 
+             
+            layui.use(["xmSelect", "layer","jquery"], function() {
+                let loading = layer.load();
+                let CATSELECT_API = "/app/webniu/web/article/catselect";
+                layui.$.ajax({
+                    url: CATSELECT_API,
+                    dataType: "json",
+                    type: "get",
+                    success: function(res) {
+                        layer.close(loading);
+                       
                         let value = layui.$("#cateid").attr("value");
                         let initValue = value ? value.split(",") : [];
                         layui.xmSelect.render({
@@ -118,6 +112,7 @@
                                 name: 'title',
                                 value: 'id',
                             },
+                            theme: {color: localStorage.getItem("theme-color-color")},
                             initValue:initValue,
                             layVerify: 'required', 
                             layReqText:'请选择分类',
@@ -126,10 +121,10 @@
                             clickClose: true,
                             radio: true,
                         })
-                    });
-                }
+                        
+                    }
+                });
             });
-            
              
             
             // 字段 缩略图 thumb
@@ -214,7 +209,7 @@
                 });
             });
             layui.$('#closeIframe').click(function(){
-                parent.layer.close(index);
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
             });
 
         </script>

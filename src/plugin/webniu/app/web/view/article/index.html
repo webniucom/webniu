@@ -3,131 +3,123 @@
     <head>
         <meta charset="utf-8">
         <title>浏览页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
-    <body class="pear-container">
+    <body>
         <style>
-            .layui-card-body{
-                padding:15px;
-            }
-            .layui-card-body .layui-form{
-                margin-top: 0px;
-            }
-            .top-search-from{
-                margin-top:15px !important;
-            }
-            .pear-container{
-				overflow-x: hidden;
-			}
             .layui-card-list-add{
                 float: right;
             }
-             
         </style>
-        <!-- 顶部查询表单 -->
-        <div class="layui-card">
-            <div class="layui-card-body">
-                <form class="layui-form top-search-from layui-manage-top-15">
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">文章标题</label>
-                        <div class="layui-input-block">
+        <div class="pear-container">
+            <!-- 顶部查询表单 -->
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <form class="layui-form top-search-from layui-manage-top-15">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">文章标题</label>
                             <div class="layui-input-block">
-                                <input type="hidden" autocomplete="off" name="title[]" value="like" class="layui-input inline-block">
-                                <input type="text" autocomplete="off" name="title[]" class="layui-input">
+                                <div class="layui-input-block">
+                                    <input type="hidden" autocomplete="off" name="title[]" value="like" class="layui-input inline-block">
+                                    <input type="text" autocomplete="off" name="title[]" class="layui-input">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="layui-form-item layui-inline">
-                        <label class="layui-form-label"></label>
-                        <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="table-query">
-                            <i class="layui-icon layui-icon-search"></i>查询
-                        </button>
-                        <button type="reset" class="pear-btn pear-btn-md" lay-submit lay-filter="table-reset">
-                            <i class="layui-icon layui-icon-refresh"></i>重置
-                        </button>
-                    </div>
-                    <div class="toggle-btn">
-                        <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
-                        <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
-                    </div>
-                </form>
+                        
+                        <div class="layui-form-item layui-inline">
+                            <label class="layui-form-label"></label>
+                            <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
+                                <i class="layui-icon layui-icon-search"></i>查询
+                            </button>
+                            <button type="reset" class="layui-btn layui-btn-sm" lay-submit lay-filter="table-reset">
+                                <i class="layui-icon layui-icon-refresh"></i>重置
+                            </button>
+                        </div>
+                        <div class="toggle-btn">
+                            <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
+                            <a class="layui-hide">收起<i class="layui-icon layui-icon-up"></i></a>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="layui-row layui-col-space10">
+            <div class="layui-row layui-col-space10">
 
-            <div class="layui-col-xs2 layui-col-md2">
-                <div class="layui-card top-panel">
-                    <div class="layui-card-header">分类列表
-                        <div class="layui-card-list-add" lay-on="addcategory">
-                            <i class="layui-icon layui-icon-addition" style="font-size: 14px;">添加</i>
-                             
+                <div class="layui-col-xs2 layui-col-md2">
+                    <div class="layui-card top-panel">
+                        <div class="layui-card-header">分类列表
+                            <div class="layui-card-list-add" lay-on="addcategory">
+                                <i class="layui-icon layui-icon-addition" style="font-size: 14px;">添加</i>
+                            </div>
+                        </div>
+                        <div class="layui-card-body" style="height: calc(100vh - 199px);">
+                            <div id="ID-tree-demo-accordion"></div>
                         </div>
                     </div>
-                    <div class="layui-card-body" style="height: calc(100vh - 204px);">
-                        <div id="ID-tree-demo-accordion"></div>
+                </div>
+                <div class="layui-col-xs10 layui-col-md10">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <table id="data-table" lay-filter="data-table"></table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="layui-col-xs10 layui-col-md10">
-                <div class="layui-card">
-                    <div class="layui-card-body">
-                        <table id="data-table" lay-filter="data-table"></table>
-                    </div>
-                </div>
-            </div>
 
+            </div>
         </div>
         <!-- 数据表格 -->
          
 
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="app.webniu.article.insert">
+            <button class="layui-btn layui-btn-sm" lay-event="add" permission="app.webniu.article.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
-            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="app.webniu.article.delete">
+            <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.article.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="app.webniu.article.update">编辑</button>
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="app.webniu.article.delete">删除</button>
+            <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit" permission="app.webniu.article.update">编辑</button>
+            <button class="layui-btn layui-btn-xs tool-btn layui-bg-red" lay-event="remove" permission="app.webniu.article.delete">删除</button>
         </script>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
-        <script src="/app/webniu/admin/js/common.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+        <script src="/app/webniu/skins/component/pear/pear.js"></script>
+        <script src="/app/webniu/skins/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/admin/js/common.js"></script>
         
         <script>
 
-            // 相关常量
-            const PRIMARY_KEY = "id";
-            const SELECT_API = "/app/webniu/web/article/select";
-            const UPDATE_API = "/app/webniu/web/article/update";
-            const DELETE_API = "/app/webniu/web/article/delete";
-            const INSERT_URL = "/app/webniu/web/article/insert";
-            const UPDATE_URL = "/app/webniu/web/article/update";
-            
-            const CATSELECT_API = "/app/webniu/web/article/catselect";
-            const CATINSERT_API = "/app/webniu/web/article/catinsert";
-            const CATUPDATE_API = "/app/webniu/web/article/catupdate";
-            const CATDELETE_API = "/app/webniu/web/article/catdelete";
-            var dom;
+             
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util","toast","drawer"], function() {
+            layui.use(["table", "form", "common", "popup", "util","toast","drawer","nprogress"], function() {
+                // 相关常量
+                let PRIMARY_KEY = "id";
+                let SELECT_API = "/app/webniu/web/article/select";
+                let UPDATE_API = "/app/webniu/web/article/update";
+                let DELETE_API = "/app/webniu/web/article/delete";
+                let INSERT_URL = "/app/webniu/web/article/insert";
+                let UPDATE_URL = "/app/webniu/web/article/update";
+                
+                let CATSELECT_API = "/app/webniu/web/article/catselect";
+                let CATINSERT_API = "/app/webniu/web/article/catinsert";
+                let CATUPDATE_API = "/app/webniu/web/article/catupdate";
+                let CATDELETE_API = "/app/webniu/web/article/catdelete"; 
+                let nprogress = layui.nprogress;
                 let table   = layui.table;
                 let form    = layui.form;
-                var drawer  = layui.drawer;
+                let drawer  = layui.drawer;
                 let $       = layui.$;
                 let common  = layui.common;
                 let util    = layui.util;
-                var tree    = layui.tree;
-                var toast   = layui.toast;
+                let tree    = layui.tree;
+                let toast   = layui.toast;
                 
                 // 获取表格中下拉或树形组件数据
 				let apiResults = {};
@@ -386,28 +378,37 @@
 
                 // 表格新增数据
                 let add = function() {
-                    dom = drawer.open({
-                        legacy: false,
-                        title: ['新增', 'font-size:16px;color:#2d8cf0'],
+                    layer.open({
+                        type: 2,
+                        title: ['新增', 'font-size:16px;'],
                         offset: 'r',
-                        area: "40%",
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
                         maxmin: false,
-                        closeBtn: 1,
-                        iframe: INSERT_URL
-                    }); 
+                        closeBtn: true,
+                        shadeClose: true,
+                        scrollbar: false,
+                        shade: 0.1,
+                        anim: 'slideLeft',
+                        content: INSERT_URL
+                    });
+                     
                 }
 
                 // 表格编辑数据
                 let edit = function(obj) {
                     let value = obj.data[PRIMARY_KEY];
-                    dom = drawer.open({
-                        legacy: false,
-                        title: ['修改', 'font-size:16px;color:#2d8cf0'],
+                    layer.open({
+                        type: 2,
+                        title: ['编辑菜单', 'font-size:16px;'],
                         offset: 'r',
-                        area: "40%",
+                        area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
                         maxmin: false,
-                        closeBtn: 1,
-                        iframe: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                        closeBtn: true,
+                        shadeClose: true,
+                        scrollbar: false,
+                        shade: 0.1,
+                        anim: 'slideLeft',
+                        content: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
                     }); 
                 }
 
@@ -454,14 +455,15 @@
 
                 // 刷新表格数据
                 window.refreshTable = function(param) {
+                    nprogress.start();
                     table.reloadData("data-table", {
-                        scrollPos: "fixed"
+                        scrollPos: "fixed",
+                        done: function () {
+                            nprogress.done();	
+                        }
+
                     });
                 }
- 
-                 
- 
-                 
             })
 
         </script>

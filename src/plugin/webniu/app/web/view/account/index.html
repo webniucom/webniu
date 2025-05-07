@@ -2,238 +2,213 @@
 <html lang="zh-cn">
     <head>
         <meta charset="UTF-8">
-        <title></title>
-        <link rel="stylesheet" href="/app/webniu/component/layui/css/layui.css?v=2.8.12" />
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <title>基本资料</title>
+        
     </head>
-    <body class="pear-container">
+    <body>
         <style>
             .layui-input-block input {
-                width: 300px;
+                width: 400px;
             }
         </style>
+        <div class="pear-container">
+            <div class="layui-card">
+                <div class="layui-card-body">
 
-        <div class="layui-card">
-            <div class="layui-card-body">
+                    <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">基本信息</li>
+                        <li>安全设置</li>
+                    </ul>
+                    <div class="layui-tab-content">
 
-                <div class="layui-tab layui-tab-brief">
-                <ul class="layui-tab-title">
-                    <li class="layui-this">基本信息</li>
-                    <li>安全设置</li>
-                </ul>
-                <div class="layui-tab-content">
+                        <!-- 基本信息 -->
+                        <div class="layui-tab-item layui-show">
 
-                    <!-- 基本信息 -->
-                    <div class="layui-tab-item layui-show">
+                            <form class="layui-form" lay-filter="baseInfo" style="padding-top:25px;">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">账户</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="username" disabled class="layui-input">
+                                    </div>
+                                </div> 
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">昵称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="nickname" required  lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">邮箱</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="email" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">联系电话</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="mobile" placeholder="请输入联系电话" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">头像</label>
+                                    <div class="layui-input-block">
+                                        <div class="wn_upload_dom">
+                                            <input type="hidden" name="avatar" value="" accept="images">
+                                            <div class="wn_list_dom"></div>
+                                            <div class="layui-btn layui-btn-sm upload" permission="app.webniu.web.upload.avatar">
+                                                <i class="layui-icon layui-icon-upload"></i>
+                                            </div>
+                                            <div class="layui-btn layui-btn-sm attachment"  permission="app.webniu.web.upload.attachment">
+                                                <i class="layui-icon layui-icon-align-left"></i>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="saveBaseInfo">
+                                            提交
+                                        </button>
+                                        <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
+                                            重置
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
 
-                        <form class="layui-form" lay-filter="baseInfo">
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">账户</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="username" disabled class="layui-input">
+                        </div>
+
+                        <div class="layui-tab-item">
+
+                            <form class="layui-form" action=""  style="padding-top:25px;">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">原始密码</label>
+                                    <div class="layui-input-block">
+                                        <input type="password" name="old_password" required  lay-verify="required" placeholder="请输入原始密码" autocomplete="off" class="layui-input">
+                                    </div>
                                 </div>
-                            </div> 
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">昵称</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="nickname" required  lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="layui-input">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">新密码</label>
+                                    <div class="layui-input-block">
+                                        <input type="password" name="password" required  lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">邮箱</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="email" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">确认新密码</label>
+                                    <div class="layui-input-block">
+                                        <input type="password" name="password_confirm" required  lay-verify="required" placeholder="请再次输入新密码" autocomplete="off" class="layui-input">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">联系电话</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="mobile" placeholder="请输入联系电话" autocomplete="off" class="layui-input">
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="savePassword">
+                                            提交
+                                        </button>
+                                        <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
+                                            重置
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                             
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">头像</label>
-                                <div class="layui-input-block">
-                                    <div class="wn_images_upload_dom" name="avatar">
-                                        <div class="wn_images_list"></div>
-                                        <div class="pear-btn pear-btn-primary pear-btn-sm upload" permission="app.webniu.web.upload.avatar">
-                                            <i class="layui-icon layui-icon-upload"></i>
-                                        </div>
-                                        <div class="pear-btn pear-btn-primary pear-btn-sm attachment"  permission="app.webniu.web.upload.attachment">
-                                            <i class="layui-icon layui-icon-align-left"></i>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <div class="layui-input-block">
-                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="saveBaseInfo">
-                                        提交
-                                    </button>
-                                    <button type="reset" class="pear-btn pear-btn-md">
-                                        重置
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+
+                        </div>
 
                     </div>
-
-                    <div class="layui-tab-item">
-
-                        <form class="layui-form" action="">
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">原始密码</label>
-                                <div class="layui-input-block">
-                                    <input type="password" name="old_password" required  lay-verify="required" placeholder="请输入原始密码" autocomplete="off" class="layui-input">
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">新密码</label>
-                                <div class="layui-input-block">
-                                    <input type="password" name="password" required  lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input">
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">确认新密码</label>
-                                <div class="layui-input-block">
-                                    <input type="password" name="password_confirm" required  lay-verify="required" placeholder="请再次输入新密码" autocomplete="off" class="layui-input">
-                                </div>
-                            </div>
-                            <div class="layui-form-item">
-                                <div class="layui-input-block">
-                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="savePassword">
-                                        提交
-                                    </button>
-                                    <button type="reset" class="pear-btn pear-btn-md">
-                                        重置
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                    </div>
+                </div>
 
                 </div>
             </div>
-
-            </div>
         </div>
-
-
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
         <script>
 
-            layui.use(["form", "popup","upload", "layer"], function () {
+            layui.use(["form","upload", "layer","toast","nprogress"], function () {
+                let nprogress = layui.nprogress;
                 let form = layui.form;
+                let toast = layui.toast;
                 let $ = layui.$;
+                nprogress.start();
                 $.ajax({
                     url: "/app/webniu/web/account/info",
                     dataType: "json",
                     success: function (res) { 
+                        nprogress.done();
                         form.val("baseInfo", res.data);
-                        $('*[name="avatar"]').attr("value", res.data.avatar);
-                        layui.$(".attachment").on("click", function(e) { 
-                            let thisi = layui.$(this);
-                            parent.layer.open({
-                                type: 2,
-                                title: "选择附件",
-                                content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
-                                area: ["95%", "90%"],
-                                success: function (layero, index) {
-                                    parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                        setImagesListValue({
-                                            elem: thisi,
-                                            data: data,
+                        layui.use(["layer","uploads"], function() {
+                            let uploads = layui.uploads;
+                            layui.$(".attachment").on("click", function(e) { 
+                                let thisimg = layui.$(this);
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/webniu/web/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                    area: ["75%", "70%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                            uploads.setUploadListValue(thisimg,data);
                                         });
-                                    });
-                                }
-                            });
-                        });
-                        var inst = layui.upload.render({
-                            elem: ".upload",
-                            url: "/app/webniu/web/upload/avatar",
-                            acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
-                            field: "__file__",
-                            done: function (res) {
-                                if (res.code > 0) return layui.layer.msg(res.msg);
-                                setImagesListValue({
-                                    elem: $(this.elem),
-                                    data: res.data,
+                                    }
                                 });
-                            }
-                        });
-                        layui.$('.wn_images_upload_dom').each(function() { 
-                            setImagesListValue({
-                                elem: layui.$(this),
                             });
-                        }); 
-                        
-                        //设置图片列表的值
-                        function setImagesListValue(object) { 
-                            let newobj      = object.elem;
-                            let data        = object.data??[];
-                            if (!Array.isArray(data)) {
-                                let url = data.url; 
-                                let multiple    = object.multiple??(newobj.parent().attr('multiple')==undefined?false:true);
-                                let accept      = object.accept??(newobj.parent().attr('accept')??'image');
-                                if(!multiple){newobj.parent().find(".wn_images_list").html('');}
-                                newobj.parent().find(".wn_images_list").prepend(`<li class="wx_images_li">
-                                    <img src="${url}" class="img_class" lay-on="photos" />
-                                    <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
-                                    <input type="hidden" name="${newobj.parent().attr('name')}${multiple?'[]':''}" value="${url}" />
-                                </li>`);
-                            }else{ 
-                                let multiple    = object.multiple??(newobj.attr('multiple')==undefined?false:true);
-                                let accept      = object.accept??(newobj.attr('accept')??'image');
-                                let value       = newobj.attr('value');
-                                if(value!=undefined){
-                                    newobj.find(".wn_images_list").html('');
-                                    layui.each((value).split(","), function (k , url) {
-                                        newobj.find(".wn_images_list").prepend(`<li class="wx_images_li">
-                                            <img src="${url}" class="img_class" lay-on="photos" />
-                                            <i class="layui-icon layui-icon-close" onclick="layui.$(this).parent().remove()"></i>
-                                            <input type="hidden" name="${newobj.attr('name')}${multiple?'[]':''}" value="${url}" />
-                                        </li>`);
-                                    });
+                            uploads.render({
+                                elem: ".upload",
+                                url: "/app/webniu/web/upload/image",
+                                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                field: "__file__",
+                                done: function (res) {
+                                    if (res.code > 0) return layui.layer.msg(res.msg);
+                                    let thisimg = layui.$(this.elem);
+                                    uploads.setUploadListValue(thisimg,res.data);
                                 }
-                            }
-                            return delete newobj,object,data;
-                        }
+                            });
+
+
+                        }); 
+                        form.render();
                     }
                 });
 
                 form.on("submit(saveBaseInfo)", function(data){
+                    nprogress.start();
                     $.ajax({
                         url: "/app/webniu/web/account/update",
                         dataType: "json",
                         type: "POST",
                         data: data.field,
                         success: function (res) {
+                            nprogress.done();
                             if (res.code) {
-                                return layui.popup.failure(res.msg);
+                                return toast.error({
+                                    message: res.msg,
+                                });
                             }
-                            return layui.popup.success("操作成功");
+                            return toast.success({
+                                message: '操作成功',
+                            }); 
                         }
                     });
                     return false;
                 });
 
                 form.on("submit(savePassword)", function(data){
+                    nprogress.start();
                     $.ajax({
                         url: "/app/webniu/web/account/password",
                         dataType: "json",
                         type: "POST",
                         data: data.field,
                         success: function (res) {
+                            nprogress.done();
                             if (res.code) {
-                                return layui.popup.failure(res.msg);
+                                return toast.error({
+                                    message: res.msg,
+                                });
                             }
-                            return layui.popup.success("操作成功");
+                            return toast.success({
+                                message: '操作成功',
+                            }); 
                         }
                     });
                     return false;

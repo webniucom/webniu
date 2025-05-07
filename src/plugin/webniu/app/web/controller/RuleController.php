@@ -77,6 +77,11 @@ class RuleController extends Crud
             $item['pid'] = (int)$item['pid'];
             $item['name'] = $item['title'];
             $item['value'] = $item['id'];
+            if ($item['opentype'] == '') {
+                $item['opentype'] = "_component"; 
+            }else{
+                $item['opentype'] = $item['opentype'];
+            }
             $item['icon'] = $item['icon'] ? "layui-icon {$item['icon']}" : '';
             $formatted_items[] = $item;
         }

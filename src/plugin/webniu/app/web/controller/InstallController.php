@@ -307,7 +307,7 @@ EOF;
      */
     protected function addMenu(array $menu, \PDO $pdo,$prefix): int
     {
-        $allow_columns = ['title', 'key', 'icon', 'href', 'pid', 'weight', 'type'];
+        $allow_columns = ['title', 'key', 'icon', 'href', 'pid', 'weight', 'type','opentype'];
         $data = [];
         foreach ($allow_columns as $column) {
             if (isset($menu[$column])) {
@@ -358,6 +358,7 @@ EOF;
                 'title' => $menu_tree['title'],
                 'icon' => $menu_tree['icon'] ?? '',
                 'key' => $menu_tree['key'],
+                'opentype' => $menu_tree['opentype'] ?? '_iframe',
             ];
             $sql = "update {$prefix}rules set title=:title, icon=:icon where `key`=:key";
             $smt = $pdo->prepare($sql);

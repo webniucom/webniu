@@ -1,56 +1,57 @@
-
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head>
         <meta charset="utf-8">
-        <title></title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <title>菜单管理</title>
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
-    <body class="pear-container">
-
-        <!-- 数据表格 -->
-        <div class="layui-card">
-            <div class="layui-card-body">
-                <table id="data-table" lay-filter="data-table"></table>
+    <body>
+        <div class="pear-container">
+            <!-- 数据表格 -->
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table id="data-table" lay-filter="data-table"></table>
+                </div>
             </div>
         </div>
-
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="app.webniu.web.rule.insert">
+            <button class="layui-btn layui-btn-sm" lay-event="add" permission="app.webniu.web.rule.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
-            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="app.webniu.web.rule.delete">
+            <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.web.rule.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.rule.update">编辑</button>
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="app.webniu.web.rule.delete">删除</button>
+            <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.rule.update">编辑</button>
+            <button class="layui-btn layui-btn-xs tool-btn layui-bg-red" lay-event="remove" permission="app.webniu.web.rule.delete">删除</button>
         </script>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
-        <script src="/app/webniu/admin/js/common.js"></script>
-
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+		<script src="/app/webniu/skins/component/pear/pear.js"></script>
+        <script src="/app/webniu/skins/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/admin/js/common.js"></script>
+         
         <script>
-
-            // 相关常量
-            const PRIMARY_KEY = "id";
-            const SELECT_API = "/app/webniu/web/rule/select?limit=5000&&format=table_tree";
-            const DELETE_API = "/app/webniu/web/rule/delete";
-            const UPDATE_API = "/app/webniu/web/rule/update";
-            const INSERT_URL = "/app/webniu/web/rule/insert";
-            const UPDATE_URL = "/app/webniu/web/rule/update";
-
+ 
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util","drawer"], function() {
+            layui.use(["table", "form", "common", "popup", "util","nprogress","toast"], function() {
+                let PRIMARY_KEY = "id";
+                let SELECT_API = "/app/webniu/web/rule/select?limit=5000&&format=table_tree";
+                let DELETE_API = "/app/webniu/web/rule/delete";
+                let UPDATE_API = "/app/webniu/web/rule/update";
+                let INSERT_URL = "/app/webniu/web/rule/insert";
+                let UPDATE_URL = "/app/webniu/web/rule/update";
                 let table   = layui.table;
-                var drawer  = layui.drawer;
+                let toast   = layui.toast;
+                let nprogress = layui.nprogress;
                 let form    = layui.form;
                 let $       = layui.$;
                 let common  = layui.common;
@@ -107,9 +108,19 @@
                         width: 80,
                         templet: function (d) {
                             let field = "type";
-                            let value = apiResults["type"][d["type"]] || d["type"];
+                            let value = apiResults["type"][d[field]] || d[field];
                             let css = {"目录":"layui-bg-blue", "菜单": "layui-bg-green", "权限": "layui-bg-orange"}[value];
                             return '<span class="layui-badge '+css+'">'+util.escape(value)+'</span>';
+                        }
+                    },{
+                        title: "打开方式",
+                        field: "opentype",
+                        width: 120,
+                        templet: function (d) { 
+                            let field = "opentype";
+                            let value = d[field];
+                            let arr = {"_iframe":"iframe嵌套", "_component": "组件装载", "_layer": "layer弹窗"};
+                            return arr[value] || "未知类型";;
                         }
                     },{
                         title: "排序",
@@ -126,7 +137,7 @@
 
                 // 渲染表格
                 function render()
-                {
+                { 
                     treeTable.render({
                         elem: '#data-table',
                         id:"data-table",
@@ -174,7 +185,7 @@
                             }
                         }],
                         done: function(){
-
+                            
                         }
                     });
                      
@@ -241,14 +252,18 @@
 
                 // 添加行
                 let add = function() {
-                    drawer.open({
-                        legacy: false,
+                    layer.open({
+                        type: 2,
                         title: ['新增菜单', 'font-size:16px;color:#2d8cf0'],
                         offset: 'r',
                         area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
                         maxmin: false,
-                        closeBtn: 1,
-                        iframe: INSERT_URL
+                        closeBtn: true,
+                        shadeClose: true,
+                        scrollbar: false,
+                        shade: 0.1,
+                        anim: 'slideLeft',
+                        content: INSERT_URL
                     });
                 }
 
@@ -256,14 +271,18 @@
                 let edit = function(obj) {
                     let value = obj.data[PRIMARY_KEY];
                      
-                    drawer.open({
-                        legacy: false,
+                    layer.open({
+                        type: 2,
                         title: ['编辑菜单', 'font-size:16px;color:#2d8cf0'],
                         offset: 'r',
                         area: [common.isModile()?"100%":"40%", common.isModile()?"100%":"100%"],
                         maxmin: false,
-                        closeBtn: 1,
-                        iframe: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
+                        closeBtn: true,
+                        shadeClose: true,
+                        scrollbar: false,
+                        shade: 0.1,
+                        anim: 'slideLeft',
+                        content: UPDATE_URL + "?" + PRIMARY_KEY + "=" + value
                     });
                 }
 
@@ -276,7 +295,9 @@
                 let batchRemove = function(obj) {
                     let checkIds = common.checkField(obj, PRIMARY_KEY);
                     if (checkIds === "") {
-                        layui.popup.warning("未选中数据");
+                        toast.warning({
+                            message: "未选中数据",
+                        }); 
                         return false;
                     }
                     doRemove(checkIds.split(","));
@@ -312,7 +333,12 @@
 
                 // 刷新表格
                 window.refreshTable = function() {
-                    treeTable.reload("data-table", {});
+                    nprogress.start();
+                    treeTable.reload("data-table",{
+                        complete: function(xhr, ts) {
+                            nprogress.done();
+                        }
+                    });
                 }
             })
 

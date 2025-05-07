@@ -20,6 +20,7 @@ return [
                         'key' => 'plugin\\webniu\\app\\web\\controller\\IndexController',
                         'icon' => '',
                         'type' => 1,
+                        'opentype'=> '_component',
                         'href' => '/app/webniu/web/index/dashboard',
                         'weight' => 0,
                     ]
@@ -38,6 +39,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/config/index',
                         'type' => 1,
+                        'opentype'=> '_component',
                         'weight' => 0,
                     ],
                     [
@@ -46,6 +48,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/rule/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ]
                 ]
@@ -63,6 +66,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/upload/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -71,6 +75,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/dict/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -79,6 +84,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/article/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -87,6 +93,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/emailtemp/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -95,6 +102,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/smstemp/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ]
                 ]
@@ -112,6 +120,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/admin/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -120,6 +129,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/role/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -128,6 +138,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/account/index',
                         'type' => 1,
+                        'opentype'=> '_component',
                         'weight' => 0,
                     ],
                     [
@@ -136,6 +147,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/logtime/index',
                         'type' => 1,
+                        'opentype'=> '_component',
                         'weight' => 0,
                     ]
                 ]
@@ -153,6 +165,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/user/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ] 
                 ]
@@ -180,6 +193,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/plugin/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [
@@ -188,6 +202,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/approle/index',
                         'type' => 1,
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ]
                 ]
@@ -208,6 +223,7 @@ return [
                 'icon' => 'layui-icon-component',
                 'href' => '/app/webniu/web/table/index',
                 'type' => 1,
+                'opentype'=> '_iframe',
                 'weight' => 0,
             ]
         ]   

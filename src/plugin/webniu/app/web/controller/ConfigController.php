@@ -93,7 +93,6 @@ class ConfigController extends Base
                 case 'user': 
                     $data['managereg']        = !empty($items['managereg']);
                     $data['background_image'] = Util::filterUrlPath($items['background_image'] ?? '');
-                     
                     $data['roles']            = htmlspecialchars($items['roles'] ?? '');
                     $data['m_image_verify']   = !empty($items['m_image_verify']);
                     $data['m_phone_verify']   = !empty($items['m_phone_verify']);
@@ -149,27 +148,38 @@ class ConfigController extends Base
                     $data['pic_mark_weizhi']  = htmlspecialchars($items['pic_mark_weizhi'] ?? ''); 
 
                     break;
-                case 'menu':
-                    $data['data']             = "/app/webniu/web/rule/get";
-                    $data['accordion']        = true;
-                    $data['collapse']         = !empty($items['collapse']);
-                    $data['control']          = !empty($items['control']);
-                    $data['controlWidth']     = 230;
-                    $data['controlHeight']    = '100%';
-                    $data['select']           = (int)$items['select'] ?? 3;
-                    $data['async']            = true;
+                case 'views':
+                    $data['menu']['data']           = "/app/webniu/web/rule/get";
+                    $data['menu']['method']         = 'GET';
+                    $data['menu']['accordion']      = !empty($items['menu']['accordion']);;
+                    $data['menu']['collapse']       = !empty($items['menu']['collapse']);
+                    $data['menu']['control']        = $items['menu']['control'];
+                    $data['menu']['controlWidth']   = "auto";
+                    $data['menu']['controlHeight']  = '100%';
+                    $data['menu']['async']          = true;
+
+                    $data['tab']['enable']          = !empty($items['tab']['enable']);
+                    $data['tab']['keepState']       = !empty($items['tab']['keepState']);
+                    $data['tab']['preload']         = !empty($items['tab']['preload']);
+                    $data['tab']['session']         = !empty($items['tab']['session']);
+                    $data['tab']['max']             = Util::filterNum($items['tab']['max'] ?? '30');
+                    $data['tab']['index']['id']     = Util::filterNum($items['tab']['index']['id'] ?? '0');
+                    $data['tab']['index']['href']   = Util::filterUrlPath($items['tab']['index']['href'] ?? '');
+                    $data['tab']['index']['title']  = htmlspecialchars($items['tab']['index']['title'] ?? '控制台');
+
+                    $data['theme']['defaultColor']  = Util::filterNum($items['theme']['defaultColor'] ?? '1');
+                    $data['theme']['defaultMenu']   = $items['theme']['defaultMenu'];
+                    $data['theme']['defaultHeader'] = $items['theme']['defaultHeader']; 
+
+                    $data['theme']['allowCustom']   = !empty($items['theme']['allowCustom']);
+                    $data['theme']['banner']        = !empty($items['theme']['banner']);
+                    $data['theme']['footer']        = !empty($items['theme']['footer']);
+
+                    $data['theme']['keepLoad']      = "800";
+                    $data['theme']['message']       = false;
+                    $data['theme']['autoHead']      = false; 
                     break;
-                case 'tab':
-                    $data['enable']           = true;
-                    $data['keepState']        = !empty($items['keepState']);
-                    $data['preload']          = !empty($items['preload']);
-                    $data['session']          = !empty($items['session']);
-                    $data['max']              = Util::filterNum($items['max'] ?? '30');
-                    $data['index']['id']      = Util::filterNum($items['index']['id'] ?? '0');
-                    $data['index']['href']    = Util::filterUrlPath($items['index']['href'] ?? '');
-                    $data['index']['title']   = htmlspecialchars($items['index']['title'] ?? '首页');
-                    break;
-                 
+                
                 case 'api':
                     $data['smtp']['type']               = !empty($items['smtp']['type']); 
                     $data['smtp']['ip']                 = htmlspecialchars($items['smtp']['ip'] ?? ''); 
@@ -199,76 +209,23 @@ class ConfigController extends Base
                     $data['sms']['qcloud']['sign_name']       = htmlspecialchars($items['sms']['qcloud']['sign_name'] ?? ''); 
 
                     break;
-                case 'theme':
-                    $data['defaultColor']         = Util::filterNum($items['defaultColor'] ?? '2');
-                    $data['defaultMenu']          = $items['defaultMenu'];
-                    $data['defaultHeader']        = $items['defaultHeader'];
-                    $data['defaultAside']         = $items['defaultAside'];
-
-                    $data['allowCustom']          = !empty($items['allowCustom']);
-                    $data['banner']               = !empty($items['banner']);
-                    $data['footer']               = !empty($items['footer']);
-
-                    $data['message']                = false;
-                    $data['keepLoad']               = "500";
-                    $data['autoHead']               = false;
-                    $color = [
-                        [
-                            'id'    =>'1',
-                            'color' =>'#36b368',
-                            'second'=>'#f0f9eb'
-                        ],
-                        [
-                            'id'    =>'2',
-                            'color' =>'#2d8cf0',
-                            'second'=>'#ecf5ff'
-                        ],
-                        [
-                            'id'    =>'3',
-                            'color' =>'#f6ad55',
-                            'second'=>'#fdf6ec'
-                        ],
-                        [
-                            'id'    =>'4',
-                            'color' =>'#f56c6c',
-                            'second'=>'#fef0f0'
-                        ],
-                        [
-                            'id'    =>'5',
-                            'color' =>'#3963bc',
-                            'second'=>'#ecf5ff'
-                        ]
-                    ];
-                    $data['colors']                 = $color; 
-
-                    break;
-                case 'colors':
-                    foreach ($jsondata['colors'] as $index => $item) {
-                        if (!isset($items[$index])) {
-                            $jsondata['colors'][$index] = $item;
-                            continue;
-                        }
-                        $data_item = $items[$index];
-                        $data[$index]['id'] = $index + 1;
-                        $data[$index]['color'] = $this->filterColor($data_item['color'] ?? '');
-                        $data[$index]['second'] = $this->filterColor($data_item['second'] ?? '');
-                    }
-                    break;
 
             }  
-            $output = array_merge($jsondata,$data);
-            unset($data);
+            $output = array_merge($jsondata,$data); 
             if(empty($jsondata)){
                 $obj->insert(
                     [
-                        'plugin'=> $request->plugin,
+                        'model' => $request->plugin,
+                        'group' => 'system',
                         'name'  => 'system_'.$section,
-                        'value' =>json_encode($output)
+                        'value' =>json_encode($output),
+                        'created_at' => date('Y-m-d H:i:s'),
                     ]
                 );
             }else{
                 $obj->update([
-                    'value' => json_encode($output)
+                    'value' => json_encode($output),
+                    'updated_at' => date('Y-m-d H:i:s'),
                 ]);
             }
              

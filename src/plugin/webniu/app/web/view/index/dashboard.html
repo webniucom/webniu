@@ -3,308 +3,209 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>浏览页面</title>
-	<link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-	<link rel="stylesheet" href="/app/webniu/component/pear/module/apexcharts/apexcharts.css" /> 
-	<link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+	<title>控制台</title>
+	<link rel="stylesheet" href="/app/webniu/skins/component/pear/module/apexcharts/apexcharts.css" />
+	<link rel="stylesheet" href="/app/webniu/skins/admin/css/dashboard.css?" />
 </head>
 
-<body class="pear-container">
-	<style>
-		.pear-container {
-			margin: 0px;
-			padding: 15px;
-			width: auto;
-			height: 100%;
-			overflow:auto;
-		}
-		.layui-table-page{
-			margin-bottom:0px;
-		}
-		.echarts-records{
-			background-color:#ffffff;
-			min-height:250px;
-		} 
-		.layui-height-300{
-			height: 300px;
-		}
-		.layui-text-style{
-			text-anchor: start; 
-			font-size: 18px;
-			font-family: Helvetica, Arial, sans-serif;
-			font-weight: 900;
-			fill: rgb(55, 61, 63);
-			color: #6c757d !important;
-		}
-		.layui-number-top-style{
-			color: #6c7a91; 
-		}
-		.layui-top-padding-z0{
-			padding: 0px;
-		}
-		.layui-dash-height-100{
-			height: 100px;
-		}
-		.layui-dash-font-ms{
-			color: #6c757d !important;
-			font-family: "Montserrat", sans-serif;
-			font-weight: 600;
-		}
-		.layui-font-diy-01{
-			font-size: 28px;
-			font-family: "Montserrat", sans-serif;
-			font-weight: 600;
-			padding-top: 5px;
-			padding-bottom: 15px;
-			color: #495057;
-			line-height: 35px;
-		}
-		.layui-dash-font-cl{
-			color: #6c757d ;
-		}
-		.layui-dash-wh{
-			width: 48px;
-			height: 48px;
-			background-color: #ecf5ff;
-			border-radius: 30px;
-			display: flex;
-			flex-direction: row;
-			flex-wrap: nowrap;
-			align-content: center;
-			justify-content: center;
-			align-items: center;
-			margin-top: 10px;
-			margin: 10px auto;
-			 
-		}
-		.layui-dash-wh i{
-			font-size: 20px;
-			color: #2d8cf0;
-			font-weight: bold;
-		}
-		.layui-card-body .layui-table{
-			margin:0px;
-		}
-		.copy-tr-height tr{
-			height: 43px;
-		}
-	</style>
+<body>
+	<div class="pear-container"> 
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="layui-card top-panel">
+					<div class="layui-card-body">
+						<div class="layui-row layui-dash-height-100">
+							<div class="layui-col-xs6 layui-col-md9">
+								<div class="layui-dash-font-ms">
+									User View
+								</div>
+								<div class="layui-font-diy-01" id="value1">
+									0
+								</div>
+								<div class="layui-dash-font-cl">
+									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总注册会员用户
+								</div>
+							</div>
+							<div class="layui-col-xs6 layui-col-md3">
+								<div class="layui-dash-wh layui-table-checked">
+									<i class="layui-icon layui-icon-group pear-this"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="layui-card top-panel">
+					<div class="layui-card-body">
+						<div class="layui-row layui-dash-height-100">
+							<div class="layui-col-xs6 layui-col-md9">
+								<div class="layui-dash-font-ms">
+									Manage View
+								</div>
+								<div class="layui-font-diy-01" id="value2">
+									0
+								</div>
+								<div class="layui-dash-font-cl">
+									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总注册管理用户
+								</div>
+							</div>
+							<div class="layui-col-xs6 layui-col-md3">
+								<div class="layui-dash-wh layui-table-checked">
+									<i class="layui-icon layui-icon-friends pear-this"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="layui-card top-panel">
+					<div class="layui-card-body">
+						<div class="layui-row layui-dash-height-100">
+							<div class="layui-col-xs6 layui-col-md9">
+								<div class="layui-dash-font-ms">
+									Page View
+								</div>
+								<div class="layui-font-diy-01" id="value3">
+									0
+								</div>
+								<div class="layui-dash-font-cl">
+									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总浏览量
+								</div>
+							</div>
+							<div class="layui-col-xs6 layui-col-md3">
+								<div class="layui-dash-wh layui-table-checked">
+									<i class="layui-icon layui-icon-chart-screen pear-this"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="layui-card top-panel">
+					<div class="layui-card-body">
+						<div class="layui-row layui-dash-height-100">
+							<div class="layui-col-xs6 layui-col-md9">
+								<div class="layui-dash-font-ms">
+									Plugin View
+								</div>
+								<div class="layui-font-diy-01" id="value4">
+									0
+								</div>
+								<div class="layui-dash-font-cl">
+									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 已安装应用
+								</div>
+							</div>
+							<div class="layui-col-xs6 layui-col-md3">
+								<div class="layui-dash-wh layui-table-checked">
+									<i class="layui-icon layui-icon-app pear-this"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-	<div class="layui-row layui-col-space15">
-		<div class="layui-col-xs6 layui-col-md3">
-			<div class="layui-card top-panel">
-				<div class="layui-card-body">
-					<div class="layui-row layui-dash-height-100">
-						<div class="layui-col-xs6 layui-col-md9">
-							<div class="layui-dash-font-ms">
-								User View
-							</div>
-							<div class="layui-font-diy-01" id="value1">
-								0
-							</div>
-							<div class="layui-dash-font-cl">
-								<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总注册会员用户
-							</div>
-						</div>
-						<div class="layui-col-xs6 layui-col-md3">
-							<div class="layui-dash-wh layui-table-checked">
-								<i class="layui-icon layui-icon-group pear-this"></i>
-							</div>
-						</div>
+
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-xs12 layui-col-md9">
+				<div class="layui-card top-panel">
+					<div class="layui-card-body layui-height-300">
+						<div class="echarts-records" id="bar"></div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-col-xs12 layui-col-md3">
+				<div class="layui-card top-panel"> 
+					<div class="layui-card-body layui-height-300">
+						<div class="echarts-records" id="donut"></div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="layui-col-xs6 layui-col-md3">
-			<div class="layui-card top-panel">
-				<div class="layui-card-body">
-					<div class="layui-row layui-dash-height-100">
-						<div class="layui-col-xs6 layui-col-md9">
-							<div class="layui-dash-font-ms">
-								Manage View
-							</div>
-							<div class="layui-font-diy-01" id="value2">
-								0
-							</div>
-							<div class="layui-dash-font-cl">
-								<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总注册管理用户
-							</div>
-						</div>
-						<div class="layui-col-xs6 layui-col-md3">
-							<div class="layui-dash-wh layui-table-checked">
-								<i class="layui-icon layui-icon-friends pear-this"></i>
-							</div>
-						</div>
+
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-xs12 layui-col-md9">
+				<div class="layui-card top-panel">
+					<div class="layui-card-header layui-text-style">日志信息</div>
+					<div class="layui-card-body" style="height: 300px; overflow: hidden;">
+						<table id="data-table" lay-filter="data-table"></table>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="layui-col-xs6 layui-col-md3">
-			<div class="layui-card top-panel">
-				<div class="layui-card-body">
-					<div class="layui-row layui-dash-height-100">
-						<div class="layui-col-xs6 layui-col-md9">
-							<div class="layui-dash-font-ms">
-								Page View
-							</div>
-							<div class="layui-font-diy-01" id="value3">
-								0
-							</div>
-							<div class="layui-dash-font-cl">
-								<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总浏览量
-							</div>
-						</div>
-						<div class="layui-col-xs6 layui-col-md3">
-							<div class="layui-dash-wh layui-table-checked">
-								<i class="layui-icon layui-icon-chart-screen pear-this"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="layui-col-xs6 layui-col-md3">
-			<div class="layui-card top-panel">
-				<div class="layui-card-body">
-					<div class="layui-row layui-dash-height-100">
-						<div class="layui-col-xs6 layui-col-md9">
-							<div class="layui-dash-font-ms">
-								Plugin View
-							</div>
-							<div class="layui-font-diy-01" id="value4">
-								0
-							</div>
-							<div class="layui-dash-font-cl">
-								<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 已安装应用
-							</div>
-						</div>
-						<div class="layui-col-xs6 layui-col-md3">
-							<div class="layui-dash-wh layui-table-checked">
-								<i class="layui-icon layui-icon-app pear-this"></i>
-							</div>
+			<div class="layui-col-xs12 layui-col-md3">
+				<div class="layui-card top-panel">
+					<div class="layui-card-header layui-text-style">软件信息</div>
+					<div class="layui-card-body" style="height:300px;">
+						<div class="layui-row">
+							<table class="layui-table copy-tr-height">
+								<colgroup>
+									<col width="50%">
+									<col>
+								</colgroup>
+								<tbody>
+								<tr>
+									<td>Workerman版本</td>
+									<td>{$workerman_version}</td>
+								</tr>
+								<tr>
+									<td>Webman版本</td>
+									<td>{$webman_version}</td>
+								</tr>
+								<tr>
+									<td>Webniu版本</td>
+									<td>{$admin_version}</td>
+								</tr>
+								<tr>
+									<td>Think-cache版本</td>
+									<td>{$think_cache}</td>
+								</tr>
+								<tr>
+									<td>PHP版本</td>
+									<td>{$php_version}</td>
+								</tr>
+								<tr>
+									<td>MYSQL版本</td>
+									<td>{$mysql_version}</td>
+								</tr>
+								<tr>
+									<td>操作系统</td>
+									<td>{$os}</td>
+								</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
-	<div class="layui-row layui-col-space15">
-		<div class="layui-col-xs12 layui-col-md9">
-			<div class="layui-card top-panel">
-				<div class="layui-card-body layui-height-300">
-					<div class="echarts-records" id="bar"></div>
-				</div>
-			</div>
-		</div>
-		<div class="layui-col-xs12 layui-col-md3">
-			<div class="layui-card top-panel"> 
-				<div class="layui-card-body layui-height-300">
-					<div class="echarts-records" id="donut"></div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="layui-row layui-col-space15">
-		<div class="layui-col-xs12 layui-col-md9">
-			<div class="layui-card top-panel">
-				<div class="layui-card-header layui-text-style">日志信息</div>
-				<div class="layui-card-body" style="height: 300px; overflow: hidden;">
-					<table id="data-table" lay-filter="data-table"></table>
-				</div>
-			</div>
-		</div>
-		<div class="layui-col-xs12 layui-col-md3">
-			<div class="layui-card top-panel">
-				<div class="layui-card-header layui-text-style">软件信息</div>
-				<div class="layui-card-body" style="height:300px;">
-					<div class="layui-row">
-						<table class="layui-table copy-tr-height">
-							<colgroup>
-								<col width="50%">
-								<col>
-							</colgroup>
-							<tbody>
-							<tr>
-								<td>Workerman版本</td>
-								<td>{$workerman_version}</td>
-							</tr>
-							<tr>
-								<td>Webman版本</td>
-								<td>{$webman_version}</td>
-							</tr>
-							<tr>
-								<td>Webniu版本</td>
-								<td>{$admin_version}</td>
-							</tr>
-							<tr>
-								<td>Think-cache版本</td>
-								<td>{$think_cache}</td>
-							</tr>
-							<tr>
-								<td>PHP版本</td>
-								<td>{$php_version}</td>
-							</tr>
-							<tr>
-								<td>MYSQL版本</td>
-								<td>{$mysql_version}</td>
-							</tr>
-							<tr>
-								<td>操作系统</td>
-								<td>{$os}</td>
-							</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
- 
-	<script src="/app/webniu/component/layui/layui.js"></script>
-	<script src="/app/webniu/component/pear/pear.js"></script> 
-	<script src="/app/webniu/component/pear/module/apexcharts/apexcharts.min.js"></script>
-	<script src="/app/webniu/admin/js/common.js"></script>
+	 
+	<script src="/app/webniu/skins/component/pear/module/apexcharts/apexcharts.js"></script>
 	<script>
 
-		// 相关常量 
-		const SELECT_API 	= "/app/webniu/web/logtime/select";
-		const READATA_API 	= "/app/webniu/web/index/readata";
-		var randomizeArray 	= function (arg) {
-			var array = arg.slice();
-			var currentIndex = array.length, temporaryValue, randomIndex;
-
-			while (0 !== currentIndex) {
-
-				randomIndex = Math.floor(Math.random() * currentIndex);
-				currentIndex -= 1;
-
-				temporaryValue = array[currentIndex];
-				array[currentIndex] = array[randomIndex];
-				array[randomIndex] = temporaryValue;
-			}
-
-			return array;
-		}
-		
+		 
 		// 表格渲染
-		layui.use(["table", "form", "common", "popup", "util", "drawer","count"], function () {
+		layui.use(["table", "form", "common", "popup", "util","count","nprogress"], function () {
 			let table 	= layui.table;
+			let nprogress = layui.nprogress;
 			let form 	= layui.form;
 			let $ 		= layui.$;
 			let common 	= layui.common;
-			let util 	= layui.util;
-			var drawer 	= layui.drawer; 
+			let util 	= layui.util; 
 			let count 	= layui.count; 
 			let color 			= localStorage.getItem("theme-color-color");
-			var sparkColor		= color==null?'#008FFB':color;
+			let sparkColor		= color==null?'#008FFB':color;
 			layui.colorPalette 	= [sparkColor];
+			nprogress.start();
 			$.ajax({
-				url: READATA_API,
+				url: "/app/webniu/web/index/readata",
 				dataType: "json",
 				success: function (res) {
+					nprogress.done();
 					count.up("value1", {
 						time: 4000,
 						num: res.data.user_count,
@@ -464,18 +365,6 @@
 				}
 			});
 			 
-			 
-
-			 
-
-			 
-			 
-
-			 
-			
-			
-			 
-
 			function render()
 			{
 				let cols = [
@@ -525,7 +414,7 @@
 				];
 				table.render({
 					elem: "#data-table",
-					url: SELECT_API,
+					url: "/app/webniu/web/logtime/select",
 					page: true,
 					cols: [cols],
 					skin: "line",

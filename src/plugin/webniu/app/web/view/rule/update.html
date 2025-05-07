@@ -4,14 +4,11 @@
     <head>
         <meta charset="UTF-8">
         <title>更新页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
-        <style>
-            .layui-iconpicker .layui-anim {
-                bottom: 42px !important;
-                top: inherit !important;
-            }
-        </style>
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
 
@@ -61,7 +58,18 @@
                             <div name="type" id="type" value="1" ></div>
                         </div>
                     </div>
-
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-block">
+                            <select name="opentype">
+                                <option value="_iframe">iframe嵌套</option>
+                                <option value="_component">组件载入</option> 
+                                <option value="_layer">layer弹窗</option>
+                                 
+                            </select>
+                        </div>
+                    </div>
+                     
                     <div class="layui-form-item">
                         <label class="layui-form-label">排序</label>
                         <div class="layui-input-block">
@@ -74,19 +82,18 @@
 
             <div class="bottom">
                 <div class="button-container">
-                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                    <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="pear-btn pear-btn-md">
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
                         重置
                     </button>
                 </div>
             </div>
         </form>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+		<script src="/app/webniu/skins/component/pear/pear.js"></script>
         <script>
 
             // 相关接口
@@ -140,6 +147,7 @@
                                         initValue: initValue,
                                         tips: "无",
                                         toolbar: {show: true, list: ["CLEAR"]},
+                                        theme: {color: localStorage.getItem("theme-color-color")},
                                         data: res.data,
                                         model: {"icon":"hidden","label":{"type":"text"}},
                                         clickClose: true,
@@ -161,6 +169,7 @@
                                 el: "#type",
                                 name: "type",
                                 initValue: initValue,
+                                theme: {color: localStorage.getItem("theme-color-color")},
                                 data: [{"value":"0","name":"目录"},{"value":"1","name":"菜单"},{"value":"2","name":"权限"}],
                                 model: {"icon":"hidden","label":{"type":"text"}},
                                 clickClose: true,

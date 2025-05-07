@@ -3,8 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>新增页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
 
@@ -25,7 +28,7 @@
                         <div class="layui-input-block">
                             <span></span>
                             <input type="text" style="display:none" name="url" value="" />
-                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="url">
+                            <button type="button" class="layui-btn" id="url">
                                 <i class="layui-icon layui-icon-upload"></i>上传文件
                             </button>
                         </div>
@@ -36,9 +39,8 @@
             
         </form>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+		<script src="/app/webniu/skins/component/pear/pear.js"></script>
         <script>
             
             // 字段 文件 url
@@ -73,6 +75,7 @@
                             el: "#category",
                             name: "category",
                             initValue: initValue,
+                            theme: {color: localStorage.getItem("theme-color-color")},
                             data: res.data,
                             model: {"icon":"hidden","label":{"type":"text"}},
                             clickClose: true,

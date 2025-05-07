@@ -3,24 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <title>新增页面</title>
-        <link rel="stylesheet" href="/app/webniu/component/pear/css/pear.css" />
-        <link rel="stylesheet" href="/app/webniu/component/jsoneditor/css/jsoneditor.css" />
-        <link rel="stylesheet" href="/app/webniu/admin/css/reset.css" />
-        <style>
-            .layui-form-item .layui-input-inline{
-                width: 70%;
-            }
-        </style>
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
 
         <form class="layui-form" action="">
-
+            <style>.layui-form-item .layui-input-inline{width: 400px;}</style>
             <div class="mainBox">
                 <div class="main-container mr-5">
                     <div class="layui-form-item">
                         <label class="layui-form-label">签名</label>
-                        <div class="layui-input-inline layui-input-wrap">
+                        <div class="layui-input-inline">
                             <input type="text" readonly name="sign" value="<?=$api['sms']['sign']?>" required lay-verify="required" lay-reqtext="请输入短信模板名称" class="layui-input layui-btn-disabled" placeholder="自动读取可用短信签名">
                         </div>
                         <div class="layui-form-mid layui-text-em">
@@ -29,7 +26,7 @@
                     </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">名称</label>
-                        <div class="layui-input-inline layui-input-wrap">
+                        <div class="layui-input-inline ">
                             <select name="name" lay-search="" lay-creatable="" required lay-verify="required" lay-reqtext="请输入短信模板名称" placeholder="请输入短信模板名称">
                                 <option value="">自行输入创建</option>
                                 <option value="captcha">验证码</option> 
@@ -43,7 +40,7 @@
                     
                     <div class="layui-form-item">
                         <label class="layui-form-label">模板id</label>
-                        <div class="layui-input-inline layui-input-wrap">
+                        <div class="layui-input-inline ">
                             <input type="text" name="template_id" value="" class="layui-input" required lay-verify="required" lay-reqtext="请输入短信模板名称" placeholder="请输入模板CODE">
                         </div>
                         <div class="layui-form-mid layui-text-em">
@@ -58,11 +55,10 @@
 
             <div class="bottom">
                 <div class="button-container">
-                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit=""
-                        lay-filter="save">
+                    <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="pear-btn pear-btn-md" id="closeIframe">
+                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" id="closeIframe">
                         关闭
                     </button>
                 </div>
@@ -70,10 +66,9 @@
             
         </form>
 
-        <script src="/app/webniu/component/layui/layui.js"></script>
-        <script src="/app/webniu/component/pear/pear.js"></script>
-        <script src="/app/webniu/component/jsoneditor/jsoneditor.js"></script>
-        <script src="/app/webniu/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+        <script src="/app/webniu/skins/component/pear/pear.js"></script>
+        <script src="/app/webniu/skins/component/jsoneditor/jsoneditor.js"></script> 
         
         <script>
 

@@ -1,10 +1,10 @@
 {
     "base": {
-		"title": "WebNiu 网牛引擎",
-        "keyword": "Webniu、网牛引擎平台管理系统",
+        "title": "Webniu 网牛",
+        "keyword": "网牛引擎(Webniu)管理系统",
         "description": "一款好用的多平台管理引擎。",
         "siteurl": "/",
-        "image": "/app/webniu/admin/images/logo.png",
+        "image": "/app/webniu/skins/admin/images/logo.png",
         "ipcbeian": "辽ICP备 20000000号",
         "copyright": "Powered by webniu.com © 2010-2025."
     },
@@ -14,7 +14,7 @@
     },
     "user": {
         "managereg": false,
-        "background_image": "/app/webniu/admin/images/auth_banner.jpg",
+        "background_image": "/app/webniu/skins/admin/images/auth_banner.jpg",
         "roles": "3,5",
         "m_phone_verify": false,
         "userreg": false,
@@ -72,69 +72,43 @@
         "pic_thumb_size": "30",
         "pic_thumb_color": "#0e82da",
         "pic_thumb_touming": "",
-        "pic_thumb_img": "/app/webniu/admin/images/logo.png",
+        "pic_thumb_img": "/app/webniu/skins/admin/images/logo.png",
         "pic_mark_weizhi": "bottom-right"
     },
-    "menu": {
-        "data": "/app/webniu/web/rule/get",
-        "accordion": true,
-        "collapse": false,
-        "control": false,
-        "controlWidth": 230,
-        "controlHeight": "100%",
-        "select": 3,
-        "async": true
-    },
-    "tab": {
-        "enable": true,
-        "keepState": true,
-        "preload": true,
-        "session": true,
-        "max": "31",
-        "index": {
-            "id": "3",
-            "href": "/app/webniu/web/index/dashboard",
-            "title": "数据面板"
-        }
-    },
-    "theme": {
-        "defaultColor": "2",
-        "defaultMenu": "light-theme",
-        "defaultHeader": "light-theme",
-        "defaultAside": "double-theme",
-        "allowCustom": true,
-        "banner": false,
-        "footer": true,
-        "message": false,
-        "keepLoad": "500",
-        "autoHead": false,
-        "colors": [
-            {
-                "id": "1",
-                "color": "#36b368",
-                "second": "#f0f9eb"
-            },
-            {
-                "id": "2",
-                "color": "#2d8cf0",
-                "second": "#ecf5ff"
-            },
-            {
+    "views": {
+        "menu": {
+            "data": "/app/webniu/web/rule/get",
+            "method": "GET",
+            "accordion": false,
+            "collapse": false,
+            "control": "double",
+            "controlWidth": "auto",
+            "controlHeight": "100%",
+            "async": true
+        },
+        "tab": {
+            "enable": true,
+            "keepState": true,
+            "preload": false,
+            "session": true,
+            "max": "30",
+            "index": {
                 "id": "3",
-                "color": "#f6ad55",
-                "second": "#fdf6ec"
-            },
-            {
-                "id": "4",
-                "color": "#f56c6c",
-                "second": "#fef0f0"
-            },
-            {
-                "id": "5",
-                "color": "#3963bc",
-                "second": "#ecf5ff"
+                "href": "/app/webniu/web/index/dashboard",
+                "title": "控制台"
             }
-        ]
+        },
+        "theme": {
+            "defaultColor": "1",
+            "defaultMenu": "light-theme",
+            "defaultHeader": "light-theme",
+            "allowCustom": true,
+            "banner": false,
+            "footer": true,
+            "keepLoad": "800",
+            "message": false,
+            "autoHead": false
+        }
     },
     "api": {
         "smtp": {

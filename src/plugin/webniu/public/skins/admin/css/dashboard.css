@@ -1,0 +1,75 @@
+.pear-container {
+	margin: 0px;
+	padding: 10px;
+	width: auto;
+	height: 100%;
+	overflow:auto;
+}
+.layui-table-page{
+	margin-bottom:0px;
+}
+.echarts-records{
+	background-color:#ffffff;
+	min-height:250px;
+} 
+.layui-height-300{
+	height: 300px;
+}
+.layui-text-style{
+	text-anchor: start; 
+	font-size: 18px;
+	font-family: Helvetica, Arial, sans-serif;
+	font-weight: 900;
+	fill: rgb(55, 61, 63);
+	color: #6c757d !important;
+}
+.layui-number-top-style{
+	color: #6c7a91; 
+}
+.layui-top-padding-z0{
+	padding: 0px;
+}
+.layui-dash-height-100{
+	height: 100px;
+}
+.layui-dash-font-ms{
+	color: #6c757d !important;
+	font-family: "Montserrat", sans-serif;
+	font-weight: 600;
+}
+.layui-font-diy-01{
+	font-size: 28px;
+	font-family: "Montserrat", sans-serif;
+	font-weight: 600;
+	padding-top: 5px;
+	padding-bottom: 15px;
+	color: #495057;
+	line-height: 35px;
+}
+.layui-dash-font-cl{
+	color: #6c757d ;
+}
+.layui-dash-wh{
+	width: 48px;
+	height: 48px;
+	border-radius: 30px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-content: center;
+	justify-content: center;
+	align-items: center;
+	margin-top: 10px;
+	margin: 10px auto;
+	 
+}
+.layui-dash-wh i{
+	font-size: 20px;
+	font-weight: bold;
+}
+.layui-card-body .layui-table{
+	margin:0px;
+}
+.copy-tr-height tr{
+	height: 43px;
+}
