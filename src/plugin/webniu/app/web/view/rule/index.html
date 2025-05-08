@@ -5,7 +5,6 @@
         <title>菜单管理</title>
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
 		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
 		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
@@ -138,6 +137,7 @@
                 // 渲染表格
                 function render()
                 { 
+                    nprogress.start();
                     treeTable.render({
                         elem: '#data-table',
                         id:"data-table",
@@ -185,7 +185,7 @@
                             }
                         }],
                         done: function(){
-                            
+                            nprogress.done();
                         }
                     });
                      

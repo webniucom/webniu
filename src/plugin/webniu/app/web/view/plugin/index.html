@@ -6,7 +6,6 @@
     <title>应用插件</title>
     <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
     <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
     <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
     <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
 </head>
@@ -91,7 +90,7 @@
     <script>
 
         // 表格渲染
-        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery"], function () {
+        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery","nprogress"], function () {
             // 相关常量
             let PRIMARY_KEY   = "id";
             let SELECT_API    = "/app/webniu/web/plugin/select"; 
@@ -99,6 +98,7 @@
             let INSTALL_URL   = "/app/webniu/web/plugin/install";
             let UPDATE_URL    = "/app/webniu/web/plugin/update";
             let apiResults      = {};
+            let nprogress   = layui.nprogress;
             let table       = layui.table;
             let layer       = layui.layer;
             let form        = layui.form;
@@ -216,6 +216,7 @@
 
             // 渲染表格
             function render() {
+                nprogress.start();
                 table.render({
                     elem: "#data-table",
                     url: SELECT_API,
@@ -232,6 +233,7 @@
                         icon: "layui-icon-refresh",
                     }],
                     done: function (res) {
+                        nprogress.done();
                         let thisOptions = this; 
                         if(thisOptions.installedtype=='installed'){
                             getversion(res.data);

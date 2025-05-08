@@ -6,7 +6,6 @@
         <title>浏览页面</title>
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
@@ -133,9 +132,10 @@
             const UPDATE_URL = "/app/webniu/web/emailtemp/update"; 
             const TEST_API   = "/app/webniu/web/emailtemp/test";
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util","drawer"], function() {
+            layui.use(["table", "form", "common", "popup", "util","drawer","nprogress"], function() {
+                let nprogress = layui.nprogress;
                 let table   = layui.table;
-                var drawer  = layui.drawer;
+                let drawer  = layui.drawer;
                 let form    = layui.form;
                 let $       = layui.$;
                 let common  = layui.common;
@@ -183,26 +183,30 @@
 						width: 180,
 					}
 				];
-				
-				// 渲染表格
-				table.render({
-				    elem: "#data-table",
-				    url: SELECT_API,
-				    page: true,
-				    cols: [cols],
-				    skin: "line",
-				    size: "lg",
-				    toolbar: "#table-toolbar",
-				    autoSort: false,
-				    defaultToolbar: [{
-				        title: "刷新",
-				        layEvent: "refresh",
-				        icon: "layui-icon-refresh",
-				    }],
-				    done: function () {
-				        layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
-				    }
-				});
+				function render(){
+                    // 渲染表格
+                    nprogress.start();
+                    table.render({
+                        elem: "#data-table",
+                        url: SELECT_API,
+                        page: true,
+                        cols: [cols],
+                        skin: "line",
+                        size: "lg",
+                        toolbar: "#table-toolbar",
+                        autoSort: false,
+                        defaultToolbar: [{
+                            title: "刷新",
+                            layEvent: "refresh",
+                            icon: "layui-icon-refresh",
+                        }],
+                        done: function () {
+                            nprogress.done();
+                            layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
+                        }
+                    });
+                }
+				render();
 				
 				
                 // 编辑或删除行事件

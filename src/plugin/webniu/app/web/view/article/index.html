@@ -5,7 +5,6 @@
         <title>浏览页面</title>
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
@@ -93,8 +92,7 @@
         <script src="/app/webniu/skins/component/pear/pear.js"></script>
         <script src="/app/webniu/skins/admin/js/permission.js"></script>
         <script src="/app/webniu/skins/admin/js/common.js"></script>
-        
-        <script>
+    <script>
 
              
             // 表格渲染
@@ -290,30 +288,35 @@
 					}
 				];
 				
-				// 渲染表格
-				table.render({
-				    elem: "#data-table",
-				    url: SELECT_API,
-				    page: true,
-				    cols: [cols],
-				    skin: "line",
-				    size: "lg",
-				    toolbar: "#table-toolbar",
-				    autoSort: false,
-                    where: { 
-						'type':'article',
-						field: 'displayorder',
-                     	order: 'desc'
-                	},
-                    height:'620px',
-				    defaultToolbar: [{
-				        title: "刷新",
-				        layEvent: "refresh",
-				        icon: "layui-icon-refresh",
-				    }],
-				    done: function () { 
-				    }
-				});
+                function render(){
+                    // 渲染表格
+                    nprogress.start();
+                    table.render({
+                        elem: "#data-table",
+                        url: SELECT_API,
+                        page: true,
+                        cols: [cols],
+                        skin: "line",
+                        size: "lg",
+                        toolbar: "#table-toolbar",
+                        autoSort: false,
+                        where: { 
+                            'type':'article',
+                            field: 'displayorder',
+                            order: 'desc'
+                        },
+                        height:'620px',
+                        defaultToolbar: [{
+                            title: "刷新",
+                            layEvent: "refresh",
+                            icon: "layui-icon-refresh",
+                        }],
+                        done: function () { 
+                            nprogress.done();
+                        }
+                    });
+                }
+				render();
 				
 				 
                 // 编辑或删除行事件

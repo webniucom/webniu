@@ -803,7 +803,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 			moreItem +=
 				'<div class="layui-form-item"><div class="layui-input-inline" style="width:200px;"><input type="checkbox" name="footer" lay-filter="footer" lay-skin="switch"></div><span class="set-text">开启页脚</span></div>';
 
-			moreItem +=
+			//moreItem +=
 				'<div class="layui-form-item"><div class="layui-input-inline" style="width:200px;"><input type="checkbox" name="dark" lay-filter="dark" lay-skin="switch"></div><span class="set-text">夜间模式</span></div>';
 
 			var moreHtml = '<br><div class="pearone-color">\n' +

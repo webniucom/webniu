@@ -6,7 +6,6 @@
     <title>浏览页面</title>
     <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
     <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-    <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
     <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
     <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
 </head>
@@ -172,6 +171,7 @@
             loadDictNames();
             // 渲染表格
             function render() {
+                nprogress.start();
                 table.render({
                     elem: "#data-table",
                     url: SELECT_API,
@@ -185,7 +185,10 @@
                         title: "刷新",
                         layEvent: "refresh",
                         icon: "layui-icon-refresh",
-                    }, "filter", "print", "exports"]
+                    }, "filter", "print", "exports"],
+                    done: function () {
+                        nprogress.done();
+                    }
                 });
             }
             render();

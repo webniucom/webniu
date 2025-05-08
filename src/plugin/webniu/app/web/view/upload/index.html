@@ -6,7 +6,6 @@
         <title>附件管理</title>
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
 		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
 		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
@@ -234,6 +233,7 @@
 				// 渲染表格
 				function render()
 				{
+                    nprogress.start();
 				    table.render({
 				        elem: "#data-table",
 				        url: SELECT_API,
@@ -249,6 +249,7 @@
 				            icon: "layui-icon-refresh",
 				        }],
                         done: function () {
+                            nprogress.done();
                             layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
                         }
 				    });

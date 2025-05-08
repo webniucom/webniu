@@ -794,7 +794,6 @@ EOF
         <title>浏览页面</title>
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
@@ -1013,7 +1012,6 @@ EOF;
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/webniu/skins/component/jsoneditor/css/jsoneditor.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" /> 
     </head>
@@ -1101,7 +1099,6 @@ EOF;
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/webniu/skins/component/jsoneditor/css/jsoneditor.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
         

@@ -6,7 +6,6 @@
         <title>浏览页面</title>
         <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
-        <link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.dark.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
@@ -194,6 +193,7 @@
                             name: "sex",
                             initValue: initValue,
                             data: res.data,
+                            theme: {color: localStorage.getItem("theme-color-color")},
                             model: {"icon":"hidden","label":{"type":"text"}},
                             clickClose: true,
                             radio: true,
@@ -232,7 +232,8 @@
             })
             
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util","drawer"], function() {
+            layui.use(["table", "form", "common", "popup", "util","drawer","nprogress"], function() {
+                let nprogress = layui.nprogress;
                 let table   = layui.table;
                 let form    = layui.form;
                 let $       = layui.$;
@@ -377,6 +378,7 @@
 				// 渲染表格
 				function render()
 				{
+                    nprogress.start();
 				    table.render({
 				        elem: "#data-table",
 				        url: SELECT_API,
@@ -392,6 +394,7 @@
 				            icon: "layui-icon-refresh",
 				        }, "filter", "print", "exports"],
 				        done: function () {
+				            nprogress.done();
 				            layer.photos({photos: 'div[lay-table-id="data-table"]', anim: 5});
 				        }
 				    }); 
