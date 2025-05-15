@@ -1,11 +1,3 @@
-CREATE TABLE IF NOT EXISTS `__PREFIX__admin_roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `role_id` int(11) NOT NULL COMMENT '角色id',
-  `admin_id` int(11) NOT NULL COMMENT '管理员id',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `role_admin_id` (`role_id`,`admin_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='管理员角色表';
-
 CREATE TABLE IF NOT EXISTS `__PREFIX__admins` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `username` varchar(32) NOT NULL COMMENT '用户名',
@@ -22,6 +14,63 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__admins` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='管理员表';
 
+CREATE TABLE IF NOT EXISTS `__PREFIX__admin_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `username` varchar(32) NOT NULL COMMENT '账号',
+  `nickname` varchar(40) DEFAULT NULL COMMENT '用户昵称',
+  `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
+  `user_agent` varchar(512) DEFAULT NULL COMMENT '浏览器 UA',
+  `user_os` varchar(255) DEFAULT NULL COMMENT '操作系统',
+  `user_browser` varchar(120) DEFAULT NULL COMMENT '浏览器',
+  `admin_id` int(11) DEFAULT NULL COMMENT '身份',
+  `error` varchar(255) DEFAULT NULL COMMENT '错误信息',
+  `status` tinyint(4) DEFAULT NULL COMMENT '登录状态',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='登录日志';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__admin_roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `role_id` int(11) NOT NULL COMMENT '角色id',
+  `admin_id` int(11) NOT NULL COMMENT '管理员id',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `role_admin_id` (`role_id`,`admin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='管理员角色表';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__article` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `cateid` int(11) DEFAULT NULL COMMENT '分类ID',
+  `title` varchar(254) DEFAULT NULL COMMENT '文章标题',
+  `source` varchar(254) DEFAULT NULL COMMENT '来源',
+  `author` varchar(49) DEFAULT NULL COMMENT '作者',
+  `displayorder` int(10) DEFAULT '0' COMMENT '排序',
+  `click` int(10) DEFAULT '0' COMMENT '阅读次数',
+  `status` int(4) DEFAULT NULL COMMENT '状态',
+  `content` text COMMENT '文章内容',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='文章公告';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__article_category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `title` varchar(255) DEFAULT NULL COMMENT '分类名',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='公告分类';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__email_temp`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uniacid` int(10) DEFAULT '0' COMMENT '平台ID',
+  `name` varchar(100) DEFAULT NULL COMMENT '名称',
+  `from` varchar(255) DEFAULT NULL COMMENT '发件人',
+  `subject` varchar(255) DEFAULT NULL COMMENT '主题',
+  `content` text COMMENT '内容',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='email模板';
+
 CREATE TABLE IF NOT EXISTS `__PREFIX__options` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `model` varchar(255) DEFAULT NULL COMMENT '模型',
@@ -32,6 +81,29 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__options` (
   `updated_at` datetime NOT NULL DEFAULT '1988-06-15 00:00:00' COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='选项表';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__plugin`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `plugin_type` varchar(32) DEFAULT NULL COMMENT '类型',
+  `plugin_class` int(3) DEFAULT '0' COMMENT '分类id',
+  `plugin_name` varchar(255) DEFAULT NULL COMMENT '应用标题',
+  `plugin_desc` varchar(255) DEFAULT NULL COMMENT '描述',
+  `plugin_author` varchar(100) DEFAULT NULL COMMENT '作者',
+  `plugin_identifier` varchar(100) DEFAULT NULL COMMENT '应用标识',
+  `plugin_logo` varchar(255) DEFAULT NULL COMMENT '应用图标',
+  `plugin_icon` varchar(255) DEFAULT NULL COMMENT 'icon图标',
+  `plugin_href` varchar(255) DEFAULT NULL COMMENT '应用入口',
+  `plugin_open` varchar(50) DEFAULT NULL COMMENT '打开方式',
+  `version` varchar(255) DEFAULT '0' COMMENT '当前版本',
+  `installed` int(2) DEFAULT '0' COMMENT '是否安装',
+  `disabled` int(2) DEFAULT '0' COMMENT '是否禁用',
+  `jump` int(3) DEFAULT '0' COMMENT '跳转入口',
+  `releases` varchar(255) DEFAULT '0' COMMENT '历史版本',
+  `created_at` datetime DEFAULT NULL COMMENT '插入时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `installed` (`installed`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='应用插件';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__roles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -60,6 +132,27 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__rules` (
   PRIMARY KEY (`id`),
   KEY `plugin_pid` (`plugin`,`pid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='权限规则';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__sms_temp`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uniacid` int(10) DEFAULT '0' COMMENT '平台ID',
+  `name` varchar(100) DEFAULT NULL COMMENT '名称',
+  `template_id` varchar(255) DEFAULT NULL COMMENT '模板id',
+  `sign` varchar(255) DEFAULT NULL COMMENT '签名',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信模板';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__statistics`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `model` varchar(32) NOT NULL COMMENT '模型',
+  `count` varchar(40) DEFAULT '0' COMMENT '数量',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `mc` (`model`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='数据统计';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__uploads` ( 
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -113,99 +206,6 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__users` (
   KEY `mobile` (`mobile`),
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户表';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__article_category` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `title` varchar(255) DEFAULT NULL COMMENT '分类名',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='公告分类';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__article` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `cateid` int(11) DEFAULT NULL COMMENT '分类ID',
-  `title` varchar(254) DEFAULT NULL COMMENT '文章标题',
-  `source` varchar(254) DEFAULT NULL COMMENT '来源',
-  `author` varchar(49) DEFAULT NULL COMMENT '作者',
-  `displayorder` int(10) DEFAULT '0' COMMENT '排序',
-  `click` int(10) DEFAULT '0' COMMENT '阅读次数',
-  `status` int(4) DEFAULT NULL COMMENT '状态',
-  `content` text COMMENT '文章内容',
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='文章公告';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__admin_log` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `username` varchar(32) NOT NULL COMMENT '账号',
-  `nickname` varchar(40) DEFAULT NULL COMMENT '用户昵称',
-  `user_ip` varchar(50) NOT NULL COMMENT '用户 IP',
-  `user_agent` varchar(512) DEFAULT NULL COMMENT '浏览器 UA',
-  `user_os` varchar(255) DEFAULT NULL COMMENT '操作系统',
-  `user_browser` varchar(120) DEFAULT NULL COMMENT '浏览器',
-  `admin_id` int(11) DEFAULT NULL COMMENT '身份',
-  `error` varchar(255) DEFAULT NULL COMMENT '错误信息',
-  `status` tinyint(4) DEFAULT NULL COMMENT '登录状态',
-  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
-  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='登录日志';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__sms_temp`(
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `uniacid` int(10) DEFAULT '0' COMMENT '平台ID',
-  `name` varchar(100) DEFAULT NULL COMMENT '名称',
-  `template_id` varchar(255) DEFAULT NULL COMMENT '模板id',
-  `sign` varchar(255) DEFAULT NULL COMMENT '签名',
-  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
-  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='短信模板';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__email_temp`(
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `uniacid` int(10) DEFAULT '0' COMMENT '平台ID',
-  `name` varchar(100) DEFAULT NULL COMMENT '名称',
-  `from` varchar(255) DEFAULT NULL COMMENT '发件人',
-  `subject` varchar(255) DEFAULT NULL COMMENT '主题',
-  `content` text COMMENT '内容',
-  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
-  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='email模板';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__plugin`(
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `plugin_type` varchar(32) DEFAULT NULL COMMENT '类型',
-  `plugin_class` int(3) DEFAULT '0' COMMENT '分类id',
-  `plugin_name` varchar(255) DEFAULT NULL COMMENT '应用标题',
-  `plugin_desc` varchar(255) DEFAULT NULL COMMENT '描述',
-  `plugin_author` varchar(100) DEFAULT NULL COMMENT '作者',
-  `plugin_identifier` varchar(100) DEFAULT NULL COMMENT '应用标识',
-  `plugin_logo` varchar(255) DEFAULT NULL COMMENT '应用图标',
-  `plugin_icon` varchar(255) DEFAULT NULL COMMENT 'icon图标',
-  `plugin_href` varchar(255) DEFAULT NULL COMMENT '应用入口',
-  `plugin_open` varchar(50) DEFAULT NULL COMMENT '打开方式',
-  `version` varchar(255) DEFAULT '0' COMMENT '当前版本',
-  `installed` int(2) DEFAULT '0' COMMENT '是否安装',
-  `disabled` int(2) DEFAULT '0' COMMENT '是否禁用',
-  `jump` int(3) DEFAULT '0' COMMENT '跳转入口',
-  `releases` varchar(255) DEFAULT '0' COMMENT '历史版本',
-  `created_at` datetime DEFAULT NULL COMMENT '插入时间',
-  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `installed` (`installed`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='应用插件';
-
-CREATE TABLE IF NOT EXISTS `__PREFIX__statistics`(
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `model` varchar(32) NOT NULL COMMENT '模型',
-  `count` varchar(40) DEFAULT '0' COMMENT '数量',
-  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
-  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `mc` (`model`,`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='数据统计';
 
 LOCK TABLES `__PREFIX__options` WRITE;
 INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_upload','[{\"value\":\"0\",\"name\":\"无分类\"},{\"value\":\"1\",\"name\":\"图片\"},{\"value\":\"2\",\"name\":\"媒体\"},{\"value\":\"3\",\"name\":\"文件\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
