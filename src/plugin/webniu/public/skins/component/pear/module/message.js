@@ -117,7 +117,7 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 		})
 
 		var notice = '<li class="layui-nav-item" lay-unselect="">' +
-			'<a href="#" class="notice layui-icon layui-icon-notice"><span class="layui-badge-dot"></div></a>' +
+			'<a href=“javascript:void(0);” class="notice layui-icon layui-icon-notice"><span class="layui-badge-dot"></div></a>' +
 			'<div class="layui-nav-child layui-tab pear-notice" style="margin-top: 0px;left: -200px;padding:0px;">';
 
 		noticeTitle += '</ul>';

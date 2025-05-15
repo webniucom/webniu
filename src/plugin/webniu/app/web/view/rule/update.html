@@ -11,7 +11,7 @@
     </head>
     <body>
 
-        <form class="layui-form">
+        <form class="layui-form"  lay-filter="demo-val-filter">
 
             <div class="mainBox">
                 <div class="main-container mr-5">
@@ -102,13 +102,14 @@
 
             // 获取行数据
             layui.use(["form", "util", "popup"], function () {
-                let $ = layui.$;
+                let $       = layui.$;
+                let form    = layui.form;
                 $.ajax({
                     url: SELECT_API,
                     dataType: "json",
                     success: function (res) {
 
-                        // 赋值表单
+                        //赋值表单
                         layui.each(res.data[0], function (key, value) {
                             let obj = $('*[name="'+key+'"]');
                             if (key === "password") {
@@ -118,10 +119,14 @@
                             if (typeof obj[0] === "undefined" || !obj[0].nodeName) return;
                             if (obj[0].nodeName.toLowerCase() === "textarea") {
                                 obj.html(layui.util.escape(value));
+
+                            }else if(obj[0].nodeName.toLowerCase() === "select") {
+                                obj.val(value);form.render("select");
                             } else {
                                 obj.attr("value", value);
                             }
                         });
+                        //form.val('demo-val-filter',res.data[0]);
 
                         // 图标选择
                         layui.use(["iconPicker"], function() {

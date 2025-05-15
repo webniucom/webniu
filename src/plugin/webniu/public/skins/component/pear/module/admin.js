@@ -18,6 +18,8 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 
 		var logout = function () { };
 		var cacheclear 	= function() {};
+		window.layui.diyfuner = function (obj) { // 自定义函数
+		}
 		var body = $('body');
 
 		var pearAdmin = new function () {
@@ -342,7 +344,8 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 							pearAdmin.instances.tabPage.refresh(false);
 						}
 						pearAdmin.instances.tabPage.positionTab();
-						pearAdmin.instances.menu.selectItem(id);
+						pearAdmin.instances.menu.selectItem(id); 
+						window.layui.diyfuner(id);
 					})
 
 					pearAdmin.instances.menu.click(function (dom, data) {
@@ -499,8 +502,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 				this.footer(footer);
 			}
 
-			this.footer = function (footer) {
-				console.log(footer);
+			this.footer = function (footer) { 
 				var bodyDOM = $(".pear-admin .layui-body");
 				var footerDOM = $(".pear-admin .layui-footer");
 				if (footer === true || footer === "true") {
@@ -553,9 +555,15 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 					logout = callback;
 				}
 			}
-
+			/**
+			 * 设置刷新缓存
+			 * 
+			 * @param callback 实现
+			 */
 			this.cacheclear = function(callback) {
-				cacheclear = callback;
+				if (callback != undefined) {
+					cacheclear = callback;
+				} 
 			}
 
 			/**

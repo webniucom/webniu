@@ -98,7 +98,7 @@
             let INSTALL_URL   = "/app/webniu/web/plugin/install";
             let UPDATE_URL    = "/app/webniu/web/plugin/update";
             let apiResults      = {};
-            let nprogress   = layui.nprogress;
+            let nprogress   = parent.layui.nprogress;
             let table       = layui.table;
             let layer       = layui.layer;
             let form        = layui.form;
@@ -216,7 +216,7 @@
 
             // 渲染表格
             function render() {
-                nprogress.start();
+                parent.layui.nprogress.start();
                 table.render({
                     elem: "#data-table",
                     url: SELECT_API,
@@ -233,7 +233,7 @@
                         icon: "layui-icon-refresh",
                     }],
                     done: function (res) {
-                        nprogress.done();
+                        parent.layui.nprogress.done();
                         let thisOptions = this; 
                         if(thisOptions.installedtype=='installed'){
                             getversion(res.data);
@@ -304,6 +304,7 @@
             });
             let installist = function (obj) {
                 cols[0] = colsone;
+                parent.layui.nprogress.start();
                 table.reload("data-table", {
                     page: {
                         curr: 1
@@ -312,10 +313,14 @@
                     installedtype: 'installed',
                     where: {
                         installedtype: 'installed'
+                    },
+                    done:function(){
+                        parent.layui.nprogress.done();
                     }
                 })
             }
             let waitapps = function (obj) {
+                parent.layui.nprogress.start();
                 table.reload("data-table", {
                     page: {
                         curr: 1
@@ -323,6 +328,9 @@
                     installedtype: 'waitapps',
                     where: {
                         installedtype: 'waitapps'
+                    },
+                    done:function(){
+                        parent.layui.nprogress.done();
                     }
                 })
             }
@@ -336,6 +344,7 @@
                         return '<i class="layui-icon layui-icon-app" style="font-size: 24px;"></i>';
                     }
                 };
+                parent.layui.nprogress.start();
                 table.reload("data-table", {
                     page: {
                         curr: 1
@@ -346,6 +355,7 @@
                         installedtype: 'localapps'
                     },
                     done: function (res) {
+                        parent.layui.nprogress.done();
                     }
                 })
             }
@@ -495,9 +505,11 @@
 
             // 刷新表格数据
             window.refreshTable = function () {
+                parent.layui.nprogress.start();
                 table.reloadData("data-table", {
                     scrollPos: "fixed",
                     done: function (res, curr) {
+                        parent.layui.nprogress.done();
                         if (curr > 1 && res.data && !res.data.length) {
                             curr = curr - 1;
                             table.reloadData("data-table", {

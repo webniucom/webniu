@@ -159,8 +159,9 @@ class RuleController extends Crud
                 $reflection = new \ReflectionClass($class);
                 $properties = $reflection->getDefaultProperties();
                 $no_need_auth = array_merge($properties['noNeedLogin'] ?? [], $properties['noNeedAuth'] ?? []);
-                $class = $reflection->getName();
-                $pid = $item->id;
+                $class  = $reflection->getName();
+                $pid    = $item->id;
+                $plugin = $item->plugin;
                 $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
                 foreach ($methods as $method) {
                     $method_name = $method->getName();
@@ -179,10 +180,11 @@ class RuleController extends Crud
                         continue;
                     }
                     $menu = new Rule;
-                    $menu->pid = $pid;
-                    $menu->key = $name;
-                    $menu->title = $title;
-                    $menu->type = 2;
+                    $menu->plugin   = $plugin;
+                    $menu->pid      = $pid;
+                    $menu->key      = $name;
+                    $menu->title    = $title;
+                    $menu->type     = 2;
                     $menu->save();
                 }
             }

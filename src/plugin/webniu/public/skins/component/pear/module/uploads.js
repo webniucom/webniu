@@ -23,6 +23,7 @@ layui.define(['jquery', 'element','upload','layer'], function(exports) {
 		let wn_u_d_accept   = wn_u_d_input.attr("accept")??'images';
 		let wn_list_dom     = wn_upload_dom.find(".wn_list_dom");
 		if(wn_u_d_value!='' && wn_u_d_value!=undefined && data==false){
+			wn_u_d_input.val('');
 			layui.each((wn_u_d_value).split(","), function (k , imgurl) {
 				setUploadListValue(object,{url:imgurl});
 			});

@@ -14,8 +14,7 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 	var tabDataCurrent = 0;
 	var contextTabDOM;
 
-	tabPage.prototype.render = function (opt) {
-
+	tabPage.prototype.render = function (opt) { 
 		var option = {
 			elem: opt.elem,
 			data: opt.data,
@@ -183,12 +182,12 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 		var elem = this.option.elem;
 		element.on('tab(' + this.option.elem + ')', function (data) {
 			var id = $("#" + elem + " .layui-tab-title .layui-this").attr("lay-id");
-			sessionStorage.setItem(option.elem + "-pear-tab-page-data-current", id);
+			sessionStorage.setItem(option.elem + "-pear-tab-page-data-current", id); 
 			callback(id);
 		});
 	}
 
-	tabPage.prototype.positionTab = function () {
+	tabPage.prototype.positionTab = function () { 
 		var $tabTitle = $('.layui-tab[lay-filter=' + this.option.elem + ']  .layui-tab-title');
 		var autoLeft = 0;
 		$tabTitle.children("li").each(function () {
@@ -275,8 +274,7 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 	 * 
 	 * @param opt 内容
 	 */
-	tabPage.prototype.changePage = function (opt) {
-
+	tabPage.prototype.changePage = function (opt) { 
 		var title = `<span class="pear-tab-page-active"></span>
 					 <span class="${opt.close ? 'able-close' : 'disable-close'} title">${opt.title}</span>
 					 <i class="layui-icon layui-unselect layui-tab-close">ဆ</i>`;
@@ -572,8 +570,7 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 			});
 	}
 
-	function menuEvent(option, index) {
-
+	function menuEvent(option, index) { 
 		$("#" + option.elem + "closeThis").click(function () {
 			var currentTab = contextTabDOM;
 
@@ -614,7 +611,7 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 		})
 	}
 
-	function mousewheelAndTouchmoveHandler(option) {
+	function mousewheelAndTouchmoveHandler(option) { 
 		var $bodyTab = $("body .layui-tab[lay-filter='" + option.elem + "'] .layui-tab-title")
 		var $tabTitle = $('#' + option.elem + '  .layui-tab-title');
 		var mouseScrollStep = 100

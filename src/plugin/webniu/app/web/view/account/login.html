@@ -221,6 +221,7 @@
                         layer.closeAll('loading');
                         if (!res.code) {
                             toast.success({message:'登录成功',position: 'topCenter',onOpened:function(){
+                                sessionStorage.clear();
                                 location.reload();
                             }});
                         } else {

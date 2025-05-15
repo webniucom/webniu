@@ -37,7 +37,10 @@ layui.define(["jquery","layer"], function (exports) {
 	};
 	
 	newTheme.generateScriptContent = function(color) {
-		return "document.documentElement.style.setProperty('--global-primary-color', '" + color + "');";
+		if(color!=null){
+			return "document.documentElement.style.setProperty('--global-primary-color', '" + color + "');";
+		}
+		return false;
 	};
 	
 

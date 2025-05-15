@@ -307,9 +307,12 @@ EOF;
      */
     protected function addMenu(array $menu, \PDO $pdo,$prefix): int
     {
-        $allow_columns = ['title', 'key', 'icon', 'href', 'pid', 'weight', 'type','opentype'];
+        $allow_columns = ['plugin','title','name','key','icon','href','pid','weight','type','opentype'];
         $data = [];
         foreach ($allow_columns as $column) {
+            if ($column=='plugin' && !isset($menu['plugin'])) {
+                $data[$column] = 'webniu';
+            }
             if (isset($menu[$column])) {
                 $data[$column] = $menu[$column];
             }
@@ -355,12 +358,14 @@ EOF;
         if ($old_menu) {
             $pid = $old_menu['id'];
             $params = [
-                'title' => $menu_tree['title'],
-                'icon' => $menu_tree['icon'] ?? '',
-                'key' => $menu_tree['key'],
-                'opentype' => $menu_tree['opentype'] ?? '_iframe',
+                'plugin'    => $menu_tree['plugin']?? 'webniu',
+                'name'      => $menu_tree['name']?? 'webniu',
+                'title'     => $menu_tree['title'],
+                'icon'      => $menu_tree['icon'] ?? '',
+                'key'       => $menu_tree['key'],
+                'opentype'  => $menu_tree['opentype'] ?? '_iframe',
             ];
-            $sql = "update {$prefix}rules set title=:title, icon=:icon where `key`=:key";
+            $sql = "update {$prefix}rules set plugin=:plugin,title=:title, icon=:icon,opentype=:opentype where `key`=:key";
             $smt = $pdo->prepare($sql);
             $smt->execute($params);
         } else {

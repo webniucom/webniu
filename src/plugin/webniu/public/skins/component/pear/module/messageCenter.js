@@ -20,7 +20,7 @@ layui.define(['table', 'jquery', 'element', 'dropdown'], function (exports) {
             $.get(option.url, function (result) {
                 const { code, success, data } = result;
                 $(`${opt.elem}`).append(`<li class="layui-nav-item" lay-unselect="">
-                    <a href="#" class="notice layui-icon layui-icon-notice"></a>
+                    <a href="javascript:void(0);" class="notice layui-icon layui-icon-notice"></a>
                     </li>`);
                 if (code == 200 || success) {
                     option.data = data;

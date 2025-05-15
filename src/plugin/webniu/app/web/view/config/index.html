@@ -8,6 +8,12 @@
         <link rel="stylesheet" href="/app/webniu/skins/admin/css/config.css" />
 	</head>
 	<body>
+        <style>
+            .layui-tabs-body{
+                border-left: 1px #eee solid;
+                border-right: 1px #eee solid;
+            }
+        </style>
 		<div class="pear-container">
 			<div class="layui-row layui-col-space10">
 				<div class="layui-col-md12">
@@ -1129,6 +1135,7 @@
             let xmSelect= layui.xmSelect;
             let name    = 'base';
             let lock    = false;
+              
             $('.layui-icon-tips').on("click", function() {
                 let value   = $(this).attr("lay-tips");
                 let offset  = $(this).offset(); 

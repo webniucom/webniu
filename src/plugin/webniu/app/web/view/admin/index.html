@@ -115,7 +115,8 @@
             })
             
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util"], function() {
+            layui.use(["table", "form", "common", "popup", "util","nprogress"], function() {
+                let nprogress = parent.layui.nprogress;
                 let table = layui.table;
                 let form = layui.form;
                 let $ = layui.$;
@@ -217,6 +218,7 @@
 				// 渲染表格
 				function render()
 				{
+                    nprogress.start();
 				    table.render({
 				        elem: "#data-table",
 				        url: SELECT_API,
@@ -232,6 +234,7 @@
 				            icon: "layui-icon-refresh",
 				        }, "filter", "print", "exports"],
 				        done: function () {
+                            nprogress.done();
 				            layer.photos({photos: 'div[lay-id="data-table"]', anim: 5});
 				        }
 				    });

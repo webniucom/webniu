@@ -4,7 +4,7 @@
         "keyword": "网牛引擎(Webniu)管理系统",
         "description": "一款好用的多平台管理引擎。",
         "siteurl": "/",
-        "image": "/app/webniu/skins/admin/images/logo.png",
+        "image": "/app/webniu/skins/admin/images/logo.svg",
         "ipcbeian": "辽ICP备 20000000号",
         "copyright": "Powered by webniu.com © 2010-2025."
     },
@@ -15,7 +15,7 @@
     "user": {
         "managereg": false,
         "background_image": "/app/webniu/skins/admin/images/auth_banner.jpg",
-        "roles": "3,5",
+        "roles": "0",
         "m_phone_verify": false,
         "userreg": false,
         "u_phone_verify": false,

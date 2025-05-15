@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__roles` (
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__rules` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `plugin` varchar(100) DEFAULT NULL COMMENT '插件',
+  `name` varchar(100) DEFAULT NULL COMMENT '名称标识',
   `title` varchar(255) NOT NULL COMMENT '标题',
   `icon` varchar(255) DEFAULT NULL COMMENT '图标',
   `key` varchar(255) NOT NULL COMMENT '标识',
@@ -55,7 +57,8 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__rules` (
   `type` int(11) NOT NULL DEFAULT '1' COMMENT '类型',
   `opentype` varchar(100) DEFAULT '_iframe' COMMENT '打开方式',
   `weight` int(11) DEFAULT '0' COMMENT '排序',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `plugin_pid` (`plugin`,`pid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='权限规则';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__uploads` ( 

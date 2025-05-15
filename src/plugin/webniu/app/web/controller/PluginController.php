@@ -73,12 +73,16 @@ class PluginController extends Crud
                 $localitems         = [];
                 $plugin_names       = array_diff(scandir(base_path() . '/plugin/'), array('.', '..'));
                 $existing_plugins   = array_column($items, 'plugin_identifier');
+                
                 foreach ($plugin_names as $plugin_name) {
                     if (!in_array($plugin_name, $existing_plugins)) {
                         $plugin_info    = $this->getPluginApp($plugin_name);
                         $plugin_info['installed']       = false;
                         $plugin_info['installedtype']   = 'localapps';
-                        $localitems[]   = $plugin_info;
+                        if(!empty($plugin_info['plugin_identifier'])){
+                            $localitems[]   = $plugin_info;
+                        }
+                         
                     }
                 }
                 $total  = count($localitems);

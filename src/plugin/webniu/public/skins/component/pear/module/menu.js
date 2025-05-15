@@ -340,7 +340,7 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 			var controlItem = '';
 			if (i === option.defaultMenu) {
 				controlItem = '<li pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id +
-					'" class="layui-this layui-nav-item"><a href="#">' + item.title + '</a></li>';
+					'" class="layui-this layui-nav-item"><a href="JavaScript:;">' + item.title + '</a></li>';
 				menuItem = '<ul  pear-id="' + item.id + '" lay-filter="' + option.elem +
 					'" class="layui-nav arrow layui-nav-tree pear-nav-tree">';
 
@@ -351,7 +351,7 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 			} else {
 
 				controlItem = '<li  pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id +
-					'" class="layui-nav-item"><a href="#">' + item.title + '</a></li>';
+					'" class="layui-nav-item"><a href="JavaScript:;">' + item.title + '</a></li>';
 
 				menuItem = '<ul style="display:none" pear-id="' + item.id + '" lay-filter="' + option.elem +
 					'" class="layui-nav arrow layui-nav-tree pear-nav-tree">';
@@ -426,7 +426,7 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 				mclassName = "";
 			}
 			if (i === option.defaultMenu) {
-				controlItem = '<li pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id + '" class="layui-this layui-nav-item"><a href="#"><i class="' + item.icon + '"></i><span>' + item.title + '</span></a></li>';
+				controlItem = '<li pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id + '" class="layui-this layui-nav-item"><a href="JavaScript:;"><i class="' + item.icon + '"></i><span>' + item.title + '</span></a></li>';
 				menuItem = '<ul  pear-id="' + item.id + '" lay-filter="' + option.elem + '" class="layui-nav arrow layui-nav-tree pear-nav-tree">';
 			} else {
 				controlItem = '<li  pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id + '" class="layui-nav-item"><a ' + mtarget + ' class="' + mclassName + '" menu-open-type="' + item.opentype + '" menu-type="' + item.type + '" menu-url="' + item.href +

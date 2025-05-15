@@ -147,7 +147,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/logtime/index',
                         'type' => 1,
-                        'opentype'=> '_component',
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ]
                 ]
@@ -192,15 +192,6 @@ return [
                         'key' => 'plugin\\webniu\\app\\web\\controller\\PluginController',
                         'icon' => '',
                         'href' => '/app/webniu/web/plugin/index',
-                        'type' => 1,
-                        'opentype'=> '_iframe',
-                        'weight' => 0,
-                    ],
-                    [
-                        'title' => '权限分组',
-                        'key' => 'plugin\\webniu\\app\\web\\controller\\AppRoleController',
-                        'icon' => '',
-                        'href' => '/app/webniu/web/approle/index',
                         'type' => 1,
                         'opentype'=> '_iframe',
                         'weight' => 0,

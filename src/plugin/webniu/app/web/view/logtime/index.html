@@ -2,7 +2,10 @@
 <html lang="zh-cn">
     <head> 
         <title>浏览页面</title>
-         
+        <link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+		<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+        <link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
     </head>
     <body>
     
@@ -57,7 +60,10 @@
         <script type="text/html" id="table-bar-logtime">
             <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit">无</button> 
         </script>
- 
+        <script src="/app/webniu/skins/component/layui/layui.js"></script>
+		<script src="/app/webniu/skins/component/pear/pear.js"></script>
+        <script src="/app/webniu/skins/admin/js/permission.js"></script>
+        <script src="/app/webniu/skins/admin/js/common.js"></script>
         <script>
 
               
@@ -73,7 +79,7 @@
                 let common  = layui.common;
                 let element = layui.element; 
                 let util    = layui.util;
-                let nprogress = layui.nprogress;
+                let nprogress = parent.layui.nprogress;
                 
 				// 表头参数
 				let cols = [
@@ -130,6 +136,7 @@
 				// 渲染表格
 				function render()
 				{
+                    nprogress.start();
 				    table.render({
 				        elem: "#data-table-logtime",
 				        url: SELECT_API,
@@ -148,7 +155,7 @@
 				            icon: "layui-icon-refresh",
 				        }, "filter","exports"],
 				        done: function () { 
-                            form.render();
+                            nprogress.done(); 
 				        }
 				    });
 				}

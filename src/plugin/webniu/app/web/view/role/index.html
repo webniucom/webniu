@@ -48,7 +48,7 @@
             
             // 表格渲染
             layui.use(["table", "form", "common", "popup", "util", "xmSelect","nprogress"], function() {
-                let nprogress = layui.nprogress;
+                let nprogress = parent.layui.nprogress;
                 let treeTable = layui.treeTable;
                 let table   = layui.table;
                 let form    = layui.form;
@@ -110,7 +110,7 @@
 				// 渲染表格
 				function render()
 				{
-                     
+                    nprogress.start();
                     treeTable.render({
                         elem: "#data-table",
                         url: SELECT_API,
@@ -132,7 +132,10 @@
                             title: "刷新",
                             layEvent: "refresh",
                             icon: "layui-icon-refresh",
-                        }]
+                        }],
+                        done: function () {
+                            nprogress.done();
+                        }
                         // 其他 table 属性
                       });
 				}

@@ -233,13 +233,13 @@
             
             // 表格渲染
             layui.use(["table", "form", "common", "popup", "util","drawer","nprogress"], function() {
-                let nprogress = layui.nprogress;
-                let table   = layui.table;
-                let form    = layui.form;
-                let $       = layui.$;
-                let common  = layui.common;
-                let util    = layui.util;
-                var drawer  = layui.drawer;
+                let nprogress   = parent.layui.nprogress;
+                let table       = layui.table;
+                let form        = layui.form;
+                let $           = layui.$;
+                let common      = layui.common;
+                let util        = layui.util;
+                var drawer      = layui.drawer;
                 
 				// 表头参数
 				let cols = [
