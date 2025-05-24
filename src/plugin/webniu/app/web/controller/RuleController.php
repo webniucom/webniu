@@ -56,7 +56,10 @@ class RuleController extends Crud
     public function select(Request $request): Response
     {
         $this->syncRules();
-        return parent::select($request);
+        [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        $query = $this->doSelect($where, $field, $order);
+        $query = $query->where('plugin', 'webniu');
+        return $this->doFormat($query, $format, $limit); 
     }
 
     /**
@@ -70,7 +73,7 @@ class RuleController extends Crud
         $rules = $this->getRules(admin('roles'));
         $types = $request->get('type', '0,1');
         $types = is_string($types) ? explode(',', $types) : [0, 1];
-        $items = Rule::orderBy('weight', 'desc')->get()->toArray();
+        $items = Rule::where('plugin','webniu')->orderBy('weight', 'desc')->get()->toArray();
 
         $formatted_items = [];
         foreach ($items as $item) {
@@ -162,6 +165,7 @@ class RuleController extends Crud
                 $class  = $reflection->getName();
                 $pid    = $item->id;
                 $plugin = $item->plugin;
+                $nameno = $item->name;
                 $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
                 foreach ($methods as $method) {
                     $method_name = $method->getName();
@@ -181,6 +185,7 @@ class RuleController extends Crud
                     }
                     $menu = new Rule;
                     $menu->plugin   = $plugin;
+                    $menu->name     = $nameno;
                     $menu->pid      = $pid;
                     $menu->key      = $name;
                     $menu->title    = $title;
@@ -239,6 +244,8 @@ class RuleController extends Crud
             return $this->json(1, "菜单标识 $key 已经存在");
         }
         $data['pid'] = empty($data['pid']) ? 0 : $data['pid'];
+        $data['plugin'] = 'webniu';
+        $data['name']   = 'webniu';
         $this->doInsert($data);
         return $this->json(0);
     }

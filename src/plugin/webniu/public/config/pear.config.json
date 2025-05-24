@@ -107,7 +107,8 @@
             "footer": true,
             "keepLoad": "800",
             "message": false,
-            "autoHead": false
+            "autoHead": false,
+            "elem": "content"
         }
     },
     "api": {

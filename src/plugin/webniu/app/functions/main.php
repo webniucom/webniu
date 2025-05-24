@@ -236,6 +236,15 @@ function formatSizeUnits($bytes) {
         return '0 bytes';
     }
 }
+//统计数据
+if (!function_exists('hosturl')) {
+    function hosturl()
+    {   
+        $request    = request();
+        return $request->header('x-forwarded-proto')."://".$request->host();
+    }
+
+}
 
 //统计数据
 if (!function_exists('statistics')) {

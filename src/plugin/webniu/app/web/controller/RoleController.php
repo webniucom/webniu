@@ -203,7 +203,7 @@ class RoleController extends Crud
         if ($rule_id_string === '') {
             return $this->json(0, 'ok', []);
         }
-        $rules = Rule::get();
+        $rules = Rule::where('plugin','webniu')->orderBy('weight', 'desc')->get();
         $include = [];
         if ($rule_id_string !== '*') {
             $include = explode(',', $rule_id_string);

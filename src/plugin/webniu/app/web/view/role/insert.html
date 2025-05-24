@@ -186,21 +186,25 @@
             });
             
             //提交事件
-            layui.use(["form", "popup"], function () {
+            layui.use(["form", "popup","nprogress","toast"], function () {
+                let nprogress   = parent.layui.nprogress;
+                let toast       = parent.parent.layui.toast;
                 layui.form.on("submit(save)", function (data) {
+                    nprogress.start();
                     layui.$.ajax({
                         url: INSERT_API,
                         type: "POST",
                         dateType: "json",
                         data: data.field,
                         success: function (res) {
+                            nprogress.done();
                             if (res.code) {
-                                return layui.popup.failure(res.msg);
-                            }
-                            return layui.popup.success("操作成功", function () {
+                                return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}}); 
+                            } 
+                            return toast.success({message:'操作成功',position: 'topCenter',onOpened:function(){
                                 parent.refreshTable();
                                 parent.layer.close(parent.layer.getFrameIndex(window.name));
-                            });
+                            }});
                         }
                     });
                     return false;

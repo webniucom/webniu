@@ -20,8 +20,8 @@ class AccessWeb implements MiddlewareInterface
     {
         $controller = $request->controller;
         $action     = $request->action; 
-        $code = 0;
-        $msg = '';
+        $code       = 0;
+        $msg        = '';
         if (!Auth::canAccess($controller, $action, $code, $msg)) {
             if ($request->expectsJson()) {
                 $response = json(['code' => $code, 'msg' => $msg, 'data' => []]);

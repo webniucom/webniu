@@ -255,13 +255,12 @@ EOF;
     public function install(Request $request): Response
     {
         $post       = $request->post();
-          
         $name       = $post['plugin_identifier'];
         $version    = $post['version'];
         $installed  = $post['installedtype']??false;
         $installed_app      = $this->getPluginVersion($name); 
         $installed_version  = $installed_app['version']??null; 
-          
+        if($installed_app==null){$installed_app = $post;}
         if (!$name || !$version || !$installed) {
             return $this->json(1, '缺少参数');
         }
@@ -308,19 +307,19 @@ EOF;
             if ($installed_version) {
                 // 执行beforeUpdate
                 if (class_exists($install_class) && method_exists($install_class, 'beforeUpdate')) {
-                    $context = call_user_func([$install_class, 'beforeUpdate'], $installed_version, $version);
+                    $context = call_user_func([$install_class, 'beforeUpdate'], $installed_version, $installed_app);
                 }
             }
  
             if ($installed_version) {
                 // 执行update更新
                 if (class_exists($install_class) && method_exists($install_class, 'update')) {
-                    call_user_func([$install_class, 'update'], $installed_version, $version, $context);
+                    call_user_func([$install_class, 'update'], $installed_version, $installed_app, $context);
                 }
             } else {
                 // 执行install安装
-                if (class_exists($install_class) && method_exists($install_class, 'install')) {
-                    call_user_func([$install_class, 'install'], $version);
+                if (class_exists($install_class) && method_exists($install_class, 'install')) { 
+                    call_user_func([$install_class, 'install'], $installed_app);
                 }
             }
             $this->updateOrInsert($post); 
@@ -373,7 +372,8 @@ EOF;
                 Monitor::pause();
             }
             try {
-                $this->rmDir($path);
+                //取消删除应用文件
+                //$this->rmDir($path);
             } finally {
                 if ($monitor_support_pause) {
                     Monitor::resume();

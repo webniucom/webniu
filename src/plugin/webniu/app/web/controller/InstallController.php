@@ -286,9 +286,10 @@ EOF;
         $options    = file_get_contents(base_path('plugin/webniu/public/config/pear.config.json')); 
         $options    = str_replace("__WEBNIUGICAI__",randStr(20), $options);
         $options    = json_decode($options, true); 
-        $smt        = $pdo->prepare("insert into `{$connection['prefix']}options` (`model`,`name`,`value`,`created_at`) values (:model,:name,:value,:created_at)");
+        $smt        = $pdo->prepare("insert into `{$connection['prefix']}options` (`model`,`group`,`name`,`value`,`created_at`) values (:model,:group,:name,:value,:created_at)");
         foreach($options as $k=>$v){
             $smt->bindValue('model', 'webniu');
+            $smt->bindValue('group', 'system');
             $smt->bindValue('name', 'system_'.$k);
             $smt->bindValue('value',json_encode($v));
             $smt->bindValue('created_at',date('Y-m-d H:i:s'));

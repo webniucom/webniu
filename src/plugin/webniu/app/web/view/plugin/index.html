@@ -90,7 +90,7 @@
     <script>
 
         // 表格渲染
-        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery","nprogress"], function () {
+        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery","nprogress","toast"], function () {
             // 相关常量
             let PRIMARY_KEY   = "id";
             let SELECT_API    = "/app/webniu/web/plugin/select"; 
@@ -100,6 +100,7 @@
             let apiResults      = {};
             let nprogress   = parent.layui.nprogress;
             let table       = layui.table;
+            let toast       = parent.layui.toast;
             let layer       = layui.layer;
             let form        = layui.form;
             let $           = layui.$;
@@ -216,7 +217,7 @@
 
             // 渲染表格
             function render() {
-                parent.layui.nprogress.start();
+                nprogress.start();
                 table.render({
                     elem: "#data-table",
                     url: SELECT_API,
@@ -233,7 +234,7 @@
                         icon: "layui-icon-refresh",
                     }],
                     done: function (res) {
-                        parent.layui.nprogress.done();
+                        nprogress.done();
                         let thisOptions = this; 
                         if(thisOptions.installedtype=='installed'){
                             getversion(res.data);
@@ -304,7 +305,7 @@
             });
             let installist = function (obj) {
                 cols[0] = colsone;
-                parent.layui.nprogress.start();
+                nprogress.start();
                 table.reload("data-table", {
                     page: {
                         curr: 1
@@ -315,12 +316,12 @@
                         installedtype: 'installed'
                     },
                     done:function(){
-                        parent.layui.nprogress.done();
+                        nprogress.done();
                     }
                 })
             }
             let waitapps = function (obj) {
-                parent.layui.nprogress.start();
+                nprogress.start();
                 table.reload("data-table", {
                     page: {
                         curr: 1
@@ -330,7 +331,7 @@
                         installedtype: 'waitapps'
                     },
                     done:function(){
-                        parent.layui.nprogress.done();
+                        nprogress.done();
                     }
                 })
             }
@@ -344,7 +345,7 @@
                         return '<i class="layui-icon layui-icon-app" style="font-size: 24px;"></i>';
                     }
                 };
-                parent.layui.nprogress.start();
+                nprogress.start();
                 table.reload("data-table", {
                     page: {
                         curr: 1
@@ -355,7 +356,7 @@
                         installedtype: 'localapps'
                     },
                     done: function (res) {
-                        parent.layui.nprogress.done();
+                        nprogress.done();
                     }
                 })
             }
@@ -371,18 +372,16 @@
                             dataType: "json",
                             data:data,
                             success: function (res) {
+                                layer.close(loading);
                                 if (res.code === 0) {
-                                    return layui.popup.success("安装成功", function () {
+                                    return toast.success({message:'安装成功',position: 'topCenter',onOpened:function(){
                                         parent.location.reload();
-                                    }); 
+                                    }}); 
                                 }
-
-                                return layui.popup.failure(res.msg);
-                                
-                                 
+                                return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}});
                             },
                             complete: function () {
-                                layer.close(loading);
+                                layer.close(index);
                             }
                         });
                     });
@@ -419,16 +418,16 @@
                         dataType: "json",
                         data:data,
                         success: function (res) {
+                            layer.close(loading);
                             if (res.code === 0) {
-                                return layui.popup.success("升级成功", function () {
+                                return toast.success({message:'升级成功',position: 'topCenter',onOpened:function(){
                                     parent.location.reload();
-                                }); 
+                                }});
                             }
-
-                            return layui.popup.failure(res.msg);
+                            return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}}); 
                         },
                         complete: function () {
-                            layer.close(loading);
+                            layer.close(index);
                         }
                     });
                 });
@@ -444,7 +443,7 @@
             let batchRemove = function (obj) {
                 let checkIds = common.checkField(obj, PRIMARY_KEY);
                 if (checkIds === "") {
-                    layui.popup.warning("未选中数据");
+                    toast.warning({message:"未选中数据",position: 'topCenter',onOpened:function(){}});
                     return false;
                 }
                 doRemove(checkIds.split(","));
@@ -457,8 +456,7 @@
                 layer.confirm("确定卸载?", {
                     icon: 3,
                     title: "提示"
-                }, function (index) {
-                    layer.close(index);
+                }, function (index) { 
                     let loading = layer.load(); 
                     $.ajax({
                         url: UNINSTALL_API,
@@ -468,11 +466,14 @@
                         success: function (res) {
                             layer.close(loading);
                             if (res.code) {
-                                return layui.popup.failure(res.msg);
+                                return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}});
                             }
-                            return layui.popup.success("卸载成功",function(){
+                            return toast.success({message:'卸载成功',position: 'topCenter',onOpened:function(){
                                 parent.location.reload();
-                            });
+                            }});
+                        },
+                        complete: function () {
+                            layer.close(index);
                         }
                     })
                 });
@@ -505,11 +506,11 @@
 
             // 刷新表格数据
             window.refreshTable = function () {
-                parent.layui.nprogress.start();
+                nprogress.start();
                 table.reloadData("data-table", {
                     scrollPos: "fixed",
                     done: function (res, curr) {
-                        parent.layui.nprogress.done();
+                        nprogress.done();
                         if (curr > 1 && res.data && !res.data.length) {
                             curr = curr - 1;
                             table.reloadData("data-table", {

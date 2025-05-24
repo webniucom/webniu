@@ -50,14 +50,17 @@ class Menu
      * @param array $menu_tree
      * @return void
      */
-    public static function import(array $menu_tree)
+    public static function import(array $menu_tree,$appinfo = [])
     {
         if (is_numeric(key($menu_tree)) && !isset($menu_tree['key'])) {
             foreach ($menu_tree as $item) {
                 if (isset($item['pid']) && !is_numeric($item['pid'])) {
                     $item['pid'] = $item['pid']!=''?static::get($item['pid'])['id']:0;   
                 }
-                static::import($item);
+                if (!isset($item['plugin']) && !isset($item[0]['key'])) {
+                    $item['plugin'] = isset($appinfo['plugin_type'])?$appinfo['plugin_type']:'webniu';   
+                }
+                static::import($item,$appinfo);
             }
             return;
         }
@@ -71,7 +74,10 @@ class Menu
         }
         foreach ($children as $menu) {
             $menu['pid'] = $pid;
-            static::import($menu);
+            if(!isset($menu['plugin'])){
+                $menu['plugin'] = isset($appinfo['plugin_type'])?$appinfo['plugin_type']:'webniu';
+            }
+            static::import($menu,$appinfo);
         }
     }
 

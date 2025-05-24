@@ -30,6 +30,8 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 
 			this.instances = {};
 
+			this.configurationCache;
+
 			/**
 			 * @since Pear Admin 4.0
 			 * 
@@ -80,6 +82,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 										"footer": false, // 底部
 										"keepLoad": "800", // 保持加载
 										"autoHead": false, // 自动头部
+										"elem": "content", // 元素
 									},
 									"colors": [
 										{
@@ -197,6 +200,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 			 */
 			this.apply = function (configuration) {
 				configurationCache = configuration;
+				pearAdmin.configurationCache = configuration;
 				pearAdmin.logoRender(configuration);
 				pearAdmin.menuRender(configuration);
 				pearAdmin.menuSearchRender(configuration);
@@ -306,8 +310,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 			 * 
 			 * 视图容器
 			 */
-			this.bodyRender = function (param) {
-
+			this.bodyRender = function (param) { 
 				body.on("click", ".refresh", function () {
 					pearAdmin.refresh();
 				})
@@ -315,7 +318,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 				if (isMuiltTab(param) === "true" || isMuiltTab(param) === true) {
 
 					pearAdmin.instances.tabPage = tabPage.render({
-						elem: 'content',
+						elem: param.theme.elem,
 						session: param.tab.session,
 						index: 0,
 						tabMax: param.tab.max,
@@ -344,8 +347,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 							pearAdmin.instances.tabPage.refresh(false);
 						}
 						pearAdmin.instances.tabPage.positionTab();
-						pearAdmin.instances.menu.selectItem(id); 
-						window.layui.diyfuner(id);
+						pearAdmin.instances.menu.selectItem(id);  
 					})
 
 					pearAdmin.instances.menu.click(function (dom, data) {
@@ -366,7 +368,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 				} else {
 
 					pearAdmin.instances.page = page.render({
-						elem: 'content',
+						elem: param.theme.elem,
 						title: '首页',
 						url: param.tab.index.href
 					});

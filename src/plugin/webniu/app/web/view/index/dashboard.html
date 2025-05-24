@@ -198,6 +198,11 @@
 			let element = layui.element;
 			let util 	= layui.util; 
 			let count 	= layui.count; 
+			element.on('tabBeforeChange(content)', function(data){
+				if(data.to.id==window.PearAdmin.configurationCache.tab.index.id){
+					table.reload('data-table');
+				}
+			});
 			let color 			= localStorage.getItem("theme-color-color");
 			let sparkColor		= color==null?'#008FFB':color;
 			layui.colorPalette 	= [sparkColor];
@@ -230,12 +235,7 @@
 						num: res.data.plugin_count,
 						bit: 0,
 						regulator: 50
-					});
-					window.layui.diyfuner = function(id){
-						if(id==3){
-							table.reload('data-table');
-						}
-					} 
+					}); 
 					var donut = new ApexCharts(document.querySelector("#donut"),{
 						chart: {
 							type: 'donut',

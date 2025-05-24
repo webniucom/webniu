@@ -461,9 +461,11 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 		})
 		sessionStorage.setItem(elem + "-pear-tab-page-data", JSON.stringify(tabData));
 		sessionStorage.setItem(elem + "-pear-tab-page-data-current", currId);
+		
 		removeTab.remove();
 		var tabContent = $(".layui-tab[lay-filter='" + elem + "']").find("*[id='" + id + "']").parent();
 		tabContent.remove();
+		element.tabChange(elem,currId);
 	}
 
 	/**

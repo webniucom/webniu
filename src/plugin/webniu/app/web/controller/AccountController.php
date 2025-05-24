@@ -30,7 +30,7 @@ class AccountController extends Crud
      * 不需要鉴权的方法
      * @var string[]
      */
-    protected $noNeedAuth = ['info'];
+    protected $noNeedAuth = ['info','index'];
 
     /**
      * @var Admin
