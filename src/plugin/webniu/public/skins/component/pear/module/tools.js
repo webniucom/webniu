@@ -92,8 +92,12 @@ layui.define(['jquery', 'element'],
                 }
                 return result;
             };
-            
-            
+
+            this.errortonodata = function (elem) {
+                var  html = '<div class="io_404_cl"><img src="/app/webniu/skins/admin/images/nodata.svg" alt=""></div>';
+                return $(elem).html(html);
+            };
+             
         };
 
         exports('tools', tools);

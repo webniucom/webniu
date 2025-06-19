@@ -32,6 +32,7 @@ layui.define(['jquery', 'element','upload','layer'], function(exports) {
 		if(wn_u_d_accept=='images' && data!=false){
 			let imgurl = data.url;
 			if(!wn_u_d_multiple){wn_list_dom.html("");}
+			wn_u_d_input.val(imgurl);
 			wn_list_dom.append(`
 			<li class="wx_images_li">
 				<img src="${imgurl}" class="img_class" lay-on="photos" />
@@ -41,6 +42,7 @@ layui.define(['jquery', 'element','upload','layer'], function(exports) {
 		}
 		if(wn_u_d_accept=='file' && data!=false){
 			let imgurl = data.url; 
+			wn_u_d_input.val(imgurl);
 			wn_list_dom.html(`
 			<li class="wx_images_li"> 
 				<div class="wn_upload_fileicon layui-icon layui-icon-file-b"></div>

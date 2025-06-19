@@ -31,7 +31,9 @@ class AccessWeb implements MiddlewareInterface
 <script>
     if (self !== top) {
         parent.location.reload();
-    }
+    }else{
+        window.location.href = '/webniu';
+    } 
 </script>
 EOF
                     );

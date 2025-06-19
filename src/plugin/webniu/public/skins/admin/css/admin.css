@@ -315,7 +315,21 @@ body,
 .pear-admin .layui-header .layui-nav-more {
 	display: none;
 }
-
+.io_404_cl{
+	min-width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    margin: auto;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+.io_404_cl img{
+	width: 150px;
+}
 .pear-collapsed-pe {
 	right: 30px;
 	bottom: 30px;
@@ -509,6 +523,7 @@ body,
 .light-theme.layui-double .layui-double-scroll {
 	background-color: white !important;
 	color: black !important;
+	overflow-x:hidden;
 }
 
 /** 顶部主题 (白) */
@@ -872,3 +887,15 @@ body,
 }
 
 /** 表详情顶部搜索框 End **/
+
+.layui-form-label.required:after {
+	content: "*";
+    color: red;
+    display: inline-block;
+    padding: 7px 5px;
+    line-height: 20px;
+    text-align: right;
+    position: absolute;
+    right: 0;
+    top: 5px;
+}

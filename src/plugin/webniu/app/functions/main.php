@@ -4,10 +4,12 @@
  */
 
 use plugin\webniu\app\model\Admin;
+use plugin\webniu\app\model\Role;
 use plugin\webniu\app\model\AdminRole;
 use plugin\webniu\app\model\AdminLog;
 use plugin\webniu\app\model\Statistics;
 use plugin\webniu\app\model\Option;
+use plugin\webniu\app\model\User;
 use plugin\webniu\app\common\Util; 
 
 /**
@@ -89,6 +91,88 @@ function refresh_admin_session(bool $force = false)
 }
 
 /**
+ * 获取当前管理员的权限规则
+ * @return array
+ */
+if (!function_exists('getAdminsRules')) {
+    function getAdminsRules() 
+    { 
+        $admin = admin();
+        $roles = $admin['roles'];
+        $rules_strings = $roles ? Role::whereIn('id', $roles)->pluck('rules') : [];
+        $rules = [];
+        foreach ($rules_strings as $rule_string) {
+            if (!$rule_string) {
+                continue;
+            }
+            $rules = array_merge($rules, explode(',', $rule_string));
+        }
+        return $rules;
+    }
+}
+
+/**
+ * 当前登录会员id
+ * @return integer|null
+ */
+function user_id(): ?int
+{
+    return session('user.id');
+}
+
+/**
+ * 当前登录会员
+ * @param null|array|string $fields
+ * @return array|mixed|null
+ */
+function user($fields = null)
+{
+    refresh_user_session();
+    if (!$user = session('user')) {
+        return null;
+    }
+    if ($fields === null) {
+        return $user;
+    }
+    if (is_array($fields)) {
+        $results = [];
+        foreach ($fields as $field) {
+            $results[$field] = $user[$field] ?? null;
+        }
+        return $results;
+    }
+    return $user[$fields] ?? null;
+}
+
+/**
+ * 刷新当前会员session
+ * @param bool $force
+ * @return void
+ */
+function refresh_user_session(bool $force = false)
+{
+    if (!$user_id = user_id()) {
+        return null;
+    }
+    $time_now = time();
+    // session在2秒内不刷新
+    $session_ttl = 2;
+    $session_last_update_time = session('user.session_last_update_time', 0);
+    if (!$force && $time_now - $session_last_update_time < $session_ttl) { 
+        return null;
+    }
+    $session = request()->session();
+    $user = User::find($user_id);
+    if (!$user) {
+        $session->forget('user');
+        return null;
+    }
+    $user = $user->toArray();
+    unset($user['password']);
+    $user['session_last_update_time'] = $time_now;
+    $session->set('user', $user); 
+}
+/**
  * 检测读写环境
  */
 if (!function_exists('check_dirfile')) {
@@ -143,19 +227,31 @@ if (!function_exists('randStr')) {
 
 //读取配置
 if (!function_exists('options')) {
+    /**
+     * 读取配置
+     * @param array $array
+     * @param string $model
+     * @return array
+     */
     function options(array $array = [], $model = null): array
     {
+        // 支持同时查询多个配置项，模型如果是空则默认为 'webniu', 配置项名称默认为 'system_xxx'
+        // 例如：options(['name1', 'name2'], 'webniu')
+        // 非webniu 不会增加system_前缀
         $output = [];
-        
         // 设置默认模型值
         $defaultModel = 'webniu';
         $model = $model ?? $defaultModel;
 
         foreach ($array as $v) {
             // 构建查询条件
+            $name   = '';
+            if($model=='webniu'){
+                $name = 'system_';
+            }
             $where = [
                 ['model', '=', $model],
-                ['name', '=', 'system_' . $v]
+                ['name', '=', $name.$v]
             ];
 
             // 获取配置值
@@ -170,6 +266,42 @@ if (!function_exists('options')) {
         }
 
         return $output;
+    }
+
+}
+
+if (!function_exists('upoptions')) {
+    /**
+     * 写入配置
+     * @param string $model
+     * @param string $name
+     * @param array $array
+     * @return array
+     */
+    function upoptions($model=null ,$name =null, array $array = []): array
+    {
+        // 更新配置项，模型如果是空则默认为 'webniu', 配置项名称默认为'system_xxx'
+        // 例如：upoptions('webniu', 'name1', ['value1', 'value2'])
+        // 非webniu 不会增加system_前缀 upoptions('wechat', 'name1', ['value1', 'value2'])
+        // 返回结果：添加或者更新的详细内容
+        $output = [];
+        // 设置默认模型值
+        $defaultModel = 'webniu';
+        $model  = $model?? $defaultModel;
+        if($model=='webniu'){
+        	$name = 'system_'.$name;
+        }
+        Option::updateOrInsert(
+            ['model' => $model, 'name' => $name],
+            ['value' => json_encode($array)]
+        );
+
+        return [
+            'code'  => 0,
+            'model' => $model,
+            'name'  => $name,
+            'data'  => $array,
+        ];
     }
 
 }
@@ -236,16 +368,93 @@ function formatSizeUnits($bytes) {
         return '0 bytes';
     }
 }
-//统计数据
+
+//转换图片路径
+if (!function_exists('tomedia')) {
+    function tomedia($imagePath) {
+        // 解析URL以检查协议和主机是否存在
+        $parsedUrl = parse_url($imagePath);
+        
+        // 检查是否有scheme和host
+        if (isset($parsedUrl['scheme']) && isset($parsedUrl['host'])) {
+            // URL是完整的，直接返回
+            return $imagePath;
+        } else {
+            // URL不完整，使用hosturl()拼接
+            $baseUrl = hosturl();
+            // 确保baseUrl以斜杠结尾
+            if (substr($baseUrl, -1) !== '/') {
+                $baseUrl .= '/';
+            }
+            // 去除imagePath开头的斜杠以避免双斜杠
+            $relativePath = ltrim($imagePath, '/');
+            return $baseUrl . $relativePath;
+        }
+    }
+}
+
+//获取当前完整url
+if (!function_exists('fullUrl')) {
+    function fullUrl()
+    {   
+        $request    = request();
+        return $request->header('x-forwarded-proto').":".$request->fullUrl();
+    }
+}
+
+//获取域名
 if (!function_exists('hosturl')) {
     function hosturl()
     {   
         $request    = request();
-        return $request->header('x-forwarded-proto')."://".$request->host();
+        return $request->header('x-forwarded-proto')."://".$request->host(true);
     }
-
 }
 
+/**
+ * 自动生成url
+ * @param string $path
+ * @param array $params
+ * @return string
+ */
+if (!function_exists('autourl')) {
+    function autourl($path, $params = []) {
+        if (empty($params)) {
+            return $path;
+        }
+        $parsedUrl  = parse_url($path);
+        $hosturl = '';
+         
+        // 检查是否有scheme和host
+        if (isset($parsedUrl['scheme']) && isset($parsedUrl['host'])) {
+        
+        }else{
+            $hosturl = hosturl();
+        }
+
+        $query = [];
+        build_query($params, $query);
+        $queryString = implode('&', $query);
+
+        if (strpos($path, '?') !== false) {
+            return $hosturl.$path . '&' . $queryString;
+        } else {
+            return $hosturl.$path . '?' . $queryString;
+        }
+    }
+}
+if (!function_exists('build_query')) {
+    // 递归函数将多维数组转换为查询字符串
+    function build_query($params, &$query) {
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                build_query($value, $query);
+            } else {
+                $query[] = urlencode($key) . '=' . urlencode($value);
+            }
+        }
+    }
+}
 //统计数据
 if (!function_exists('statistics')) {
     function statistics($model='webniu'): bool

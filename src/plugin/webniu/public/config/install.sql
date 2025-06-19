@@ -180,32 +180,32 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__uploads` (
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `username` varchar(32) NOT NULL COMMENT '用户名',
-  `nickname` varchar(40) NOT NULL COMMENT '昵称',
-  `password` varchar(255) NOT NULL COMMENT '密码',
-  `sex` enum('0','1') NOT NULL DEFAULT '1' COMMENT '性别',
+  `username` varchar(255) DEFAULT NULL COMMENT '用户名',
+  `nickname` varchar(40) DEFAULT NULL COMMENT '昵称',
+  `password` varchar(255) DEFAULT NULL COMMENT '密码',
+  `sex` enum('0','1') DEFAULT '1' COMMENT '性别',
   `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
   `email` varchar(128) DEFAULT NULL COMMENT '邮箱',
   `mobile` varchar(16) DEFAULT NULL COMMENT '手机',
-  `level` tinyint(4) NOT NULL DEFAULT '0' COMMENT '等级',
+  `level` tinyint(4) DEFAULT '0' COMMENT '等级',
   `birthday` date DEFAULT NULL COMMENT '生日',
-  `money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '余额(元)',
-  `score` int(11) NOT NULL DEFAULT '0' COMMENT '积分',
+  `money` decimal(10,2) DEFAULT '0.00' COMMENT '余额(元)',
+  `score` int(11) DEFAULT '0' COMMENT '积分',
   `last_time` datetime DEFAULT NULL COMMENT '登录时间',
   `last_ip` varchar(50) DEFAULT NULL COMMENT '登录ip',
   `join_time` datetime DEFAULT NULL COMMENT '注册时间',
   `join_ip` varchar(50) DEFAULT NULL COMMENT '注册ip',
   `token` varchar(50) DEFAULT NULL COMMENT 'token',
+  `role` varchar(255) DEFAULT '1' COMMENT '角色',
+  `status` tinyint(4) DEFAULT '0' COMMENT '禁用',
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
-  `role` int(11) NOT NULL DEFAULT '1' COMMENT '角色',
-  `status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '禁用',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   KEY `join_time` (`join_time`),
   KEY `mobile` (`mobile`),
   KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
 LOCK TABLES `__PREFIX__options` WRITE;
 INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_upload','[{\"value\":\"0\",\"name\":\"无分类\"},{\"value\":\"1\",\"name\":\"图片\"},{\"value\":\"2\",\"name\":\"媒体\"},{\"value\":\"3\",\"name\":\"文件\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');

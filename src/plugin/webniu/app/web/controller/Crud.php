@@ -201,7 +201,7 @@ class Crud extends Base
     {
         $data = $this->inputFilter($request->post());
         $password_filed = 'password';
-        if (isset($data[$password_filed])) {
+        if (isset($data[$password_filed]) && $data[$password_filed] !== '') {
             $data[$password_filed] = Util::passwordHash($data[$password_filed]);
         }
 
@@ -250,9 +250,9 @@ class Crud extends Base
     protected function updateInput(Request $request): array
     {
         $primary_key = $this->model->getKeyName();
-        $id = $request->post($primary_key);
-        $data = $this->inputFilter($request->post());
-        $model = $this->model->find($id);
+        $id     = $request->post($primary_key);
+        $data   = $this->inputFilter($request->post());
+        $model  = $this->model->find($id);
         if (!$model) {
             throw new BusinessException('记录不存在', 2);
         }

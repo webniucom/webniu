@@ -122,6 +122,8 @@
                 </div>
             </div>
         </div>
+        
+        <script src="/app/webniu/skins/admin/js/permission.js"></script>
         <script>
 
             layui.use(["form","upload", "layer","toast","nprogress"], function () {
@@ -136,8 +138,10 @@
                     success: function (res) { 
                         nprogress.done();
                         form.val("baseInfo", res.data);
+
                         layui.use(["layer","uploads"], function() {
                             let uploads = layui.uploads;
+                             
                             layui.$(".attachment").on("click", function(e) { 
                                 let thisimg = layui.$(this);
                                 parent.layer.open({
@@ -163,7 +167,7 @@
                                     uploads.setUploadListValue(thisimg,res.data);
                                 }
                             });
-
+                            uploads.renderList();
 
                         }); 
                         form.render();

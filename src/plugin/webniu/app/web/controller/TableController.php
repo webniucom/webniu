@@ -766,12 +766,14 @@ EOF;
             $html
             <div class="layui-form-item layui-inline">
                 <label class="layui-form-label"></label>
+                <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
                     <i class="layui-icon layui-icon-search"></i>查询
                 </button>
                 <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
                     <i class="layui-icon layui-icon-refresh"></i>重置
                 </button>
+                </div>
             </div>
             <div class="toggle-btn">
                 <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
@@ -812,18 +814,22 @@ EOF
 
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
+            <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" lay-event="add" permission="$code_base.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
             <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="$code_base.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
+            </div>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
+            <div class="layui-btn-container">
             <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit" permission="$code_base.update">编辑</button>
             <button class="layui-btn layui-btn-xs tool-btn layui-bg-red" lay-event="remove" permission="$code_base.delete">删除</button>
+            </div>
         </script>
 
         <script src="/app/webniu/skins/component/layui/layui.js"></script>

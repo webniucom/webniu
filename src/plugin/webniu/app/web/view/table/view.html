@@ -39,17 +39,21 @@
         </div>
 
         <script type="text/html" id="table-toolbar">
+            <div class="layui-btn-container">
             <button class="layui-btn  layui-btn-sm" lay-event="add" permission="app.webniu.web.table.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
             <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.web.table.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
+            </div>
         </script>
 
         <script type="text/html" id="table-bar">
+            <div class="layui-btn-container">
             <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.table.update">编辑</button>
             <button class="layui-btn layui-btn-xs layui-bg-red tool-btn" lay-event="remove" permission="app.webniu.web.table.delete">删除</button>
+            </div>
         </script>
 
         <script src="/app/webniu/skins/component/layui/layui.js"></script>

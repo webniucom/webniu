@@ -127,10 +127,7 @@ class IndexController
                 'size'   => $size,
             ];
         }
-        // mysql版本
-        $version = Util::db()->select('select VERSION() as version');
-        $mysql_version = $version[0]->version ?? 'unknown';
-
+        
         $day15_series = [];
         $day15_labels = [];
         $now = time();

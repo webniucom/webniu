@@ -42,12 +42,14 @@
 
                     <div class="layui-form-item layui-inline">
                         <label class="layui-form-label"></label>
+                        <div class="layui-btn-container">
                         <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
                             <i class="layui-icon layui-icon-search"></i>查询
                         </button>
                         <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
                             <i class="layui-icon layui-icon-refresh"></i>重置
                         </button>
+                        </div>
                     </div>
                     <div class="toggle-btn">
                         <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
@@ -532,29 +534,29 @@
 
     <!-- 表格顶部工具栏 -->
     <script type="text/html" id="table-toolbar">
-            <div class="layui-btn-group plugin_btn">
-                <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='installed' ? '' : 'layui-btn-plugin' }}" lay-event="installed">已安装</button>
-                <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='waitapps' ? '' : 'layui-btn-plugin' }}" lay-event="waitapps">待安装</button>
-                <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='localapps' ? '' : 'layui-btn-plugin' }}" lay-event="localapps">本地包</button>
-            </div>
-        </script>
+        <div class="layui-btn-group plugin_btn">
+            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='installed' ? '' : 'layui-btn-plugin' }}" lay-event="installed">已安装</button>
+            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='waitapps' ? '' : 'layui-btn-plugin' }}" lay-event="waitapps">待安装</button>
+            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='localapps' ? '' : 'layui-btn-plugin' }}" lay-event="localapps">本地包</button>
+        </div>
+    </script>
 
     <!-- 表格行工具栏 -->
     <script type="text/html" id="table-bar">
-            {{# if(d.installed == '1'){ }}
-            <div class="layui-btn-group">
-            
-                <button type="button" class="layui-btn layui-btn-xs" lay-event="edit">
-                    <i class="layui-icon layui-icon-set-sm"></i>配置
-                </button>
-                <button type="button" class="layui-btn layui-btn-xs layui-bg-red" lay-event="remove">
-                    <i class="layui-icon layui-icon-delete"></i>卸载
-                </button>
-            
-            </div>
-            {{# }else{ }}
-            <button class="layui-btn layui-btn-xs" lay-event="installed">安装应用</button>
-            {{# } }}
+        {{# if(d.installed == '1'){ }}
+        <div class="layui-btn-group">
+        
+            <button type="button" class="layui-btn layui-btn-xs" lay-event="edit">
+                <i class="layui-icon layui-icon-set-sm"></i>配置
+            </button>
+            <button type="button" class="layui-btn layui-btn-xs layui-bg-red" lay-event="remove">
+                <i class="layui-icon layui-icon-delete"></i>卸载
+            </button>
+        
+        </div>
+        {{# }else{ }}
+        <button class="layui-btn layui-btn-xs" lay-event="installed">安装应用</button>
+        {{# } }}
     </script>
 </body>
 

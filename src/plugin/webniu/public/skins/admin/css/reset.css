@@ -147,7 +147,6 @@
 .layui-dash-wh i{
     color: var(--global-primary-color);
 }
-
 .layui-table-checked.layui-table-click, .layui-table-checked.layui-table-hover{
     background-color:rgb(from var(--global-primary-color) r g b / 8%);
 }
@@ -160,4 +159,13 @@
 }
 .login-title-text{
     color: var(--global-primary-color);
+}
+.layui-elem-quote{
+    border-left: 5px solid var(--global-primary-color);
+}
+.layui-webniu-bg-color{
+    background-color: var(--global-primary-color);
+}
+.layui-webniu-bg-rgb{
+    background-color: rgb(from var(--global-primary-color) r g b / 8%);
 }

@@ -6,5 +6,5 @@ return [
     'public_path'       => base_path('plugin' . DIRECTORY_SEPARATOR. 'webniu' . DIRECTORY_SEPARATOR . 'public'),
     'plugin_market_host'=> 'https://api.webniu.com',
     'plugin_identifier' => 'webniu',
-    'version'           => '1.0.7',
+    'version'           => '1.0.8',
 ];

@@ -128,12 +128,14 @@
                         
                         <div class="layui-form-item layui-inline">
                             <label class="layui-form-label"></label>
+                            <div class="layui-btn-container">
                             <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
                                 <i class="layui-icon layui-icon-search"></i>查询
                             </button>
                             <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
                                 <i class="layui-icon layui-icon-refresh"></i>重置
                             </button>
+                            </div>
                         </div>
                         <div class="toggle-btn">
                             <a class="layui-hide">展开<i class="layui-icon layui-icon-down"></i></a>
@@ -152,18 +154,22 @@
         </div>
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
+            <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" lay-event="add" permission="app.webniu.web.user.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
             <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.web.user.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
+            </div>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
+            <div class="layui-btn-container">
             <button class="layui-btn layui-btn-xs tool-btn" lay-event="edit" permission="app.webniu.web.user.update">编辑</button>
             <button class="layui-btn layui-btn-xs tool-btn layui-bg-red" lay-event="remove" permission="app.webniu.web.user.delete">删除</button>
+            </div>
         </script>
 
         <script src="/app/webniu/skins/component/layui/layui.js"></script>
@@ -232,8 +238,9 @@
             })
             
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util","drawer","nprogress"], function() {
-                let nprogress   = parent.layui.nprogress;
+            layui.use(["table", "form", "common", "popup", "util","drawer","nprogress","toast"], function() {
+                let nprogress = parent.layui.nprogress;
+                let toast     = parent.layui.toast;
                 let table       = layui.table;
                 let form        = layui.form;
                 let $           = layui.$;
@@ -360,7 +367,7 @@
                                             form.render();
                                         });
 				                    }
-									return layui.popup.success("操作成功");
+									return toast.success({message:'操作成功',position: 'topCenter',onOpened:function(){}}); 
 								})
 							});
 							let checked = d[field] === 1 ? "checked" : "";
@@ -546,7 +553,7 @@
                 let batchRemove = function(obj) {
                     let checkIds = common.checkField(obj, PRIMARY_KEY);
                     if (checkIds === "") {
-                        layui.popup.warning("未选中数据");
+                        toast.warning({message:'未选中数据',position: 'topCenter',onOpened:function(){}}); 
                         return false;
                     }
                     doRemove(checkIds.split(","));
@@ -570,9 +577,11 @@
                             success: function(res) {
                                 layer.close(loading);
                                 if (res.code) {
-                                    return layui.popup.failure(res.msg);
+                                    return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}}); 
                                 }
-                                return layui.popup.success("操作成功", refreshTable);
+                                return toast.success({message:'操作成功',position: 'topCenter',onOpened:function(){
+                                    refreshTable();
+                                }}); 
                             }
                         })
                     });

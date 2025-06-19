@@ -173,8 +173,8 @@
                     <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="save">
                         提交
                     </button>
-                    <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary">
-                        重置
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="closeIframe">
+                        关闭
                     </button>
                 </div>
             </div>
@@ -328,7 +328,9 @@
             });
 
             //提交事件
-            layui.use(["form", "popup"], function () {
+            layui.use(["form", "popup","toast"], function () {
+                let toast   = parent.layui.toast;
+                let $       = layui.$;
                 layui.form.on("submit(save)", function (data) {
                     data.field[PRIMARY_KEY] = layui.url().search[PRIMARY_KEY];
                     layui.$.ajax({
@@ -338,15 +340,18 @@
                         data: data.field,
                         success: function (res) {
                             if (res.code) {
-                                return layui.popup.failure(res.msg);
-                            }
-                            return layui.popup.success("操作成功", function () {
+                                return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}}); 
+                            } 
+                            return toast.success({message:'操作成功',position: 'topCenter',onOpened:function(){
                                 parent.refreshTable();
                                 parent.layer.close(parent.layer.getFrameIndex(window.name));
-                            });
+                            }});
                         }
                     });
                     return false;
+                });
+                $('#closeIframe').click(function(){
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
                 });
             });
 
