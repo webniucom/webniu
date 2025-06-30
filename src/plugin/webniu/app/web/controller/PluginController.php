@@ -53,83 +53,112 @@ class PluginController extends Crud
     }
 
     /**
-     * 查询
+     * 已安装查询
      * @param Request $request
      * @return Response
      * @throws BusinessException
      */
     public function select(Request $request): Response
     {
-        $data       = [];
-        $total      = 0;
-        $installedtype = $request->get('installedtype','installed');
-        [$where, $format, $limit, $field, $order] = $this->selectInput($request); 
-        $query      = $this->doSelect($where, $field, $order);
-        $paginator  = $query->paginate($limit);
-        $items      = $paginator->items();
-         
-        switch ($installedtype) {
-            case 'localapps': 
-                $localitems         = [];
-                $plugin_names       = array_diff(scandir(base_path() . '/plugin/'), array('.', '..'));
-                $existing_plugins   = array_column($items, 'plugin_identifier');
-                
-                foreach ($plugin_names as $plugin_name) {
-                    if (!in_array($plugin_name, $existing_plugins)) {
-                        $plugin_info    = $this->getPluginApp($plugin_name);
-                        $plugin_info['installed']       = false;
-                        $plugin_info['installedtype']   = 'localapps';
-                        if(!empty($plugin_info['plugin_identifier'])){
-                            $localitems[]   = $plugin_info;
-                        }
-                         
-                    }
-                }
-                $total  = count($localitems);
-                $data   = $localitems;
-                break;
-            case 'waitapps':
-                $client = $this->httpClient();
-                $query  = $request->get();
-                $query['core']      = options(['core'])['core'];
-                $query['version']   = $this->getAdminVersion();
-                $response   = $client->get('/api/online', ['query'=>$query]);
-                $content    = $response->getBody()->getContents();
-                $content    = json_decode($content, true);
-                if($content){
-                    $total  = $content['count']??0;
-                    $data   = $content['data']??[];
-                    if(!empty($data)){
-                        $plugin_identifier  = array_column($data, 'plugin_identifier');
-                        $list   = $this->model->whereIn('plugin_identifier',$plugin_identifier)->select('plugin_identifier')->get();
-                        if($list){
-                            $list   = $list->toArray();
-                            $list   = array_column($list,'plugin_identifier');
-                            foreach($data as $k=>$v){
-                                if(in_array($v['plugin_identifier'],$list)){
-                                    unset($data[$k]);
-                                }
-                            }
-                            $total  = count($data);
-                        } 
-                    }
-                     
-                }  
-                break;
-            case 'updateset': 
-                $total              = $paginator->total();
-                $data['items']      = $items[0]; 
-                $data['rewrite']    = $this->getPluginRewrite($items[0]['plugin_identifier']); 
-                break;
-            default:
-                
-                $total  = $paginator->total();
-                $data   = $items;
-            break;
-        }
-        return call_user_func([$this, 'formatNormal'], $data, $total);
+        [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        $query = $this->doSelect($where, $field, $order);
+        return $this->doFormat($query, $format, $limit);
     }
- 
+
+    /**
+     * 查询数据库后置方法，可用于修改数据
+     * @param mixed $items 原数据
+     * @return mixed 修改后数据
+     */
+    protected function afterQuery($items)
+    {
+        if(!empty($items)){
+            $id = request()->get('id',false);
+            if($id){
+                foreach($items as $k=>$v){
+                    $items[$k]['rewrite']    = $this->getPluginRewrite($v['plugin_identifier']);
+                }
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * 待安装查询
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
+    public function waitapps(Request $request): Response
+    {
+        $total  = 0;
+        $data   = [];
+        $code   = 0;
+        $msg    = 'ok';
+        try{
+            $client = Util::httpClient();
+            $query  = $request->get();
+            $query['version']   = $this->getAdminVersion();
+            $response   = $client->post('/api/v1/applist', ['form_params'=>$query]);
+            $content    = $response->getBody()->getContents();
+            $content    = json_decode($content, true); 
+            if($content['code'] == 0){
+                $total  = $content['count']??0;
+                $data   = $content['data']??[];
+                if(!empty($data)){
+                    $plugin_identifier  = array_column($data, 'plugin_identifier');
+                    $list   = $this->model->whereIn('plugin_identifier',$plugin_identifier)->select('plugin_identifier')->get();
+                    if($list){  
+                        $list   = $list->toArray();
+                        $list   = array_column($list,'plugin_identifier');
+                        foreach($data as $k=>$v){
+                            if(in_array($v['plugin_identifier'],$list)){
+                                unset($data[$k]);
+                            }
+                        }
+                        $total  = count($data);
+                    } 
+                }
+            }else{
+                $code   = $content['code'];
+                $msg    = $content['msg'];
+            }
+        }catch(\Throwable $e){
+            return json(['code' => 1, 'msg' => $e->getMessage(), 'count' => 0, 'data' => []]);
+        }
+        return json(['code' => $code, 'msg' => $msg, 'count' => $total, 'data' => $data]);
+    }
+
+    /**
+     * 本地版查询
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
+    public function localapps(Request $request): Response
+    {
+        $total  = 0;
+        $data   = [];
+        try{
+            $localitems         = [];
+            $plugin_names       = array_diff(scandir(base_path() . '/plugin/'), array('.', '..'));
+            $existing_plugins   = array_column($this->model->select('plugin_identifier')->get()->toArray(), 'plugin_identifier');
+            foreach ($plugin_names as $plugin_name) {
+                if (!in_array($plugin_name, $existing_plugins)) {
+                    $plugin_info    = $this->getPluginApp($plugin_name);
+                    $plugin_info['installed']       = false;
+                    $plugin_info['installedtype']   = 'localapps';
+                    if(!empty($plugin_info['plugin_identifier'])){
+                        $localitems[]   = $plugin_info;
+                    }
+                        
+                }
+            }
+            $total  = count($localitems);
+            $data   = $localitems;
+        }catch(\Throwable $e){$total  = 0;$data   = [];}
+        return json(['code' => 0, 'msg' => 'ok', 'count' => $total, 'data' => $data]);
+    }
 
     /**
      * 更新安装应用
@@ -195,11 +224,10 @@ EOF;
         if ($data) {
             return $this->json(0, 'ok', json_decode($data, true));
         };
-        $client = $this->httpClient();
+        $client             = Util::httpClient();
         $query              = $request->get();
-        $query['core']      = options(['core'])['core'];
         $query['version']   = $this->getAdminVersion();
-        $response   = $client->get('/api/typeclass', ['query'=>$query]);
+        $response   = $client->post('/api/v1/category', ['form_params'=>$query]);
         $content    = $response->getBody()->getContents();
         $data       = json_decode($content, true); 
         Cache::set($key,json_encode($data['data']??[]),60*60*24*7);
@@ -219,30 +247,33 @@ EOF;
         if(empty($version)){
             return json(['code' => 0, 'msg' => 'ok', 'data' => []]);
         }
-        $names  = array_column($version, 'name');
-        $name   = implode(',', $names);
-        $client     = $this->httpClient(); 
-        $form_params['version'] = $version;
-        $form_params['core']    = options(['core'])['core'];
-        $response   = $client->post('/api/local', ['form_params'=>$form_params]);
-        $content    = $response->getBody()->getContents();
-        $content    = json_decode($content, true);
-        
-        foreach ($version as $item) {
-            if(isset($content['data']) && is_array($content['data']) && array_key_exists($item['name'], $content['data'])){
-                $data[$item['name']] = $content['data'][$item['name']];  
+        try{
+            $names      = array_column($version, 'name');
+            $name       = implode(',', $names);
+            $client     = Util::httpClient();
+            $form_params['plugin']  = $version;
+            $response   = $client->post('/api/v1/checkupdate', ['form_params'=>$form_params]);
+            $content    = $response->getBody()->getContents();
+            $content    = json_decode($content, true); 
+            if($content['code'] == 0){
+                foreach ($version as $item) {
+                    if(isset($content['data']) && is_array($content['data']) && array_key_exists($item['name'], $content['data'])){
+                        if (version_compare($content['data'][$item['name']]['version'],$item['version'], '>')) {
+                            $data[$item['name']] = $content['data'][$item['name']];continue;
+                        }
+                    }
+                    $installed = $this->getPluginApp($item['name']);
+                    if (version_compare($installed['version'],$item['version'], '>')) {
+                        $data[$item['name']] = $installed;
+                    }
+                }
             }
-            $installed = $this->getPluginApp($item['name']);
-            if (version_compare($installed['version'],$item['version'], '>')) {
-                $data[$item['name']] = $installed;
-            }
-        }
+        }catch(\Throwable $e){$data   = [];}
         return json(['code' => 0, 'msg' => 'ok', 'data' => $data]);
     }
 
     public function system(Request $request): Response
     { 
-         
         return json(['code' => 0, 'msg' => 'ok', 'data' => []]);
     }
 
@@ -264,14 +295,11 @@ EOF;
         if (!$name || !$version || !$installed) {
             return $this->json(1, '缺少参数');
         }
-        
         if($installed == 'waitapps'){
-            
             $base_path = base_path() . "/plugin/$name";
             $zip_file = "$base_path.zip";
             $extract_to = base_path() . '/plugin/';
             $this->downloadZipFile(base64_decode($post['tokens']), $zip_file);
-
             $has_zip_archive = class_exists(ZipArchive::class, false);
             if (!$has_zip_archive) {
                 $cmd = $this->getUnzipCmd($zip_file, $extract_to);
@@ -283,7 +311,6 @@ EOF;
                 }
             }
         }
-         
         Util::pauseFileMonitor();
         try {
             // 解压zip到plugin目录
@@ -292,7 +319,6 @@ EOF;
                     $zip = new ZipArchive;
                     $zip->open($zip_file);
                 }
-    
                 if (!empty($zip)) {
                     $zip->extractTo(base_path() . '/plugin/');
                     unset($zip);
@@ -310,7 +336,6 @@ EOF;
                     $context = call_user_func([$install_class, 'beforeUpdate'], $installed_version, $installed_app);
                 }
             }
- 
             if ($installed_version) {
                 // 执行update更新
                 if (class_exists($install_class) && method_exists($install_class, 'update')) {
@@ -322,14 +347,16 @@ EOF;
                     call_user_func([$install_class, 'install'], $installed_app);
                 }
             }
+            if($installed == 'waitapps'){
+                unlink(base_path() . "/plugin/{$name}/public/config/install.php");
+                unlink(base_path() . "/plugin/{$name}/public/config/update.php"); 
+            }
             $this->updateOrInsert($post); 
 
         } finally {
             Util::resumeFileMonitor();
         }
-
         Util::reloadWebman();
-
         return $this->json(0);
     }
     
@@ -372,8 +399,7 @@ EOF;
                 Monitor::pause();
             }
             try {
-                //取消删除应用文件
-                //$this->rmDir($path);
+                $this->rmDir($path);
             } finally {
                 if ($monitor_support_pause) {
                     Monitor::resume();
@@ -396,114 +422,152 @@ EOF;
      */
     protected function updateOrInsert($post)
     {
+        $data = $this->inputFilter($post);
+        $data['installed'] = 1;
         return Plugin::updateOrInsert(
-            [
-                'plugin_identifier'=> $post['plugin_identifier']
-            ],
-            [
-                'plugin_type'   => $post['plugin_type']??'webniu',
-                'plugin_class'  => $post['plugin_class']??'1',
-                'plugin_name'   => $post['plugin_name']??'未定义名称',
-                'plugin_desc'   => $post['plugin_desc']??'未定义描述',
-                'plugin_author' => $post['plugin_author']??'未定义作者',
-                'plugin_logo'   => $post['plugin_logo']??'',
-                'plugin_icon'   => $post['plugin_icon']??'',
-                'plugin_href'   => $post['plugin_href']??'',
-                'plugin_open'   => $post['plugin_open']??'0',
-                'version'       => $post['version']??'0.0.0',
-                'installed'     => 1,
-                'releases'      => $post['version']??'0.0.0', 
-            ]
+            ['plugin_identifier'=> $data['plugin_identifier']
+            ],$data
         ); 
     }
-
-   
-
+    
     /**
-     * 登录验证码
+     * 网牛验证码
      * @param Request $request
      * @return Response
      * @throws GuzzleException
      */
     public function captcha(Request $request): Response
     {
-        $client = $this->httpClient();
-        $response = $client->get('/user/captcha?type=login');
-        $sid_str = $response->getHeaderLine('Set-Cookie');
+        $client     = Util::httpClient();
+        $response   = $client->get('/api/v1/captcha?type=login');
+        $sid_str    = $response->getHeaderLine('Set-Cookie');
         if (preg_match('/PHPSID=([a-zA-Z_0-9]+?);/', $sid_str, $match)) {
             $sid = $match[1];
-            session()->set('app-plugin-token', $sid);
+            session()->set('webniu-plugin-token', $sid);
         }
         return response($response->getBody()->getContents())->withHeader('Content-Type', 'image/jpeg');
     }
 
     /**
-     * 登录官网
+     * 登录网牛
      * @param Request $request
      * @return Response|string
      * @throws GuzzleException
      */
     public function login(Request $request)
     {
-        $client = $this->httpClient();
-        if ($request->method() === 'GET') {
-            $response = $client->get("/webman-admin/login");
-            return (string)$response->getBody();
+        $token = session()->get('webniu-plugin-token');
+        if(!$token){
+            return $this->json(1,'请先获取验证码');
         }
-
-        $response = $client->post('/api/user/login', [
-            'form_params' => [
-                'email' => $request->post('username'),
-                'password' => $request->post('password'),
-                'captcha' => $request->post('captcha')
-            ]
-        ]);
-        $content = $response->getBody()->getContents();
-        $data = json_decode($content, true);
-        if (!$data) {
-            $msg = "/api/user/login return $content";
-            echo "msg\r\n";
-            Log::error($msg);
-            return $this->json(1, '发生错误');
-        }
-        if ($data['code'] != 0) {
-            return $this->json($data['code'], $data['msg']);
-        }
-        session()->set('app-plugin-user', [
-            'uid' => $data['data']['uid']
-        ]);
-        return $this->json(0);
+        try {
+            $client     = Util::httpClient();
+            $response   = $client->post('/api/v1/user/login', [
+                'form_params' => [
+                    'username' => $request->post('username'),
+                    'password' => $request->post('password'),
+                    'captcha'  => $request->post('captcha'),
+                ]
+            ]);
+            $content = $response->getBody()->getContents();
+            $data = json_decode($content, true);
+            if($data['code'] == 2){
+                return $this->json($data['code'], $data['msg'],[]);
+            }
+            if($data['code'] == 0){
+                session()->set('webniu-plugin-user', $data['data']);
+            }
+            return $this->json($data['code'], $data['msg'], $data['data']);
+        } catch (\Exception $e) {}
+        return $this->json(1,'登录异常,请重试!',[]);
     }
 
     /**
-     * 获取zip下载url
-     * @param $name
-     * @param $version
-     * @return mixed
-     * @throws BusinessException
+     * 注册网牛
+     * @param Request $request
+     * @return Response|string
      * @throws GuzzleException
      */
-    protected function getDownloadUrl($name, $version)
+    public function reg(Request $request)
     {
-        $client = $this->httpClient();
-        $response = $client->get("/app/download/$name?version=$version");
-
-        $content = $response->getBody()->getContents();
-        $data = json_decode($content, true);
-        if (!$data) {
-            $msg = "/api/app/download return $content";
-            Log::error($msg);
-            throw new BusinessException('访问官方接口失败 ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase());
+        $token = session()->get('webniu-plugin-token');
+        if(!$token){
+            return $this->json(1,'请先获取验证码');
         }
-        if ($data['code'] && $data['code'] != -1 && $data['code'] != -2) {
-            throw new BusinessException($data['msg']);
-        }
-        if ($data['code'] == 0 && !isset($data['data']['url'])) {
-            throw new BusinessException('官方接口返回数据错误');
-        }
-        return $data;
+        try {
+            $client     = Util::httpClient();
+            $response   = $client->post('/api/v1/user/reg', [
+                'form_params' => [
+                    'username' => $request->post('username'),
+                    'password' => $request->post('password'),
+                    'confirmpassword'=> $request->post('confirmPassword'),
+                    'nickname' => $request->post('nickname'),
+                    'captcha'  => $request->post('captcha'),
+                ]
+            ]);
+            $content = $response->getBody()->getContents();
+            $data = json_decode($content, true);
+            if($data['code'] == 2){
+                return $this->json($data['code'], $data['msg'],[]);
+            }
+            return $this->json($data['code'], $data['msg'], $data['data']);
+        } catch (\Exception $e) {}
+        return $this->json(1,'注册异常,请官网注册!',[]);
     }
 
+    /**
+     * 注销登录
+     * @param Request $request
+     * @return Response|string
+     * @throws GuzzleException
+     */
+    public function out(Request $request)
+    {
+        try {
+            $client     = Util::httpClient();
+            $response   = $client->post('/api/v1/user/logout', [
+                'form_params' => [
+                    'action' => 'logout',
+                ]
+            ]);
+            $content = $response->getBody()->getContents();
+            $data = json_decode($content, true);
+            if($data['code'] == 2){
+                return $this->json($data['code'], $data['msg'],[]);
+            }
+            if($data['code'] == 0){
+                $request->session()->delete('webniu-plugin-user'); 
+                return $this->json($data['code'], $data['msg'], []);
+            }
+             
+        } catch (\Exception $e) {}
+        return $this->json(1,'退出异常!',[]);
+    }
+
+    /**
+     * 会员状态
+     * @param Request $request
+     * @return Response|string
+     * @throws GuzzleException
+     */
+    public function wnyun(Request $request)
+    {
+        try {
+            $client     = Util::httpClient();
+            $response   = $client->post('/api/v1/user/account');
+            $content    = $response->getBody()->getContents();
+            $data       = json_decode($content, true);
+            if($data['code'] == 102){
+                $request->session()->delete('webniu-plugin-user'); 
+                return $this->json($data['code'], $data['msg'], []);
+            }
+            return $this->json($data['code'], $data['msg'],$data['data']);
+             
+        } catch (\Exception $e) {
+            return $this->json(1,$e->getMessage(),[]);
+        }
+    }
+    
     /**
      * 下载zip
      * @param $url
@@ -514,7 +578,7 @@ EOF;
      */
     protected function downloadZipFile($url, $file)
     {
-        $client = $this->downloadClient();
+        $client = Util::httpClient();
         $response = $client->get($url);
         $body = $response->getBody();
         $status = $response->getStatusCode();
@@ -522,6 +586,9 @@ EOF;
             throw new BusinessException('安装包不存在');
         }
         $zip_content = $body->getContents();
+        if ($status == 503) {
+            throw new BusinessException($zip_content);
+        }
         if (empty($zip_content)) {
             throw new BusinessException('安装包不存在');
         }
@@ -681,55 +748,7 @@ EOF;
         closedir($dir);
         rmdir($src);
     }
-
-    /**
-     * 获取httpclient
-     * @return Client
-     */
-    protected function httpClient(): Client
-    {
-        // 下载zip
-        $options = [
-            'base_uri' => config('plugin.webniu.app.plugin_market_host'),
-            'timeout' => 60,
-            'connect_timeout' => 5,
-            'verify' => false,
-            'http_errors' => false,
-            'headers' => [
-                'Referer' => \request()->fullUrl(),
-                'User-Agent' => 'webniu-app-plugin',
-                'Accept' => 'application/json;charset=UTF-8',
-            ]
-        ];
-        if ($token = session('app-plugin-token')) {
-            $options['headers']['Cookie'] = "PHPSID=$token;";
-        }
-        return new Client($options);
-    }
-
-    /**
-     * 获取下载httpclient
-     * @return Client
-     */
-    protected function downloadClient(): Client
-    {
-        // 下载zip
-        $options = [
-            'timeout' => 59,
-            'connect_timeout' => 5,
-            'verify' => false,
-            'http_errors' => false,
-            'headers' => [
-                'Referer' => \request()->fullUrl(),
-                'User-Agent' => 'webman-app-plugin',
-            ]
-        ];
-        if ($token = session('app-plugin-token')) {
-            $options['headers']['Cookie'] = "PHPSID=$token;";
-        }
-        return new Client($options);
-    }
-
+    
     /**
      * 查找系统命令
      * @param string $name

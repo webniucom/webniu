@@ -27,6 +27,5 @@ class IndexController extends Base
     public function index(Request $request): Response
     {
         return view('index/index');
-    }
-
+    } 
 }

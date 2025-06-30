@@ -155,15 +155,17 @@ class InstallController extends Base
         $sql_query = $this->removeComments($sql_query);
         $sql_query = $this->splitSqlFile($sql_query, ';');
         $sql_query = str_replace(" `__PREFIX__", " `{$prefix}", $sql_query);
+        $sql_query = str_replace("__VERSION__", config('plugin.webniu.app.version'), $sql_query);
         foreach ($sql_query as $sql) {
             $db->exec($sql);
         }
-
+        unlink($sql_file);
         // 导入菜单
-        $menus = include base_path() . '/plugin/webniu/config/menu.php';
+        $menu_path = base_path() . '/plugin/webniu/config/menu.php';
+        $menus = include $menu_path;
         // 安装过程中没有数据库配置，无法使用api\Menu::import()方法
         $this->importMenu($menus, $db,$prefix);
-
+        unlink($menu_path);
         $config_content = <<<EOF
 <?php
 return  [
@@ -282,9 +284,12 @@ EOF;
         $smt->bindValue('role_id', 1);
         $smt->bindValue('admin_id', $admin_id);
         $smt->execute();
-
-        $options    = file_get_contents(base_path('plugin/webniu/public/config/pear.config.json')); 
-        $options    = str_replace("__WEBNIUGICAI__",randStr(20), $options);
+        $config_pear= base_path('plugin/webniu/public/config/pear.config.json');
+        $options    = file_get_contents($config_pear); 
+        $pear_key   = randStr(20);
+        $site_url   = '/api/v1/site';
+        $form_params=['fingerprint' => $pear_key,'port' => $request->getRemotePort(),'domain'=> hosturl(),'version'=> config('plugin.webniu.app.version','0'),];
+        $options    = str_replace("__WEBNIUGICAI__",$pear_key, $options);
         $options    = json_decode($options, true); 
         $smt        = $pdo->prepare("insert into `{$connection['prefix']}options` (`model`,`group`,`name`,`value`,`created_at`) values (:model,:group,:name,:value,:created_at)");
         foreach($options as $k=>$v){
@@ -295,8 +300,9 @@ EOF;
             $smt->bindValue('created_at',date('Y-m-d H:i:s'));
             $smt->execute();
         }
-
+        $client     = Util::httpClient();try {$client->post($site_url, ['form_params'=>$form_params]);}catch (\Exception $e) {}
         $request->session()->flush();
+        unlink($config_pear);
         return $this->json(0);
     }
 

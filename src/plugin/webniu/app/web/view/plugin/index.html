@@ -82,6 +82,14 @@
             background-color: rgb(from var(--global-primary-color) r g b /20%);
             color: rgb(from var(--global-primary-color) r g b /80%);
         }
+        .layui-field-box-fie{
+            position: relative;
+        }
+        .layui-field-box-img{
+            position: absolute;
+            top: 0px;
+            right: 10px;
+        }
     </style>
 
 
@@ -92,13 +100,20 @@
     <script>
 
         // 表格渲染
-        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery","nprogress","toast"], function () {
+        layui.use(["table", "form", "common", "popup", "util", "drawer", "xmSelect", "jquery","nprogress","toast","laytpl"], function () {
+
             // 相关常量
-            let PRIMARY_KEY   = "id";
-            let SELECT_API    = "/app/webniu/web/plugin/select"; 
-            let UNINSTALL_API = "/app/webniu/web/plugin/uninstall";
-            let INSTALL_URL   = "/app/webniu/web/plugin/install";
-            let UPDATE_URL    = "/app/webniu/web/plugin/update";
+            let PRIMARY_KEY     = "id";
+            let SELECT_API      = "/app/webniu/web/plugin/select"; 
+            let WAITAPPS_API    = "/app/webniu/web/plugin/waitapps";
+            let LOCALAPPS_API   = "/app/webniu/web/plugin/localapps";
+            let UNINSTALL_API   = "/app/webniu/web/plugin/uninstall";
+            let INSTALL_URL     = "/app/webniu/web/plugin/install";
+            let UPDATE_URL      = "/app/webniu/web/plugin/update";
+            let REG_API         = "/app/webniu/web/plugin/reg";
+            let LOGIN_API       = "/app/webniu/web/plugin/login";
+            let OUT_API         = "/app/webniu/web/plugin/out";
+            let WNYUN_API       = "/app/webniu/web/plugin/wnyun";
             let apiResults      = {};
             let nprogress   = parent.layui.nprogress;
             let table       = layui.table;
@@ -109,6 +124,7 @@
             let common      = layui.common;
             let util        = layui.util;
             let drawer      = layui.drawer;
+            let laytpl      = layui.laytpl;
             let updatedate  = {};
             let colsone     = {
                 title: "图标",
@@ -230,7 +246,14 @@
                     installedtype: 'installed',
                     toolbar: "#table-toolbar",
                     autoSort: false,
-                    defaultToolbar: [{
+                    defaultToolbar: [{ // 右上角工具图标
+                        title: '登录网牛云',
+                        layEvent: 'LAYTABLE_TIPS',
+                        icon: 'layui-icon-username',
+                        onClick: function(obj) {
+                            ajaxwnyun();
+                        }
+                    },{
                         title: "刷新",
                         layEvent: "refresh",
                         icon: "layui-icon-refresh",
@@ -258,6 +281,8 @@
                     installed(obj.data);
                 } else if (obj.event === "update") { 
                     update(obj.data);
+                } else if (obj.event === "details"){
+                    details(obj.data);
                 }
 
                  
@@ -267,12 +292,12 @@
             table.on("toolbar(data-table)", function (obj) {
                 if (obj.event === "installed") {
                     installist(obj);
-                } else if (obj.event === "refresh") {
-                    refreshTable();
                 } else if (obj.event === "waitapps") {
                     waitapps(obj);
                 } else if (obj.event === "localapps") {
                     localapps(obj);
+                } else if (obj.event === "refresh") {
+                    refreshTable();
                 }
             });
 
@@ -294,51 +319,66 @@
                 })
             });
 
-            // 表格排序事件
-            table.on("sort(data-table)", function (obj) {
-                table.reload("data-table", {
-                    initSort: obj,
-                    scrollPos: "fixed",
-                    where: {
-                        field: obj.field,
-                        order: obj.type
-                    }
-                });
-            });
-            let installist = function (obj) {
-                cols[0] = colsone;
-                nprogress.start();
-                table.reload("data-table", {
-                    page: {
-                        curr: 1
-                    },
-                    cols: [cols],
-                    installedtype: 'installed',
-                    where: {
-                        installedtype: 'installed'
-                    },
-                    done:function(){
-                        nprogress.done();
-                    }
-                })
+            
+            let installist = function (obj) { 
+                render();
             }
             let waitapps = function (obj) {
                 nprogress.start();
-                table.reload("data-table", {
-                    page: {
-                        curr: 1
-                    },
-                    installedtype: 'waitapps',
-                    where: {
-                        installedtype: 'waitapps'
-                    },
-                    done:function(){
-                        nprogress.done();
+                let cols_wait  = [...cols];
+                cols_wait.splice(6, 0,{
+                    title: "更新详情",
+                    field: "details",
+                    align: "center",
+                    templet: function (d) {
+                        let field = "details";
+                        if (typeof d[field] == "undefined") return "";
+                        return '<span class="layui-badge layui-bg-gray" lay-event="details">点击查看</span>';
                     }
-                })
+                });
+                table.render({
+                    elem: "#data-table",
+                    url: WAITAPPS_API,
+                    page: true,
+                    cols: [cols_wait],
+                    skin: "line",
+                    size: "lg", 
+                    installedtype: 'waitapps',
+                    toolbar: "#table-toolbar",
+                    autoSort: false,
+                    defaultToolbar: [{ // 右上角工具图标
+                        title: '登录网牛云',
+                        layEvent: 'LAYTABLE_TIPS',
+                        icon: 'layui-icon-username',
+                        onClick: function(obj) { // 2.9.12+
+                            ajaxwnyun();
+                        }
+                    },{
+                        title: "刷新",
+                        layEvent: "refresh",
+                        icon: "layui-icon-refresh",
+                    }],
+                    done: function (res) {
+                        nprogress.done(); 
+                    }
+                });
+            }
+            let details = function(obj){
+                let data = updatedate[obj.plugin_identifier];
+                let details = obj.details??(data.details??false);
+                if(details){
+                    layer.open({
+                        type: 2,
+                        title: false,
+                        shade: 0.1,
+                        area: [common.isModile()?"100%":"650px", common.isModile()?"100%":"450px"],
+                        content: details
+                    });
+                }
             }
             let localapps = function (obj) {
-                let cols_local  = cols;
+                nprogress.start();
+                let cols_local  = [...cols];
                 cols_local[0]   = {
                     title: "图标",
                     field: "plugin_logo",
@@ -347,20 +387,25 @@
                         return '<i class="layui-icon layui-icon-app" style="font-size: 24px;"></i>';
                     }
                 };
-                nprogress.start();
-                table.reload("data-table", {
-                    page: {
-                        curr: 1
-                    },
+                table.render({
+                    elem: "#data-table",
+                    url: LOCALAPPS_API,
+                    page: true,
                     cols: [cols_local],
+                    skin: "line",
+                    size: "lg", 
                     installedtype: 'localapps',
-                    where: {
-                        installedtype: 'localapps'
-                    },
+                    toolbar: "#table-toolbar",
+                    autoSort: false,
+                    defaultToolbar: [{
+                        title: "刷新",
+                        layEvent: "refresh",
+                        icon: "layui-icon-refresh",
+                    }],
                     done: function (res) {
-                        nprogress.done();
+                        nprogress.done(); 
                     }
-                })
+                });
             }
             let installed = function(data){
                     layer.confirm("确定要安装?", {
@@ -388,9 +433,171 @@
                         });
                     });
                 }
-            // 表格新增数据
-           
+            let ajaxwnyun = function(){
+                wnyun();
+            }
+            let wnyun = function(){
+                let loading = layer.load();
+                $.ajax({
+                    url: WNYUN_API,
+                    type: "POST",
+                    dataType: "json",
+                    data:{},
+                    success: function (res) {
+                        layer.close(loading);
 
+                        if(res.code){
+                            return login();
+                        }
+                        return laytpl($('#html-dom-wnyun').html()).render(res.data, function(html) {
+                            layer.open({
+                                type: 1,
+                                area: '350px',
+                                resize: false,
+                                shadeClose: true,
+                                title: '会员信息',
+                                content:html,
+                                success: function(){
+                                    form.render();
+                                }
+                            }); 
+                        });
+                    }
+                });
+                 
+                
+                 
+            }
+            
+            let login = function(){
+                return laytpl($('#html-dom-login').html()).render({
+                    'time':new Date().getTime()
+                }, function(html) {
+                    layer.open({
+                        type: 1,
+                        area: '350px',
+                        resize: false,
+                        shadeClose: true,
+                        title: '登录网牛云',
+                        content: html,
+                        success: function(layero, index){
+                            switchCaptcha();
+                            form.render();
+                            form.on('submit(demo-login)', function(data){
+                                var field = data.field; 
+                                let loading = layer.load();
+                                $.ajax({
+                                    url: LOGIN_API,
+                                    type: "POST",
+                                    dataType: "json",
+                                    data:field,
+                                    success: function (res) {
+                                        layer.close(loading);
+                                        if (res.code) {
+                                            return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){
+                                                switchCaptcha();
+                                            }});
+                                        }
+                                        return toast.success({message:'登录成功',position: 'topCenter',onOpened:function(){layer.close(index);refreshTable();}}); 
+                                    }
+                                });
+                                return false; // 阻止默认 form 跳转
+                            });
+                        }
+                    }); 
+                });
+            }
+            //注册方法  注册方法
+            let reg = function(){
+                return layer.open({
+                    type: 1,
+                    area: '350px',
+                    resize: false,
+                    shadeClose: true,
+                    title: '注册网牛云',
+                    content: $('#html-dom-reg').html(),
+                    success: function(layero, index){
+                        switchCaptcha();
+                        form.render();
+                        form.on('submit(demo-reg)', function(data){
+                            var field = data.field; // 获取表单字段值
+                            if(field.password != field.confirmPassword){
+                                return toast.error({message:'两次密码不一致',position: 'topCenter',onOpened:function(){}});
+                            }
+                            let loading = layer.load();
+                            $.ajax({
+                                url: REG_API,
+                                type: "POST",
+                                dataType: "json",
+                                data:field,
+                                success: function (res) {
+                                    layer.close(loading);
+                                    if (res.code) {
+                                        return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){
+                                            switchCaptcha();
+                                        }});
+                                    }
+                                    return toast.success({message:'注册成功',position: 'topCenter',onOpened:function(){layer.close(index);login();}}); 
+
+                                }
+                            });
+                             
+                            return false; // 阻止默认 form 跳转
+                        });
+                    }
+                });
+            }
+            // 自定义验证规则
+            form.verify({
+                confirmPassword: function(value) {
+                    if (value !== $('#reg-password').val()) {
+                        return '两次密码不一致';
+                    }
+                },
+                nickname: function(value){
+                    if(value.length < 2 || value.length > 10){
+                        return '昵称长度为2-10位';
+                    }
+                }
+            });
+            util.on('lay-on', {
+                reg: function(){
+                    layer.closeAll();
+                    reg();
+                },
+                login: function(){
+                    layer.closeAll();
+                    login();
+                },
+                out: function(){
+                    layer.confirm("确定要退出登录?", {
+                        icon: 3,
+                        title: "提示"
+                    }, function(index) { 
+                        layer.close(index);
+                        let loading = layer.load();
+                        $.ajax({
+                            url: OUT_API,
+                            type: "POST",
+                            dataType: "json",
+                            data:{'type':'logout'},
+                            success: function (res) {
+                                layer.close(index);
+                                layer.close(loading);
+                                if (res.code) {
+                                    return toast.error({message:res.msg,position: 'topCenter',onOpened:function(){}});
+                                }
+                                return toast.success({message:'退出登录',position: 'topCenter',onOpened:function(){layer.closeAll();refreshTable();}});
+                            }
+                        });
+                         
+                    });
+                },
+                //刷新验证码
+                refreshCaptcha: function () {
+                    switchCaptcha();
+                }
+            });
             // 表格编辑数据
             let edit = function (obj) {
                 let value = obj.data[PRIMARY_KEY];
@@ -408,6 +615,9 @@
 
             let update = function (obj) {
                 let data = updatedate[obj.plugin_identifier];
+                if(data.islogin===0){
+                    return login();
+                }
                 data['installedtype'] = data.installedtype??'localapps';
                 layer.confirm("确定要升级?", {
                     icon: 3,
@@ -440,17 +650,12 @@
             let remove = function (obj) {
                 return doRemove(obj.data[PRIMARY_KEY]);
             }
-
-            // 删除多行
-            let batchRemove = function (obj) {
-                let checkIds = common.checkField(obj, PRIMARY_KEY);
-                if (checkIds === "") {
-                    toast.warning({message:"未选中数据",position: 'topCenter',onOpened:function(){}});
-                    return false;
-                }
-                doRemove(checkIds.split(","));
+            function switchCaptcha() {
+                var captcha = $('input[name="captcha"]');
+                captcha.val('');
+                $('.codeImage').attr("src", "/app/webniu/web/plugin/captcha?v=" + new Date().getTime());
             }
-
+            
             // 执行删除
             let doRemove = function (ids) {
                 let data = {};
@@ -481,7 +686,7 @@
                 });
             }
 
-            function getversion(arr){ 
+            function getversion(arr){
                 let version = arr.map(item => ({
                     'name': item.plugin_identifier,
                     'version': item.version
@@ -495,7 +700,10 @@
                     success: function (res) { 
                         updatedate = res.data;
                         $.each(res.data,function(k,v){
-                            $('.version_'+v.plugin_identifier).append('<span class="layui-badge layui-bg-red pointer_style" lay-event="update">发现新版本</span>');   
+                            $('.version_'+v.plugin_identifier).append('<span class="layui-badge layui-bg-red pointer_style" lay-event="update">新版本</span>');
+                            if(v.details){
+                                $('.version_'+v.plugin_identifier).append('<span class="layui-badge layui-bg-gray pointer_style" lay-event="details">查看</span>');   
+                            }
                         });
                         
                     }
@@ -504,6 +712,9 @@
                     
             }
 
+            $('.codeImage').on('click', function () {
+                switchCaptcha();
+            });
             
 
             // 刷新表格数据
@@ -535,16 +746,16 @@
     <!-- 表格顶部工具栏 -->
     <script type="text/html" id="table-toolbar">
         <div class="layui-btn-group plugin_btn">
-            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='installed' ? '' : 'layui-btn-plugin' }}" lay-event="installed">已安装</button>
-            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='waitapps' ? '' : 'layui-btn-plugin' }}" lay-event="waitapps">待安装</button>
-            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='localapps' ? '' : 'layui-btn-plugin' }}" lay-event="localapps">本地包</button>
+            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='installed' ? '' : 'layui-btn-plugin' }}" lay-event="installed">已经安装</button>
+            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='waitapps' ? '' : 'layui-btn-plugin' }}" lay-event="waitapps">在线安装</button>
+            <button type="button" class="layui-btn layui-btn-sm {{= d.installedtype =='localapps' ? '' : 'layui-btn-plugin' }}" lay-event="localapps">本地安装</button>
         </div>
     </script>
 
     <!-- 表格行工具栏 -->
     <script type="text/html" id="table-bar">
         {{# if(d.installed == '1'){ }}
-        <div class="layui-btn-group">
+        <div class="layui-btn-container">
         
             <button type="button" class="layui-btn layui-btn-xs" lay-event="edit">
                 <i class="layui-icon layui-icon-set-sm"></i>配置
@@ -557,6 +768,133 @@
         {{# }else{ }}
         <button class="layui-btn layui-btn-xs" lay-event="installed">安装应用</button>
         {{# } }}
+    </script>
+    <script type="text/html" id="html-dom-reg">
+        <div class="layui-form" lay-filter="filter-reg-layer" style="margin: 16px;">
+            <div class="demo-reg-container">
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-cellphone"></i>
+                        </div>
+                        <input type="text" name="username" value="" lay-verify="required|phone" placeholder="手机号" lay-reqtext="请填写手机号" autocomplete="off" class="layui-input" id="reg-cellphone">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="password" value="" lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="confirmPassword" value="" lay-verify="required|confirmPassword" placeholder="确认密码" autocomplete="off" class="layui-input" lay-affix="eye">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-username"></i>
+                        </div>
+                        <input type="text" name="nickname" value="" lay-verify="required|nickname" placeholder="昵称" autocomplete="off" class="layui-input" lay-affix="clear">
+
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                    <div class="layui-col-xs7">
+                        <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-vercode"></i>
+                        </div>
+                        <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear">
+                        </div>
+                    </div>
+                    <div class="layui-col-xs5">
+                        <div style="margin-left: 10px;">
+                        <img class="codeImage" width="100%" height="38" lay-on="refreshCaptcha">
+                        </div>
+                    </div>
+                    </div>
+                </div> 
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-reg">注册</button>
+                </div>
+                <div class="layui-form-item demo-reg-other" style="float:right;">
+                    <a href="JavaScript:;" lay-on="login">登录帐号</a>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script type="text/html" id="html-dom-login">
+        <div class="layui-form" lay-filter="filter-login-layer" style="margin: 16px;">
+            <div class="demo-login-container">
+            <div class="layui-form-item">
+                <div class="layui-input-wrap">
+                <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-username"></i>
+                </div>
+                <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-wrap">
+                <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-password"></i>
+                </div>
+                <input type="password" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" lay-affix="eye">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                <div class="layui-col-xs7">
+                    <div class="layui-input-wrap">
+                    <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-vercode"></i>
+                    </div>
+                    <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear">
+                    </div>
+                </div>
+                <div class="layui-col-xs5">
+                    <div style="margin-left: 10px;">
+                        <img class="codeImage" width="100%" height="38" lay-on="refreshCaptcha">
+                    </div>
+                </div>
+                </div>
+            </div> 
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-login">登录</button>
+            </div>
+            <div class="layui-form-item demo-login-other" style="float:right;">
+                <a href="JavaScript:;" lay-on="reg">注册帐号</a></span>
+            </div>
+            </div>
+        </div>
+    </script>
+    <script type="text/html" id="html-dom-wnyun">
+        <div class="layui-form" lay-filter="filter-login-layer" style="margin: 16px;">
+            <div class="demo-login-container">
+                <div class="layui-form-item">
+                    <fieldset class="layui-elem-field layui-field-box-fie">
+                        <div class="layui-field-box">
+                            <p>用户:{{= d.username }}</p>
+                            <p>姓名:{{= d.nickname }}</p>
+                        </div>
+                        <div class="layui-field-box-img">
+                            <img src="/app/webniu/skins/admin/images/avatar.png" width="70" height="70" />
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-on="out">退出登录</button>
+                </div> 
+            </div>
+        </div>
     </script>
 </body>
 

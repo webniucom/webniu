@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__users` (
   KEY `join_time` (`join_time`),
   KEY `mobile` (`mobile`),
   KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户表';
 
 LOCK TABLES `__PREFIX__options` WRITE;
 INSERT INTO `__PREFIX__options` VALUES (NULL,'dict','dict', 'dict_upload','[{\"value\":\"0\",\"name\":\"无分类\"},{\"value\":\"1\",\"name\":\"图片\"},{\"value\":\"2\",\"name\":\"媒体\"},{\"value\":\"3\",\"name\":\"文件\"}]','1988-06-15 23:59:59', '1988-06-15 23:59:59');
@@ -223,5 +223,5 @@ INSERT INTO `__PREFIX__article_category` VALUES (NULL,'系统公告');
 UNLOCK TABLES;
 
 LOCK TABLES `__PREFIX__plugin` WRITE;
-INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu','1','网牛引擎','网牛引擎','webniu','webniu','/app/webniu/avatar.png',NULL,'/app/webniu/web/index/dashboard','0','1.0.2',1,0,0,'1.0.2','1988-06-15 23:59:59', '1988-06-15 23:59:59');
+INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu','1','网牛引擎','网牛引擎','webniu','webniu','/app/webniu/avatar.png',NULL,'/app/webniu/web/index/dashboard','0','__VERSION__',1,0,0,'__VERSION__','1988-06-15 23:59:59', '1988-06-15 23:59:59');
 UNLOCK TABLES;

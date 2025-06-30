@@ -404,10 +404,10 @@ if (!function_exists('fullUrl')) {
 
 //获取域名
 if (!function_exists('hosturl')) {
-    function hosturl()
+    function hosturl($port = true)
     {   
         $request    = request();
-        return $request->header('x-forwarded-proto')."://".$request->host(true);
+        return $request->header('x-forwarded-proto')."://".$request->host($port);
     }
 }
 

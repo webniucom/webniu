@@ -8,6 +8,8 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Builder;
 use plugin\webniu\app\model\Option;
 use support\exception\BusinessException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use support\Db;
 use Workerman\Timer;
 use Workerman\Worker;
@@ -570,6 +572,38 @@ class Util
         if (method_exists(Monitor::class, 'resume')) {
             Monitor::resume();
         }
+    }
+
+    /**
+     * Get http client
+     * @param array $options
+     * @return Client
+     */
+    public static function httpClient(array $options=[]): Client
+    {
+        if(!$options){
+            $options = [
+                'base_uri' => config('plugin.webniu.app.plugin_market_host'),
+                'timeout' => 60,
+                'connect_timeout' => 5,
+                'verify' => false,
+                'http_errors' => false,
+                'headers' => [
+                    'Domain'    => hosturl(),
+                    'Referer'   => \request()->fullUrl(),
+                    'User-Agent'=> 'webniu-app-plugin',
+                    'Accept'    => 'application/json;charset=UTF-8',
+                    'version'   => config('plugin.webniu.app.version')
+                ]
+            ];
+        } 
+        if ($token = session('webniu-plugin-token')) {
+            $options['headers']['Cookie'] = "PHPSID=$token;";
+        }
+        if($core = options(['core'])['core']){
+            $options['headers']['fingerprint'] = $core['fingerprint'];
+        };
+        return new Client($options);
     }
 
 }
