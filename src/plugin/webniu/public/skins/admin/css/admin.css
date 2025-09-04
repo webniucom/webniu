@@ -763,7 +763,8 @@ body,
     justify-content: center;
     align-items: center;
 	transition:none;
-	-webkit-transition:none
+	-webkit-transition:none;
+	padding:0px 12px;
 }
 .wn_upload_dom li{
     width: 43px;

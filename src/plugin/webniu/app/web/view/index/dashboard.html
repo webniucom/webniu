@@ -13,7 +13,7 @@
 </head>
 
 <body>
-	<div class="pear-container"> 
+	<div class="pear-container">
 		<div class="layui-row layui-col-space10">
 			<div class="layui-col-xs6 layui-col-md3">
 				<div class="layui-card top-panel">
@@ -27,7 +27,9 @@
 									0
 								</div>
 								<div class="layui-dash-font-cl">
-									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总注册会员用户
+									<span class="layui-table-checked" style="border-radius:15px;"><i
+											class="layui-icon layui-icon-about pear-this"
+											style="font-size: 12px;"></i></span> 总注册会员用户
 								</div>
 							</div>
 							<div class="layui-col-xs6 layui-col-md3">
@@ -51,7 +53,9 @@
 									0
 								</div>
 								<div class="layui-dash-font-cl">
-									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总注册管理用户
+									<span class="layui-table-checked" style="border-radius:15px;"><i
+											class="layui-icon layui-icon-about pear-this"
+											style="font-size: 12px;"></i></span> 总注册管理用户
 								</div>
 							</div>
 							<div class="layui-col-xs6 layui-col-md3">
@@ -75,7 +79,9 @@
 									0
 								</div>
 								<div class="layui-dash-font-cl">
-									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 总浏览量
+									<span class="layui-table-checked" style="border-radius:15px;"><i
+											class="layui-icon layui-icon-about pear-this"
+											style="font-size: 12px;"></i></span> 总浏览量
 								</div>
 							</div>
 							<div class="layui-col-xs6 layui-col-md3">
@@ -99,7 +105,9 @@
 									0
 								</div>
 								<div class="layui-dash-font-cl">
-									<span class="layui-table-checked" style="border-radius:15px;"><i class="layui-icon layui-icon-about pear-this" style="font-size: 12px;"></i></span> 已安装应用
+									<span class="layui-table-checked" style="border-radius:15px;"><i
+											class="layui-icon layui-icon-about pear-this"
+											style="font-size: 12px;"></i></span> 已安装应用
 								</div>
 							</div>
 							<div class="layui-col-xs6 layui-col-md3">
@@ -123,7 +131,7 @@
 				</div>
 			</div>
 			<div class="layui-col-xs12 layui-col-md3">
-				<div class="layui-card top-panel"> 
+				<div class="layui-card top-panel">
 					<div class="layui-card-body layui-height-300">
 						<div class="echarts-records" id="donut"></div>
 					</div>
@@ -145,42 +153,41 @@
 					<div class="layui-card-header layui-text-style">软件信息</div>
 					<div class="layui-card-body" style="height:300px;">
 						<div class="layui-row">
-							<table class="layui-table copy-tr-height">
-								<colgroup>
-									<col width="50%">
-									<col>
-								</colgroup>
+							<table lay-filter="parse-table-demo">
+								<thead>
+									<tr>
+										<th lay-data="{field:'name',style:'height:41px'}">名称</th>
+										<th lay-data="{field:'nation',style:'height:41px'}">版本号</th>
+									</tr>
+								</thead>
 								<tbody>
-								<tr>
-									<td>Workerman版本</td>
-									<td>{$workerman_version}</td>
-								</tr>
-								<tr>
-									<td>Webman版本</td>
-									<td>{$webman_version}</td>
-								</tr>
-								<tr>
-									<td>Webniu版本</td>
-									<td>{$admin_version}</td>
-								</tr>
-								<tr>
-									<td>Think-cache版本</td>
-									<td>{$think_cache}</td>
-								</tr>
-								<tr>
-									<td>PHP版本</td>
-									<td>{$php_version}</td>
-								</tr>
-								<tr>
-									<td>MYSQL版本</td>
-									<td>{$mysql_version}</td>
-								</tr>
-								<tr>
-									<td>操作系统</td>
-									<td>{$os}</td>
-								</tr>
+									<tr>
+										<td>Workerman版本</td>
+										<td>{$workerman_version}</td>
+									</tr>
+									<tr>
+										<td>Webman版本</td>
+										<td>{$webman_version}</td>
+									</tr>
+									<tr>
+										<td>Webniu版本</td>
+										<td>{$admin_version}</td>
+									</tr>
+									<tr>
+										<td>PHP版本</td>
+										<td>{$php_version}</td>
+									</tr>
+									<tr>
+										<td>MYSQL版本</td>
+										<td>{$mysql_version}</td>
+									</tr>
+									<tr>
+										<td>操作系统</td>
+										<td>{$os}</td>
+									</tr>
 								</tbody>
 							</table>
+
 						</div>
 					</div>
 				</div>
@@ -191,29 +198,36 @@
 	<script src="/app/webniu/skins/component/pear/pear.js"></script>
 	<script src="/app/webniu/skins/admin/js/permission.js"></script>
 	<script src="/app/webniu/skins/admin/js/common.js"></script>
-	
+
 	<script src="/app/webniu/skins/component/pear/module/apexcharts/apexcharts.js"></script>
 	<script>
 
 		 
 		// 表格渲染
-		layui.use(["table", "form", "common", "popup", "util","count","nprogress","element"], function () {
-			let table 	= layui.table;
+		layui.use(["table", "form", "common", "popup", "util", "count", "nprogress", "element"], function () {
+			let table = layui.table;
 			let nprogress = parent.layui.nprogress;
-			let form 	= layui.form;
-			let $ 		= layui.$;
-			let common 	= layui.common;
+			let form = layui.form;
+			let $ = layui.$;
+			let common = layui.common;
 			let element = layui.element;
-			let util 	= layui.util; 
-			let count 	= layui.count; 
-			element.on('tabBeforeChange(content)', function(data){
-				if(data.to.id==window.PearAdmin.configurationCache.tab.index.id){
+			let util = layui.util;
+			let count = layui.count;
+			element.on('tabBeforeChange(content)', function (data) {
+				if (data.to.id == window.PearAdmin.configurationCache.tab.index.id) {
 					table.reload('data-table');
 				}
 			});
-			let color 			= localStorage.getItem("theme-color-color");
-			let sparkColor		= color==null?'#008FFB':color;
-			layui.colorPalette 	= [sparkColor];
+			table.init('parse-table-demo', {
+				// height: ''
+			});
+			window.dashboard = function(){
+				//刷新当前页
+				location.reload();
+			}
+			let color = localStorage.getItem("theme-color-color");
+			let sparkColor = color == null ? '#008FFB' : color;
+			layui.colorPalette = [sparkColor];
 			nprogress.start();
 			$.ajax({
 				url: "/app/webniu/web/index/readata",
@@ -243,15 +257,20 @@
 						num: res.data.plugin_count,
 						bit: 0,
 						regulator: 50
-					}); 
-					var donut = new ApexCharts(document.querySelector("#donut"),{
+					});
+					var donut = new ApexCharts(document.querySelector("#donut"), {
+						series: res.data.plugin.series,
 						chart: {
-							type: 'donut',
 							width: '100%',
-							height: 300
+							height: '100%',
+							type: 'pie',
 						},
-						dataLabels: {
-							enabled: false
+						labels: res.data.plugin.labels,
+						theme: {
+							monochrome: {
+								enabled: true,
+								color: sparkColor,
+							},
 						},
 						plotOptions: {
 							pie: {
@@ -260,42 +279,32 @@
 								},
 							},
 						},
-						title: {
-							text: '安装应用', 
-							style: {
-								fontSize: '18px',
-								color:"#6c757d"
-							}
-						},
-						theme: {
-							monochrome: {
-								enabled: true,
-								color: sparkColor,
-								shadeTo: 'light',
-								shadeIntensity: 0.65
+						grid: {
+							padding: {
+								top: 0,
+								bottom: 0,
+								left: 0,
+								right: 0,
 							},
 						},
-						series: res.data.plugin.series,
-						labels: res.data.plugin.labels,
-						legend: {
-							position: 'left',
-							offsetY: 10,
-							offsetX: -25
+						dataLabels: {
+							formatter(val, opts) {
+								let size = res.data.plugin.size[opts.seriesIndex];
+								let labels = res.data.plugin.labels[opts.seriesIndex];
+								return [labels, `已安装 ${size}`];
+							},
 						},
-						tooltip: {
-							y: {
-								formatter: function (val,opts) {
-									let size = res.data.plugin.size[opts.seriesIndex];
-									return `已安装 ${size}`;
-								}
-							}
-						}
+						legend: {
+							show: false,
+						},
 					}).render();
+
+					
 
 					let bar = new ApexCharts(document.getElementById("bar"), {
 						chart: {
 							type: "area",
-							fontFamily: "inherit", 
+							fontFamily: "inherit",
 							height: 300,
 							parentHeightOffset: 0,
 							toolbar: {
@@ -367,7 +376,7 @@
 						legend: {
 							show: false,
 						},
-						stroke:{
+						stroke: {
 							show: true,
 							width: 2,
 						},
@@ -376,61 +385,60 @@
 							align: 'left',
 							style: {
 								fontSize: '18px',
-								color:"#6c757d"
+								color: "#6c757d"
 							}
 						}
 					}).render();
 				}
 			});
-			 
-			function render()
-			{
+
+			function render() {
 				let cols = [
 					{
 						type: "checkbox",
 						hide: true,
-					},{
+					}, {
 						title: "主键",
 						field: "id",
 						hide: true,
-					},{
+					}, {
 						title: "账号",
 						field: "username",
-					},{
+					}, {
 						title: "昵称",
 						field: "nickname",
-					},{
+					}, {
 						title: "IP",
 						field: "user_ip",
-					},{
+					}, {
 						title: "代理",
 						field: "user_agent",
-					},{
+					}, {
 						title: "操作系统",
 						field: "user_os",
-					},{
+					}, {
 						title: "浏览器",
 						field: "user_browser",
-					},{
+					}, {
 						title: "日志信息",
 						field: "error",
-					},{
+					}, {
 						title: "日志状态",
 						field: "status",
-                        templet: function (d) {
-                            if(d.status=='1'){
-                                return '正常';
-                            }else{
-                                return '错误';
-                            }
-                             
-                        }
-					},{
+						templet: function (d) {
+							if (d.status == '1') {
+								return '正常';
+							} else {
+								return '错误';
+							}
+
+						}
+					}, {
 						title: "日志时间",
 						field: "created_at",
 					}
 				];
-				 
+
 				table.render({
 					elem: "#data-table",
 					url: "/app/webniu/web/logtime/select",
@@ -447,13 +455,13 @@
 						icon: "layui-icon-refresh",
 					}],
 					done: function () {
-				 
+
 					}
 				});
 			}
 
 			render();
-			window.onresize = function() { 
+			window.onresize = function () {
 			}
 		})
 

@@ -8,6 +8,11 @@ layui.define(["jquery","layer"], function (exports) {
 	newTheme.changeTheme = function (target, autoHead) {
 		this.autoHead = autoHead;
 		var color 	= localStorage.getItem("theme-color-color");
+		//判断window.GICAI 是否是一个方法
+		if (typeof window.dashboard == "function") {
+			window.dashboard();
+		}
+		 
 		this.colorSet(color);
 		if (target.frames.length == 0) return;
 		for (var i = 0; i < target.frames.length; i++) {
@@ -20,6 +25,7 @@ layui.define(["jquery","layer"], function (exports) {
 		}
 	}
 	newTheme.colorSet = function(color) {
+		 
 		var uniqueId = "pear-admin-color-script";
 		var existingScript = $("script[data-unique-id='" + uniqueId + "']").first();
 	

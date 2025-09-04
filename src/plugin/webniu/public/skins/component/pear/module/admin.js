@@ -70,7 +70,8 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 										"index": {
 											"id": "3",
 											"href": "/app/webniu/web/index/dashboard",
-											"title": "控制台"
+											"title": "控制台",
+											"type": "_iframe"
 										}
 									},
 									"theme": {
