@@ -95,7 +95,8 @@
             "index": {
                 "id": "3",
                 "href": "/app/webniu/web/index/dashboard",
-                "title": "控制台"
+                "title": "控制台",
+                "type": "iframe"
             }
         },
         "theme": {

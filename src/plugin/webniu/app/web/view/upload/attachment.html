@@ -48,15 +48,15 @@
                             </div>
                         </div>
                         
-                        <div class="layui-form-item layui-inline">
+                        <div class="layui-form-item layui-inline layui-c-top">
                             <label class="layui-form-label"></label>
                             <div class="layui-btn-container">
-                            <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
-                                <i class="layui-icon layui-icon-search"></i>查询
-                            </button>
-                            <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
-                                <i class="layui-icon layui-icon-refresh"></i>重置
-                            </button>
+                                <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
+                                    <i class="layui-icon layui-icon-search"></i>查询
+                                </button>
+                                <button type="reset" class="layui-btn layui-btn-sm layui-btn-primary" lay-submit lay-filter="table-reset">
+                                    <i class="layui-icon layui-icon-refresh"></i>重置
+                                </button>
                             </div>
                         </div>
                         <div class="toggle-btn">
@@ -77,12 +77,12 @@
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
             <div class="layui-btn-container">
-            <button class="layui-btn layui-btn-sm" lay-event="add" permission="app.webniu.web.upload.insert">
-                <i class="layui-icon layui-icon-add-1"></i>新增
-            </button>
-            <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.web.upload.delete">
-                <i class="layui-icon layui-icon-delete"></i>删除
-            </button>
+                <button class="layui-btn layui-btn-sm" lay-event="add" permission="app.webniu.web.upload.insert">
+                    <i class="layui-icon layui-icon-add-1"></i>新增
+                </button>
+                <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="batchRemove" permission="app.webniu.web.upload.delete">
+                    <i class="layui-icon layui-icon-delete"></i>删除
+                </button>
             </div>
         </script>
 
@@ -100,7 +100,7 @@
              
             
             // 表格渲染
-            layui.use(["table", "form", "common", "popup", "util","nprogress"], function() {
+            layui.use(["table", "form", "common", "popup", "util","nprogress", "tools"], function() {
                 // 相关接口
                 let PRIMARY_KEY = "id";
                 let SELECT_API = "/app/webniu/web/upload/select";
@@ -115,6 +115,7 @@
                 let $ = layui.$;
                 let common = layui.common;
                 let util = layui.util;
+                let tools = layui.tools;
 
                 // 字段 上传时间 created_at
                 layui.use(["laydate"], function() {
@@ -169,9 +170,9 @@
 						field: "url",
 						templet: function (d) {
                             if (["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"].indexOf(d.ext.toLowerCase()) !== -1) {
-                                return '<img src="' + encodeURI(d['url']) + '" style="max-width:32px;max-height:32px;" />';
+                                return '<img src="' + encodeURI(tools.normalizePath(d['url'])) + '" style="max-width:32px;max-height:32px;" />';
                             }
-							return '<a href="' + encodeURI(d['url']) + '" target="_blank">' + util.escape(d['url']) + '</a>';
+							return '<a href="' + encodeURI(tools.normalizePath(d['url'])) + '" target="_blank">' + util.escape(tools.normalizePath(d['url'])) + '</a>';
 						}
 					},{
 						title: "管理员id",

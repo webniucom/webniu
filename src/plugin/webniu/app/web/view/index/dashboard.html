@@ -4,8 +4,12 @@
 <head>
 	<meta charset="utf-8">
 	<title>控制台</title>
+	<link rel="stylesheet" href="/app/webniu/skins/component/pear/css/pear.css" />
+	<link rel="stylesheet" href="/app/webniu/skins/admin/css/admin.css" />
+	<link rel="stylesheet" href="/app/webniu/skins/admin/css/variables.css" />
+	<link rel="stylesheet" href="/app/webniu/skins/admin/css/reset.css" />
 	<link rel="stylesheet" href="/app/webniu/skins/component/pear/module/apexcharts/apexcharts.css" />
-	<link rel="stylesheet" href="/app/webniu/skins/admin/css/dashboard.css?" />
+	<link rel="stylesheet" href="/app/webniu/skins/admin/css/dashboard.css" />
 </head>
 
 <body>
@@ -183,7 +187,11 @@
 			</div>
 		</div>
 	</div>
-	 
+	<script src="/app/webniu/skins/component/layui/layui.js"></script>
+	<script src="/app/webniu/skins/component/pear/pear.js"></script>
+	<script src="/app/webniu/skins/admin/js/permission.js"></script>
+	<script src="/app/webniu/skins/admin/js/common.js"></script>
+	
 	<script src="/app/webniu/skins/component/pear/module/apexcharts/apexcharts.js"></script>
 	<script>
 
@@ -191,7 +199,7 @@
 		// 表格渲染
 		layui.use(["table", "form", "common", "popup", "util","count","nprogress","element"], function () {
 			let table 	= layui.table;
-			let nprogress = layui.nprogress;
+			let nprogress = parent.layui.nprogress;
 			let form 	= layui.form;
 			let $ 		= layui.$;
 			let common 	= layui.common;
@@ -358,6 +366,10 @@
 						colors: layui.colorPalette,
 						legend: {
 							show: false,
+						},
+						stroke:{
+							show: true,
+							width: 2,
 						},
 						title: {
 							text: '访问量',

@@ -20,7 +20,7 @@ return [
                         'key' => 'plugin\\webniu\\app\\web\\controller\\IndexController',
                         'icon' => '',
                         'type' => 1,
-                        'opentype'=> '_component',
+                        'opentype'=> '_iframe',
                         'href' => '/app/webniu/web/index/dashboard',
                         'weight' => 0,
                     ]
@@ -39,7 +39,7 @@ return [
                         'icon' => '',
                         'href' => '/app/webniu/web/config/index',
                         'type' => 1,
-                        'opentype'=> '_component',
+                        'opentype'=> '_iframe',
                         'weight' => 0,
                     ],
                     [

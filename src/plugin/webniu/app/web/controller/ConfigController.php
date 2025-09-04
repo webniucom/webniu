@@ -166,7 +166,7 @@ class ConfigController extends Base
                     $data['tab']['index']['id']     = Util::filterNum($items['tab']['index']['id'] ?? '0');
                     $data['tab']['index']['href']   = Util::filterUrlPath($items['tab']['index']['href'] ?? '');
                     $data['tab']['index']['title']  = htmlspecialchars($items['tab']['index']['title'] ?? '控制台');
-
+                    $data['tab']['index']['type']   = "_iframe";
                     $data['theme']['defaultColor']  = Util::filterNum($items['theme']['defaultColor'] ?? '1');
                     $data['theme']['defaultMenu']   = $items['theme']['defaultMenu'];
                     $data['theme']['defaultHeader'] = $items['theme']['defaultHeader']; 
@@ -178,6 +178,7 @@ class ConfigController extends Base
                     $data['theme']['keepLoad']      = "800";
                     $data['theme']['message']       = false;
                     $data['theme']['autoHead']      = false; 
+                    $data['theme']['elem']          = "content";
                     break;
                 
                 case 'api':

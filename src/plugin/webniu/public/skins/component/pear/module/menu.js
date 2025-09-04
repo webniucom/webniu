@@ -307,12 +307,12 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 			if (item.type == 0) {
 				// 创 建 目 录 结 构
 				content += '<a  href="javascript:;" menu-type="' + item.type + '" menu-id="' + item.id + '" href="' + href +
-					'" ' + target + '><i class="' + item.icon + '"></i><span>' + item.title +
+					'" ' + target + '><i rases1 class="' + item.icon + '"></i><span>' + item.title +
 					'</span></a>';
 			} else if (item.type == 1) {
 				content += '<a class="' + className + '" menu-type="' + item.type + '" menu-open-type="' + item.opentype + '"  menu-url="' + item.href + '" menu-id="' +
 					item.id +
-					'" menu-title="' + item.title + '"  href="' + href + '"  ' + target + '><i class="' + item.icon +
+					'" menu-title="' + item.title + '"  href="' + href + '"  ' + target + '><i rases2 class="' + item.icon +
 					'"></i><span>' + item.title + '</span></a>';
 			}
 			// 调 用 递 归 方 法 加 载 无 限 层 级 的 子 菜 单 
@@ -376,13 +376,13 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 				if (note.type == 0) {
 					// 创 建 目 录 结 构
 					content += '<a  href="' + href + '" ' + target + ' menu-type="' + note.type + '" menu-id="' + note.id +
-						'" ><i class="' + note.icon + '"></i><span>' + note.title +
+						'" ><i rases3 class="' + note.icon + '"></i><span>' + note.title +
 						'</span></a>';
 				} else if (note.type == 1) {
 					// 创 建 菜 单 结 构
 					content += '<a ' + target + ' class="' + className + '" menu-open-type="' + note.opentype + '" menu-type="' + note.type + '" menu-url="' + note.href +
 						'" menu-id="' + note.id +
-						'" menu-title="' + note.title + '" href="' + href + '"><i class="' + note.icon +
+						'" menu-title="' + note.title + '" href="' + href + '"><i rases4 class="' + note.icon +
 						'"></i><span>' + note.title + '</span></a>';
 				}
 				content += loadchild(note);
@@ -426,12 +426,12 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 				mclassName = "";
 			}
 			if (i === option.defaultMenu) {
-				controlItem = '<li pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id + '" class="layui-this layui-nav-item"><a href="JavaScript:;"><i class="' + item.icon + '"></i><span>' + item.title + '</span></a></li>';
+				controlItem = '<li pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id + '" class="layui-this layui-nav-item"><a href="JavaScript:;"><i rases5 class="' + item.icon + '"></i><span>' + item.title + '</span></a></li>';
 				menuItem = '<ul  pear-id="' + item.id + '" lay-filter="' + option.elem + '" class="layui-nav arrow layui-nav-tree pear-nav-tree">';
 			} else {
 				controlItem = '<li  pear-href="' + item.href + '" pear-title="' + item.title + '" pear-id="' + item.id + '" class="layui-nav-item"><a ' + mtarget + ' class="' + mclassName + '" menu-open-type="' + item.opentype + '" menu-type="' + item.type + '" menu-url="' + item.href +
 				'" menu-id="' + item.id +
-				'" menu-title="' + item.title + '" href="' + mhref + '"><i class="' + item.icon +
+				'" menu-title="' + item.title + '" href="' + mhref + '"><i rases6 class="' + item.icon +
 				'"></i><span>' + item.title + '</span></a></li>';
 				menuItem = '<ul style="display:none" pear-id="' + item.id + '" lay-filter="' + option.elem + '" class="layui-nav arrow layui-nav-tree pear-nav-tree">';
 			}
@@ -447,16 +447,19 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 					target = "target='_blank'";
 					className = "";
 				}
+				if(!note.icon){
+					note.icon = 'layui-icon layui-icon-set';
+				}
 				// 判 断 菜 单 类 型 0 是 不可跳转的目录 1 是 可 点 击 跳 转 的 菜 单
 				if (note.type == 0) {
 					// 创 建 目 录 结 构
-					content += '<a  href="' + href + '" ' + target + ' menu-type="' + note.type + '" menu-id="' + note.id +'" ><i class="' + note.icon + '"></i><span>' + note.title +
+					content += '<a  href="' + href + '" ' + target + ' menu-type="' + note.type + '" menu-id="' + note.id +'" title="'+note.title+'" ><i class="' + note.icon + '"></i><span>' + note.title +
 						'</span></a>';
 				} else if (note.type == 1) {
 					// 创 建 菜 单 结 构
 					content += '<a ' + target + ' class="' + className + '" menu-open-type="' + note.opentype + '" menu-type="' + note.type + '" menu-url="' + note.href +
 						'" menu-id="' + note.id +
-						'" menu-title="' + note.title + '" href="' + href + '"><i class="' + note.icon +
+						'" menu-title="' + note.title + '" href="' + href + '" title="'+note.title+'"><i class="' + note.icon +
 						'"></i><span>' + note.title + '</span></a>';
 				}
 				content += loadchild(note);
@@ -519,13 +522,16 @@ layui.define(['table', 'jquery', 'element'], function (exports) {
 				// 判 断 子 项 类 型
 				if (note.type == 0) {
 					// 创 建 目 录 结 构
+					if(!note.icon){
+						note.icon = 'layui-icon layui-icon-set';
+					}
 					content += '<a ' + target + '  href="' + href + '" menu-type="' + note.type + '" menu-id="' + note.id +
-						'"><i class="' + note.icon + '"></i><span>' + note.title + '</span></a>';
+						'"><i rases9 class="' + note.icon + '"></i><span>' + note.title + '</span></a>';
 				} else if (note.type == 1) {
 					// 创 建 菜 单 结 构
 					content += '<a ' + target + ' class="' + className + '" menu-open-type="' + note.opentype + '" menu-type="' + note.type + '" menu-url="' + note.href +
 						'" menu-id="' + note.id + '" menu-title="' + note.title + '" menu-icon="' + note.icon + '" href="' + href +
-						'" ><i class="' + note.icon + '"></i><span>' + note.title + '</span></a>';
+						'" ><i rases10 class="' + note.icon + '"></i><span>' + note.title + '</span></a>';
 				}
 				// 加 载 子 项 目 录
 				content += loadchild(note);

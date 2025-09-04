@@ -9,7 +9,6 @@
 }
 
 .pear-tab-page .layui-tab-content .layui-tab-item {
-	overflow-y: auto;
 	height: 100%;
 }
 

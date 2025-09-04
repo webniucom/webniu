@@ -27,7 +27,7 @@ class LocalAdapter extends Adapter
             $dirPath    = 'plugin'.$L.$plugin_path.$dirname;
         } 
         if (!$obj->createDir($basePath)) {
-            throw new StorageException('文件夹创建失败，请核查是否有对应权限。');
+            throw new BusinessException('文件夹创建失败，请核查是否有对应权限。');
         }
          
         foreach ($obj->files as $key => $file) {
@@ -54,6 +54,7 @@ class LocalAdapter extends Adapter
                 $file_info['size']      = $file->getSize();
                 $file_info['is_image']  = false;
             }
+            $uri    = str_replace('/', '\\', $uri);
             $temp = [
                 'key'           => $key,//指针
                 'origin_name'   => $file->getUploadName(),//原名称

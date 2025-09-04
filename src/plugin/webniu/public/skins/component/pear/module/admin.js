@@ -58,7 +58,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 										"accordion": true,// 手风琴
 										"collapse": false,// 折叠
 										"control": "double",// 控制
-										"controlWidth": "auto",// 控制宽度
+										"controlWidth": "200",// 控制宽度
 										"async": true// 异步
 									},
 									"tab": {
@@ -208,6 +208,11 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 				pearAdmin.messageCenterRender(configuration);
 				pearAdmin.themeRender(configuration);
 				pearAdmin.keepLoad(configuration);
+				if(pearAdmin.instances.menu.option.control != "double"){
+					$('.pear-admin .layui-side').css('width','200px');
+					$('.pear-admin .layui-body').css('left','200px');
+					$('.pear-admin .layui-header').css('left','200px').css('width','calc(100% - 200px)');
+				}
 				window.PearAdmin = pearAdmin;
 			}
 
@@ -315,8 +320,7 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 					pearAdmin.refresh();
 				})
 
-				if (isMuiltTab(param) === "true" || isMuiltTab(param) === true) {
-
+				if (isMuiltTab(param) === "true" || isMuiltTab(param) === true) { 
 					pearAdmin.instances.tabPage = tabPage.render({
 						elem: param.theme.elem,
 						session: param.tab.session,
@@ -330,7 +334,8 @@ layui.define(['jquery', 'tools', 'element', 'yaml', 'form', 'tabPage','newTheme'
 							id: param.tab.index.id,
 							url: param.tab.index.href,
 							title: param.tab.index.title,
-							close: false
+							close: false,
+							type: param.tab.index.type,
 						}],
 						success: function (id) {
 							if (param.tab.session) {

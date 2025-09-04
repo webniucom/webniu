@@ -220,7 +220,13 @@ EOF;
     public function typeclass(Request $request): Response
     { 
         $key    = 'typeclass';
-        $data   = Cache::get($key);
+        $redis  = true;
+        try {
+            $data   = Cache::get($key);
+        } catch (\Throwable $e) {
+            $redis = false;
+            $data  = false;
+        }
         if ($data) {
             return $this->json(0, 'ok', json_decode($data, true));
         };
@@ -230,7 +236,9 @@ EOF;
         $response   = $client->post('/api/v1/category', ['form_params'=>$query]);
         $content    = $response->getBody()->getContents();
         $data       = json_decode($content, true); 
-        Cache::set($key,json_encode($data['data']??[]),60*60*24*7);
+        if($redis){
+            Cache::set($key,json_encode($data['data']??[]),60*60*24*7);
+        }
         return  $this->json(0,'ok',$data['data']??[]);
     }
 
@@ -399,7 +407,8 @@ EOF;
                 Monitor::pause();
             }
             try {
-                $this->rmDir($path);
+                //卸载不删除模块
+                //$this->rmDir($path);
             } finally {
                 if ($monitor_support_pause) {
                     Monitor::resume();

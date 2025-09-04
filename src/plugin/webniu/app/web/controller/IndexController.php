@@ -110,14 +110,21 @@ class IndexController
         $size   = [];
         $top_data['plugin']             = [];
         if($plugin){
+            $error = true;
             foreach($plugin as $key=>$val){
                 $series[] = 1;
                 $labels[] = $val->plugin_name;
-                if($sizea = Cache::get('plugin_'.$val->plugin_identifier.'_size')){
-                    $size[] = $sizea;
+                try { // 捕获如果服务器没有安装缓存组件，则会直接读取数据库
+                    $sizea = Cache::get('plugin_'.$val->plugin_identifier.'_size');
+                } catch (Throwable $e) {
+                    $error = false;$sizea = false;
+                };
+                if($sizea){$size[] = $sizea;
                 }else{
                     $sizea = formatSizeUnits(getDirectorySize(base_path().'/plugin/'.$val->plugin_identifier));
-                    Cache::set('plugin_'.$val->plugin_identifier.'_size',$sizea,60*60*24);
+                    if($error){
+                        Cache::set('plugin_'.$val->plugin_identifier.'_size',$sizea,60*60*24);
+                    }
                     $size[] = $sizea;
                 }   
             }

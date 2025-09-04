@@ -46,7 +46,7 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 		}
 
 		var lastIndex;
-		var tab = createTab(option);
+		var tab = createTab(option); 
 		$("#" + option.elem).html(tab);
 		$(".layui-tab[lay-filter='" + option.elem + "'] .layui-tab-prev").click(function () {
 			rollPage("left", option);
@@ -541,7 +541,7 @@ layui.define(['jquery', 'element', 'dropdown'], function (exports) {
 		tab += content;
 		tab += loading;
 		tab += '</div>';
-		tab += ''
+		tab += '';
 		return tab;
 	}
 

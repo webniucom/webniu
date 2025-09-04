@@ -121,8 +121,17 @@ class AccountController extends Crud
      */
     public function cacheclear(Request $request): Response
     {
-        Cache::clear();
-        return $this->json(0);
+        $redis = true;
+        try {
+            Cache::clear();
+        } catch (\Throwable $e) {
+            $redis = false;
+        }
+        if ($redis) {
+            return $this->json(0);
+        }else {
+            return $this->json(1, '清除缓存失败，请检查是否安装了缓存组件');
+        }
     }
 
     /**

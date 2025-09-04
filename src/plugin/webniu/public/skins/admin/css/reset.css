@@ -169,3 +169,6 @@
 .layui-webniu-bg-rgb{
     background-color: rgb(from var(--global-primary-color) r g b / 8%);
 }
+.layui-c-top div .layui-btn{
+    margin-bottom:0px;
+}

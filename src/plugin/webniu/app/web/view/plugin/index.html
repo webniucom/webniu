@@ -40,7 +40,7 @@
                         </div>
                     </div>
 
-                    <div class="layui-form-item layui-inline">
+                    <div class="layui-form-item layui-inline layui-c-top">
                         <label class="layui-form-label"></label>
                         <div class="layui-btn-container">
                         <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">
@@ -760,10 +760,11 @@
             <button type="button" class="layui-btn layui-btn-xs" lay-event="edit">
                 <i class="layui-icon layui-icon-set-sm"></i>配置
             </button>
-            <button type="button" class="layui-btn layui-btn-xs layui-bg-red" lay-event="remove">
+             
+            <button type="button" class="layui-btn layui-btn-xs layui-bg-red {{# if(d.plugin_identifier == 'webniu'){ }} layui-btn-disabled {{# } }}" {{# if(d.plugin_identifier != 'webniu'){ }} lay-event="remove" {{# } }}>
                 <i class="layui-icon layui-icon-delete"></i>卸载
             </button>
-        
+            
         </div>
         {{# }else{ }}
         <button class="layui-btn layui-btn-xs" lay-event="installed">安装应用</button>

@@ -97,6 +97,26 @@ layui.define(['jquery', 'element'],
                 var  html = '<div class="io_404_cl"><img src="/app/webniu/skins/admin/images/nodata.svg" alt=""></div>';
                 return $(elem).html(html);
             };
+
+            this.normalizePath = function(path) {
+                // 如果路径以 http:// 或 https:// 开头，直接返回
+                if (path.startsWith('http://') || path.startsWith('https://')) {
+                    return path;
+                }
+
+                // 将所有的反斜杠 (\) 替换为正斜杠 (/)
+                let normalizedPath = path.replace(/\\/g, '/');
+
+                // 确保路径以 / 开头
+                if (!normalizedPath.startsWith('/')) {
+                    normalizedPath = '/' + normalizedPath;
+                }
+
+                // 去除多余的斜杠
+                normalizedPath = normalizedPath.replace(/\/+/g, '/');
+
+                return normalizedPath;
+            }
              
         };
 
