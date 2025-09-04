@@ -407,8 +407,8 @@ EOF;
                 Monitor::pause();
             }
             try {
-                //卸载不删除模块
-                //$this->rmDir($path);
+                //卸载删除模块
+                $this->rmDir($path);
             } finally {
                 if ($monitor_support_pause) {
                     Monitor::resume();
