@@ -764,7 +764,7 @@ EOF;
     <div class="layui-card-body">
         <form class="layui-form top-search-from">
             $html
-            <div class="layui-form-item layui-inline">
+            <div class="layui-form-item layui-inline layui-c-top">
                 <label class="layui-form-label"></label>
                 <div class="layui-btn-container">
                 <button class="layui-btn layui-btn-sm" lay-submit lay-filter="table-query">

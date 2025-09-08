@@ -289,7 +289,7 @@
                             let html    = '';
 							layui.each((d[field] + "").split(","), function (k , v) {
                                 if (v != 'null'){
-                                    html += '<img src="'+encodeURI(v)+'" style="max-width:32px;max-height:32px;margin-right:5px;" alt="" />';
+                                    html += '<img src="'+decodeURI(v)+'" style="max-width:32px;max-height:32px;margin-right:5px;" alt="" />';
                                 }
                                  
 							});

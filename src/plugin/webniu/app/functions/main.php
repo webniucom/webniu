@@ -398,7 +398,7 @@ if (!function_exists('fullUrl')) {
     function fullUrl()
     {   
         $request    = request();
-        return $request->header('x-forwarded-proto').":".$request->fullUrl();
+        return ($request->header('x-forwarded-proto')??'http').":".$request->fullUrl();
     }
 }
 
@@ -407,7 +407,7 @@ if (!function_exists('hosturl')) {
     function hosturl($port = true)
     {   
         $request    = request();
-        return $request->header('x-forwarded-proto')."://".$request->host($port);
+        return ($request->header('x-forwarded-proto')??'http')."://".$request->host($port);
     }
 }
 
