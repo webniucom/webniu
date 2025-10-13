@@ -291,17 +291,29 @@ if (!function_exists('upoptions')) {
         if($model=='webniu'){
         	$name = 'system_'.$name;
         }
-        Option::updateOrInsert(
-            ['model' => $model, 'name' => $name],
-            ['value' => json_encode($array)]
-        );
+        try {
+        	Option::updateOrInsert(
+                ['model' => $model, 'name' => $name],
+                ['value' => json_encode($array)]
+            );
+                return [
+                'code'  => 0,
+                'model' => $model,
+                'name'  => $name,
+                'data'  => $array,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code'  => 1,
+                'model' => $model,
+                'name'  => $name,
+                'data'  => $array,
+                'msg'   => $e->getMessage(),
+            ];
+        }
+         
 
-        return [
-            'code'  => 0,
-            'model' => $model,
-            'name'  => $name,
-            'data'  => $array,
-        ];
+         
     }
 
 }
@@ -407,7 +419,7 @@ if (!function_exists('hosturl')) {
     function hosturl($port = true)
     {   
         $request    = request();
-        return ($request->header('x-forwarded-proto')??'http')."://".$request->host($port);
+        return ($request->header('x-forwarded-proto')??'http')."://".$request->host();
     }
 }
 
@@ -419,9 +431,16 @@ if (!function_exists('hosturl')) {
  */
 if (!function_exists('autourl')) {
     function autourl($path, $params = []) {
+        
         if (empty($params)) {
             return $path;
         }
+        foreach ($params as $key => $value) {
+            if (is_array($value) && empty($value)) {
+                unset($params[$key]);
+            }
+        }
+
         $parsedUrl  = parse_url($path);
         $hosturl = '';
          
@@ -433,13 +452,12 @@ if (!function_exists('autourl')) {
         }
 
         $query = [];
-        build_query($params, $query);
-        $queryString = implode('&', $query);
-
+        build_query($params, $query); 
+        $queryString = implode('&', $query); 
         if (strpos($path, '?') !== false) {
             return $hosturl.$path . '&' . $queryString;
         } else {
-            return $hosturl.$path . '?' . $queryString;
+            return $queryString == '' ? $hosturl.$path : $hosturl.$path . '?' . $queryString;
         }
     }
 }
@@ -450,6 +468,9 @@ if (!function_exists('build_query')) {
             if (is_array($value)) {
                 build_query($value, $query);
             } else {
+                if ($value === null || $value === '' || $value == 0 || $value === '0') {
+                    continue; // 跳过值为 null 的参数   
+                }
                 $query[] = urlencode($key) . '=' . urlencode($value);
             }
         }
