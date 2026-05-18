@@ -1,0 +1,11 @@
+/runtime
+/.idea
+/.vscode
+/vendor
+*.log
+.env
+composer.lock
+/plugin/webniu/public/upload/*
+# webniu 插件配置文件
+plugin/webniu/config/thinkorm.php
+plugin/webniu/config/database.php

@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Webniu 网牛引擎</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Webniu 网牛引擎是一个基于 webman + art design pro, TypeScript, and Element Plus 的后台管理系统."
+    />
+    <link rel="shortcut icon" type="image/x-icon" href="/app/webniu/admin/dist/assets/ico/favicon.ico" />
+
+    <style>
+      /* 防止页面刷新时白屏的初始样式 */
+      html {
+        background-color: #fafbfc;
+      }
+
+      html.dark {
+        background-color: #070707;
+      }
+    </style>
+    <script>
+      var __SiteConfig__, __UserInfo__ , __Login__;
+    </script>
+    <script>
+      // 初始化 html class 主题属性
+      ;(function () {
+        try {
+          if (typeof Storage === 'undefined' || !window.localStorage) {
+            return
+          }
+          const themeType = localStorage.getItem('sys-theme')
+          if (themeType === 'dark') {
+            document.documentElement.classList.add('dark')
+          }
+        } catch (e) {
+          console.warn('Failed to apply initial theme:', e)
+        }
+      })()
+    </script>
+    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/js/index.js"></script>
+    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/css/index.css">
+  </head>
+
+  <body>
+    <div id="app"></div>
+
+  </body>
+</html>

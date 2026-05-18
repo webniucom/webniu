@@ -1,0 +1,72 @@
+{
+	"systemInfo": {
+		"title": "欢迎使用中后台网牛引擎",
+		"keyword": "网牛引擎",
+		"description": "基于webman框架开发的中后台管理系统",
+		"logo": "/app/webniu/images/avatar.png",
+		"siteurl": "/",
+		"copyright": "Powered by webniu.com © 2010-2026.",
+		"ipcbeian": "辽ICP备 20000000号",
+		"name": "Webniu 网牛引擎",
+		"footerTxt": "一款兼具设计美学与高效开发的后台系统"
+	},
+	"systemSetting": {
+		"isCaptcha": true,
+		"isRegister": false,
+		"m_phone_verify": false,
+		"forgetPassword": false
+	},
+	"attachMent": {
+		"exclude": "php,php3,php5,css,js,html,htm,asp,jsp,exe",
+		"include": "jpg,jpeg,png,gif,txt",
+		"dirname": "upload",
+		"path_style": "Ymd",
+		"single_limit": "1",
+		"total_limit": "10",
+		"nums": "10",
+		"storage_type": "0"
+	},
+	"waterMark": {
+		"pic_mark_style": "1",
+		"pic_mark_type": false,
+		"pic_mark_weizhi": "middle-right",
+		"pic_thumb_img": "\/app\/webniu\/upload\/files\/20260511\/6a0117547797.png",
+		"pic_thumb_width": 800,
+		"pic_thumb_percent": 0.5,
+		"pic_thumb_type": false
+	},
+	"systemTheme": {
+		"menuType": "dual-menu",
+		"menuThemeType": "design",
+		"systemThemeType": "auto",
+		"systemThemeMode": "auto",
+		"systemThemeColor": "#5D87FF",
+		"pageTransition": "slide-left",
+		"tabStyle": "tab-card",
+		"containerWidth": "100%",
+		"menuOpenWidth": 220,
+		"customRadius": 0.75,
+		"menuOpen": true,
+		"dualMenuShowText": true,
+		"showMenuButton": true,
+		"showFastEnter": true,
+		"showRefreshButton": true,
+		"showCrumbs": true,
+		"showWorkTab": true,
+		"showLanguage": false,
+		"showNprogress": true,
+		"showSettingGuide": false,
+		"showFestivalText": false,
+		"watermarkVisible": false,
+		"autoClose": false,
+		"uniqueOpened": true,
+		"colorWeak": false,
+		"refresh": false,
+		"holidayFireworksLoaded": false,
+		"boxBorderMode": true
+	},
+	"interfaceConfig": {
+		"smtp_type": false,
+		"sms_type": "0"
+	}
+}

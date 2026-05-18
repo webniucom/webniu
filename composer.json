@@ -1,0 +1,63 @@
+{
+  "name": "webniucom/webniu",
+  "type": "project",
+  "keywords": [
+    "high performance",
+    "http service"
+  ],
+  "homepage": "https://www.webniu.com",
+  "license": "MIT",
+  "description": "High performance HTTP Service Framework.",
+  "authors": [
+    {
+      "name": "webniu",
+      "email": "webniu@webniu.com",
+      "homepage": "https://www.webniu.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "admin@webniu.com",
+    "issues": "https://github.com/webniucom/webniu/issues",
+    "forum": "https://wenda.webniu.com/",
+    "wiki": "https://webniu.com/doc",
+    "source": "https://github.com/webniucom/webniu"
+  },
+  "require": {
+    "php": ">=8.1",
+    "workerman/webman-framework": "^2.1",
+    "monolog/monolog": "^2.0",
+    "webman/console": "^2.2",
+    "symfony/process": "^7.4"
+  },
+  "suggest": {
+    "ext-event": "For better performance. "
+  },
+  "autoload": {
+    "psr-4": {
+      "": "./",
+      "app\\": "./app",
+      "App\\": "./app",
+      "app\\View\\Components\\": "./app/view/components"
+    }
+  },
+  "scripts": {
+    "post-package-install": [
+      "support\\Plugin::install"
+    ],
+    "post-package-update": [
+      "support\\Plugin::install"
+    ],
+    "pre-package-uninstall": [
+      "support\\Plugin::uninstall"
+    ],
+    "post-create-project-cmd": [
+      "support\\Setup::run"
+    ],
+    "setup-webman": [
+      "support\\Setup::run"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
