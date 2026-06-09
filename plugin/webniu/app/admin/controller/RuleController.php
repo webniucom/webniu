@@ -58,6 +58,9 @@ class RuleController extends Crud
     {
         $this->syncRules();
         [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        if (!empty($where['title']) && is_string($where['title'])) {
+            $where['title'] = ['like', "%{$where['title']}%"];
+        }
         $query = $this->doSelect($where, $field, $order);
         return $this->doFormat($query, $format, $limit);
     }
@@ -92,6 +95,12 @@ class RuleController extends Crud
         $tree = new Tree($items);
         return $this->json(200, '完成', $tree->getTree());
     }
+    /**
+     * 临时查询
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
     function get1(Request $request): Response
     {
         $types = $request->get('type', '0,1');
@@ -104,7 +113,6 @@ class RuleController extends Crud
             $formatted_items[] = [
                 'id'    => $item['id'],
                 'pid'   => $item['pid'],
-                'name'  => $item['name'],
                 'path'  => $item['path'],
                 'key'   => $item['key'],
                 'title' => $item['title'],
@@ -133,7 +141,7 @@ class RuleController extends Crud
         $rules = $this->getRules(admin('roles'));
         $types = $request->get('type', '0,1,2,3');
         $types = is_string($types) ? explode(',', $types) : [0, 1, 2, 3];
-        $items = Rule::orderBy('sort', 'desc')->get()->toArray();
+        $items = Rule::where('menu', 0)->orderBy('sort', 'desc')->get()->toArray();
 
         $formatted_items = [];
         foreach ($items as $item) {
@@ -204,184 +212,6 @@ class RuleController extends Crud
         return $tree;
     }
 
-    /**
-     * 获取菜单
-     * @param Request $request
-     * @return Response
-     * @throws Exception
-     */
-    function menulist(Request $request): Response
-    {
-        $menus = [
-            [
-                'name' => 'Dashboard',
-                'path' => '/dashboard',
-                'component' => '/index/index',
-                'meta' => [
-                    'title' => 'menus.dashboard.title',
-                    'icon' => 'ri:pie-chart-line'
-                ],
-                'children' => [
-                    [
-                        'path' => 'console',
-                        'name' => 'Console',
-                        'component' => '/dashboard/console',
-                        'meta' => [
-                            'title' => 'menus.dashboard.console',
-                            'icon' => 'ri:home-smile-2-line',
-                            'keepAlive' => false,
-                            'fixedTab' => true
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'path' => '/system',
-                'name' => 'System',
-                'component' => '/index/index',
-                'meta' => [
-                    'title' => 'menus.system.title',
-                    'icon' => 'ri:user-3-line'
-                ],
-                'children' => [
-                    [
-                        'path' => 'user',
-                        'name' => 'User',
-                        'component' => '/system/user',
-                        'meta' => [
-                            'title' => 'menus.system.user',
-                            'icon' => 'ri:user-line',
-                            'keepAlive' => true,
-                            'roles' => ['R_SUPER', 'R_ADMIN']
-                        ]
-                    ],
-                    [
-                        'path' => 'role',
-                        'name' => 'Role',
-                        'component' => '/system/role',
-                        'meta' => [
-                            'title' => 'menus.system.role',
-                            'icon' => 'ri:user-settings-line',
-                            'keepAlive' => true,
-                            'roles' => ['R_SUPER']
-                        ]
-                    ],
-                    [
-                        'path' => 'user-center',
-                        'name' => 'UserCenter',
-                        'component' => '/system/user-center',
-                        'meta' => [
-                            'title' => 'menus.system.userCenter',
-                            'icon' => 'ri:user-line',
-                            'isHide' => true,
-                            'keepAlive' => true,
-                            'isHideTab' => true
-                        ]
-                    ],
-                    [
-                        'path' => 'menu',
-                        'name' => 'Menus',
-                        'component' => '/system/menu',
-                        'meta' => [
-                            'title' => 'menus.system.menu',
-                            'icon' => 'ri:menu-line',
-                            'keepAlive' => true,
-                            'roles' => ['R_SUPER'],
-                            'authList' => [
-                                [
-                                    'title' => '新增',
-                                    'authMark' => 'add'
-                                ],
-                                [
-                                    'title' => '编辑',
-                                    'authMark' => 'edit'
-                                ],
-                                [
-                                    'title' => '删除',
-                                    'authMark' => 'delete'
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'path' => '/result',
-                'name' => 'Result',
-                'component' => '/index/index',
-                'meta' => [
-                    'title' => 'menus.result.title',
-                    'icon' => 'ri:checkbox-circle-line'
-                ],
-                'children' => [
-                    [
-                        'path' => 'success',
-                        'name' => 'ResultSuccess',
-                        'component' => '/result/success',
-                        'meta' => [
-                            'title' => 'menus.result.success',
-                            'icon' => 'ri:checkbox-circle-line',
-                            'keepAlive' => false
-                        ]
-                    ],
-                    [
-                        'path' => 'fail',
-                        'name' => 'ResultFail',
-                        'component' => '/result/fail',
-                        'meta' => [
-                            'title' => 'menus.result.fail',
-                            'icon' => 'ri:close-circle-line',
-                            'keepAlive' => false
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'path' => '/exception',
-                'name' => 'Exception',
-                'component' => '/index/index',
-                'meta' => [
-                    'title' => 'menus.exception.title',
-                    'icon' => 'ri:error-warning-line'
-                ],
-                'children' => [
-                    [
-                        'path' => '403',
-                        'name' => '403',
-                        'component' => '/exception/403',
-                        'meta' => [
-                            'title' => 'menus.exception.forbidden',
-                            'keepAlive' => true,
-                            'isFullPage' => true
-                        ]
-                    ],
-                    [
-                        'path' => '404',
-                        'name' => '404',
-                        'component' => '/exception/404',
-                        'meta' => [
-                            'title' => 'menus.exception.notFound',
-                            'keepAlive' => true,
-                            'isFullPage' => true
-                        ]
-                    ],
-                    [
-                        'path' => '500',
-                        'name' => '500',
-                        'component' => '/exception/500',
-                        'meta' => [
-                            'title' => 'menus.exception.serverError',
-                            'keepAlive' => true,
-                            'isFullPage' => true
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        return $this->json(200, 'ok', $menus);
-    }
-
     private function empty_filter($menus)
     {
         return array_map(
@@ -444,12 +274,13 @@ class RuleController extends Crud
                 $reflection = new \ReflectionClass($class);
                 $properties = $reflection->getDefaultProperties();
                 $no_need_auth = array_merge($properties['noNeedLogin'] ?? [], $properties['noNeedAuth'] ?? []);
+                $use_auth = array_merge($properties['useAuth'] ?? []);
                 $class = $reflection->getName();
                 $pid = $item->id;
                 $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
                 foreach ($methods as $method) {
                     $method_name = $method->getName();
-                    if (strtolower($method_name) === 'index' || strpos($method_name, '__') === 0 || in_array($method_name, $no_need_auth)) {
+                    if (strtolower($method_name) === 'index' || strpos($method_name, '__') === 0 || in_array($method_name, $no_need_auth) || in_array($method_name, $use_auth)) {
                         continue;
                     }
                     $name = "$class@$method_name";
@@ -458,21 +289,23 @@ class RuleController extends Crud
                     $title = Util::getCommentFirstLine($method->getDocComment()) ?: $method_name;
                     $menu = $items[$name] ?? [];
                     if ($menu) {
-                        if ($menu->title != $title) {
-                            Rule::where('key', $name)->update([
-                                //'title' => $title,
-                                'auth_mark' => $method_name
-                            ]);
-                        }
+                        // if ($menu->title != $title) {
+                        //     Rule::where('key', $name)->update([
+                        //         'title' => $title,
+                        //         'auth_mark' => $method_name
+                        //     ]);
+                        // }
                         continue;
                     }
-                    $menu           = new Rule;
-                    $menu->pid      = $pid;
-                    $menu->auth_mark = $method_name;
-                    $menu->key      = $name;
-                    $menu->title    = $title;
-                    $menu->type     = 2;
-                    $menu->is_enable = 1;
+                    $menu               = new Rule;
+                    $menu->model        = $item->model;
+                    $menu->menu         = $item->model == 'webniu' ? 0 : 1;
+                    $menu->pid          = $pid;
+                    $menu->auth_mark    = $method_name;
+                    $menu->key          = $name;
+                    $menu->title        = $title;
+                    $menu->type         = 2;
+                    $menu->is_enable    = 1;
                     $menu->save();
                 }
             }

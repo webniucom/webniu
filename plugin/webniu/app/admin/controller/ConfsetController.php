@@ -36,8 +36,10 @@ class ConfsetController extends Crud
     public function select(Request $request): Response
     {
         [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        if (!empty($where['label']) && is_string($where['label'])) {
+            $where['label'] = ['like', "%{$where['label']}%"];
+        }
         $query = $this->doSelect($where, $field, $order);
-        $query = $query->orderBy('sort', 'asc');
         return $this->doFormat($query, $format, $limit);
     }
     /**

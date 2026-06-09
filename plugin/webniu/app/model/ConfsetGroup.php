@@ -28,4 +28,6 @@ class ConfsetGroup extends Base
      * @var string
      */
     protected $primaryKey = 'id';
+
+    public $timestamps = true;
 }

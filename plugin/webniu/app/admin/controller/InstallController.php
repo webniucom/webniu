@@ -29,7 +29,7 @@ class InstallController extends Base
      */
     public function license(Request $request): Response
     {
-        $license = file_get_contents(base_path('README.md'));
+        $license = file_get_contents(base_path('LICENSE'));
         return json(['code' => 200, 'msg' => '请求成功','data' => $license]);
     }
     /**
@@ -162,6 +162,8 @@ class InstallController extends Base
         $sql_query = $this->removeComments($sql_query);
         $sql_query = $this->splitSqlFile($sql_query, ';');
         $sql_query = str_replace(" `__PREFIX__", " `{$prefix}", $sql_query);
+        $sql_query = str_replace("__YYYYMDHIS__", date('Y-m-d H:i:s'), $sql_query);
+        $sql_query = str_replace("__VERSION__", config('plugin.webniu.app.version'), $sql_query);
         foreach ($sql_query as $sql) {
             $db->exec($sql);
         }
@@ -271,12 +273,13 @@ EOF;
             return $this->json(400, '后台已经安装完毕，无法通过此页面创建管理员');
         }
 
-        $smt = $pdo->prepare("insert into `{$connection['prefix']}admins` (`username`, `password`, `nickname`, `created_at`, `updated_at`) values (:username, :password, :nickname, :created_at, :updated_at)");
+        $smt = $pdo->prepare("insert into `{$connection['prefix']}admins` (`username`, `password`, `nickname`, `status`, `created_at`, `updated_at`) values (:username, :password, :nickname, :status, :created_at, :updated_at)");
         $time = date('Y-m-d H:i:s');
         $data = [
             'username' => $username,
             'password' => Util::passwordHash($password),
             'nickname' => '超级管理员',
+            'status' => 1,
             'created_at' => $time,
             'updated_at' => $time
         ];
@@ -302,7 +305,7 @@ EOF;
      */
     protected function addMenu(array $menu, \PDO $pdo,$prefix): int
     {
-        $allow_columns = ['pid','type','title','name','icon','path','key','href','component','sort'];
+        $allow_columns = ['pid','type','title','name','icon','path','key','is_hide','href','component','sort'];
         $data = [];
         foreach ($allow_columns as $column) {
             if (isset($menu[$column])) {

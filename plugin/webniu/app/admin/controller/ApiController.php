@@ -541,27 +541,27 @@ class ApiController extends Crud
         );
     }
 
-    public function build(Request $request): Response
-    {
-        $vuePath = base_path().'/plugin/webniu/public/vue/webniu'; // Vue 源码路径
-        $authKey = '123456';
-        // ============================================
+    // public function build(Request $request): Response
+    // {
+    //     $vuePath = base_path().'/plugin/webniu/public/vue/webniu'; // Vue 源码路径
+    //     $authKey = '123456';
+    //     // ============================================
 
-        if ($request->get('key') !== $authKey) {
-            return response('无权访问', 403);
-        }
+    //     if ($request->get('key') !== $authKey) {
+    //         return response('无权访问', 403);
+    //     }
 
-        $logFile = $vuePath . '/build_log.txt';
+    //     $logFile = $vuePath . '/build_log.txt';
 
-        // ===================== 关键修复 =====================
-        // Windows 必须用 start /B 才能真正后台，不阻塞PHP
-        // ====================================================
-        $cmd = "cd /d \"$vuePath\" && start /B cmd /c \"pnpm install --registry=https://registry.npmmirror.com > build_log.txt 2>&1 && pnpm run build >> build_log.txt 2>&1\"";
+    //     // ===================== 关键修复 =====================
+    //     // Windows 必须用 start /B 才能真正后台，不阻塞PHP
+    //     // ====================================================
+    //     $cmd = "cd /d \"$vuePath\" && start /B cmd /c \"pnpm install --registry=https://registry.npmmirror.com > build_log.txt 2>&1 && pnpm run build >> build_log.txt 2>&1\"";
 
-        $process = Process::fromShellCommandline($cmd);
-        $process->setTimeout(3); // 3秒足够启动命令
-        $process->run();
+    //     $process = Process::fromShellCommandline($cmd);
+    //     $process->setTimeout(3); // 3秒足够启动命令
+    //     $process->run();
 
-        return raw_view('api/index');
-    }
+    //     return raw_view('api/index');
+    // }
 }

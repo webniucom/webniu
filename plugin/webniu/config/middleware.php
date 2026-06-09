@@ -12,16 +12,15 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use plugin\webniu\app\middleware\AccessControl;
-use plugin\webniu\app\middleware\WechatControl;
-
+use plugin\webniu\app\middleware\AccessAdmin;
+use plugin\webniu\app\middleware\AccessMobile;
 
 
 return [
-    '' => [
-        AccessControl::class,
+    'admin' => [
+        AccessAdmin::class,
     ],
-    'plugin.webniu.admin.api.config' => [
-        WechatControl::class,
+    'mobile' => [
+        AccessMobile::class,
     ],
 ];

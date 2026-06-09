@@ -35,7 +35,36 @@ class UserController extends Crud
      */
     public function index(): Response
     {
-        return raw_view('user/index');
+        return $this->json(200, '加载成功', [
+            'config' => [
+                'title' => '用户',
+                'layout' => 'refresh,size,fullscreen,columns,settings',
+            ],
+        ]);
+    }
+
+    /**
+     * 查询
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
+    public function select(Request $request): Response
+    {
+        [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        print_r($where);
+        if (!empty($where['username']) && is_string($where['username'])) {
+            $where['username'] = ['like', "%{$where['username']}%"];
+        }
+        if (!empty($where['nickname']) && is_string($where['nickname'])) {
+            $where['nickname'] = ['like', "%{$where['nickname']}%"];
+        }
+        // if (!empty($where['join_time']) && is_array($where['join_time'])) {
+        //     $where['join_time'] = ['between', $where['join_time']];
+        // }
+         
+        $query = $this->doSelect($where, $field, $order);
+        return $this->doFormat($query, $format, $limit);
     }
 
     /**
@@ -49,7 +78,7 @@ class UserController extends Crud
         if ($request->method() === 'POST') {
             return parent::insert($request);
         }
-        return raw_view('user/insert');
+        return $this->json(400, '请求方法错误');
     }
 
     /**
@@ -63,7 +92,7 @@ class UserController extends Crud
         if ($request->method() === 'POST') {
             return parent::update($request);
         }
-        return raw_view('user/update');
+        return $this->json(400, '请求方法错误');
     }
 
 }

@@ -38,8 +38,14 @@ class Menu
     public static function add(array $menu)
     {
         $item = new Rule;
+        print_r($menu);
         foreach ($menu as $key => $value) {
+            
             $item->$key = $value;
+            if($key == 'model' && isset($menu['model'])){
+                $item->model= $menu['model'];
+                $item->menu = $menu['model'] == 'webniu' ? 0 : 1;
+            }
         }
         $item->save();
         return $item->id;
@@ -73,11 +79,29 @@ class Menu
     }
 
     /**
+     * 准备删除菜单
+     * @param $key
+     * @return void
+     */
+    public static function delete($menu_tree)
+    {
+        if(!isset($menu_tree[0]['key'])){
+            $menu_tree = $menu_tree[0];
+            if(!isset($menu_tree[0]['key'])){
+                $menu_tree = $menu_tree[0];
+            }
+        } 
+        foreach ($menu_tree as $menu) { 
+            static::impdelete($menu['key']);
+        }
+    }
+
+    /**
      * 删除菜单
      * @param $key
      * @return void
      */
-    public static function delete($key)
+    public static function impdelete($key)
     {
         $item = Rule::where('key', $key)->first();
         if (!$item) {

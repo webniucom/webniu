@@ -32,4 +32,6 @@ class Confset extends Base
      * @var string
      */
     protected $primaryKey = 'id';
+
+    public $timestamps = true;
 }

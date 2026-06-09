@@ -29,6 +29,12 @@ class Base
     protected $noNeedAuth = [];
 
     /**
+     * 禁用自动获权限的方法
+     * @var array
+     */
+    protected $useAuth = [];
+
+    /**
      * 数据限制
      * null 不做限制，任何管理员都可以查看该表的所有数据
      * auth 管理员能看到自己以及自己的子管理员插入的数据

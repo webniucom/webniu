@@ -37,6 +37,4 @@ class Upload extends Base
     protected $primaryKey = 'id';
     
     
-    
-    
 }

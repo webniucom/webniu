@@ -6,7 +6,12 @@
 
 use plugin\webniu\app\model\Admin;
 use plugin\webniu\app\model\AdminRole;
+use plugin\webniu\app\model\AdminLog;
 use plugin\webniu\app\model\Option;
+use plugin\webniu\app\model\Statistics;
+use plugin\webniu\app\model\Confset;
+use plugin\webniu\app\model\ConfsetGroup;
+use plugin\webniu\app\common\Util;
 use support\Response;
 
 /**
@@ -78,7 +83,7 @@ function refresh_admin_session(bool $force = false)
         return null;
     }
     // 账户被禁用
-    if ($admin['status'] != 0) {
+    if ($admin['status'] != 1) {
         $session->forget('admin');
         return;
     }
@@ -268,4 +273,355 @@ function isEmpty2DArray($arr) {
         }
     }
     return true;
+}
+
+/**
+ * 记录管理员操作日志
+ * @return bool
+ */
+if (!function_exists('adminlog')) {
+    function adminlog()
+    {
+        $a_session  = session('admin');
+        $request    = request();
+        $header     = $request->header();
+        $AdminLog   = new AdminLog;
+        $userAgent  = $header['user-agent'];
+        $AdminLog->username     = $a_session['username'];
+        $AdminLog->nickname     = $a_session['nickname'] ?? '未知';
+        $AdminLog->user_ip      = $request->getRealIp();
+        $AdminLog->user_agent   = $userAgent;
+        if (preg_match('/.*?\((.*?)\).*?/', $userAgent, $matches)) {
+            $user_os = substr($matches[1], 0, strpos($matches[1], ';'));
+        } else {
+            $user_os = '未知';
+        } 
+        $AdminLog->user_os      = $user_os;
+        $AdminLog->admin_id     = $a_session['id'];
+        $AdminLog->user_browser = preg_replace('/[^(]+\((.*?)[^)]+\) .*?/', '$1', $userAgent);
+        $AdminLog->error        = '成功';
+        $AdminLog->status       = '1';
+        $AdminLog->save();
+        return true;
+    }
+}
+
+/**
+ * 统计插件安装量
+ * @return bool
+ */
+if (!function_exists('statistics')) {
+    function statistics($model='webniu'): bool
+    {
+        $AdminLog   = new Statistics;
+        $timestamp  = date("Y-m-d", time());
+        if(!$AdminLog->where('model', $model)->whereDate('created_at', $timestamp)->increment('count')){
+            $AdminLog->model       = $model;
+            $AdminLog->count       = 1;
+            $AdminLog->created_at  = $timestamp;
+            $AdminLog->save();
+        };
+        return true;
+    }
+}
+
+//获取当前完整url
+if (!function_exists('fullUrl')) {
+    function fullUrl()
+    {   
+        $request    = request();
+        return ($request->header('x-forwarded-proto')??'http').":".$request->fullUrl();
+    }
+}
+
+//获取域名
+if (!function_exists('hosturl')) {
+    function hosturl($port = true)
+    {   
+        $request    = request();
+        return ($request->header('x-forwarded-proto')??'http')."://".$request->host();
+    }
+}
+
+//获取配置
+if (!function_exists('confset_get')) {
+    function confset_get($name, $model = 'system')
+    {   
+        if (empty($name)) {
+            return [];
+        }
+        $confset = Confset::where([
+            ['name', '=', $name],
+            ['model', '=', $model],
+        ])->get();
+        if ($confset) {
+            $confset = $confset->toArray();
+        }
+        return $confset ?? [];
+    }
+}
+/**
+ * 设置配置
+ * @param array $array 分组数据
+ * @param array $data 配置数据
+ * @param string $model 模型
+ * @return bool
+ */
+if (!function_exists('confset_set')) {
+    function confset_set($group,$data, $model = 'system')
+    {   
+        if (empty($group) || !is_array($group) || empty($data)) {
+            return false;
+        }
+        $group_fields = ['model','name','label'];
+        $data_fields = ['model','name','label','label_width','desc','type','key','value','options','dict','span','sort','hidden','props','disabled','status'];
+        $array_group = [];
+        foreach ($group_fields as $field) {
+           if (isset($group[$field])) {
+                $array_group[$field] = $group[$field];
+            }
+        }
+        //判断数组是否为空
+        if(isEmpty2DArray($array_group)){
+            return false;
+        }
+        $array_data = [];
+        foreach ($data_fields as $field) {
+           if (isset($data[$field])) {
+                $array_data[$field] = $data[$field];
+            }
+        }
+        //判断数组是否为空
+        if(isEmpty2DArray($array_data)){
+            return false;
+        }
+        ConfsetGroup::updateOrInsert(
+            ['name' => $array_group['name']],
+            $array_group
+        );
+        Confset::updateOrInsert(
+            ['name' => $array_data['name'],'model'=>$array_group['model'],'key'=>$array_data['key']],
+            $array_data
+        );
+        return true;
+    }
+}
+ 
+
+/**
+ * 分割sql文件
+ * @param string $sql sql文件内容
+ * @param string $delimiter 分隔符
+ * @return array
+ */
+if (!function_exists('splitSqlFile')) {
+    function splitSqlFile($sql, $delimiter): array
+    {
+        $tokens = explode($delimiter, $sql);
+        $output = array();
+        $matches = array();
+        $token_count = count($tokens);
+        for ($i = 0; $i < $token_count; $i++) {
+            if (($i != ($token_count - 1)) || (strlen($tokens[$i] > 0))) {
+                $total_quotes = preg_match_all("/'/", $tokens[$i], $matches);
+                $escaped_quotes = preg_match_all("/(?<!\\\\)(\\\\\\\\)*\\\\'/", $tokens[$i], $matches);
+                $unescaped_quotes = $total_quotes - $escaped_quotes;
+
+                if (($unescaped_quotes % 2) == 0) {
+                    $output[] = $tokens[$i];
+                    $tokens[$i] = "";
+                } else {
+                    $temp = $tokens[$i] . $delimiter;
+                    $tokens[$i] = "";
+
+                    $complete_stmt = false;
+                    for ($j = $i + 1; (!$complete_stmt && ($j < $token_count)); $j++) {
+                        $total_quotes = preg_match_all("/'/", $tokens[$j], $matches);
+                        $escaped_quotes = preg_match_all("/(?<!\\\\)(\\\\\\\\)*\\\\'/", $tokens[$j], $matches);
+                        $unescaped_quotes = $total_quotes - $escaped_quotes;
+                        if (($unescaped_quotes % 2) == 1) {
+                            $output[] = $temp . $tokens[$j];
+                            $tokens[$j] = "";
+                            $temp = "";
+                            $complete_stmt = true;
+                            $i = $j;
+                        } else {
+                            $temp .= $tokens[$j] . $delimiter;
+                            $tokens[$j] = "";
+                        }
+
+                    }
+                }
+            }
+        }
+
+        return $output;
+    }
+}
+    
+/**
+ * 检测表是否存在
+ * @param string $tablename 表名
+ * @return bool
+ */
+if (!function_exists('pdo_hasTable')) {
+    function pdo_hasTable($tablename){
+        return Util::schema()->hasTable($tablename);
+    }
+}
+/**
+ * 检测表是否存在
+ * @param string $tablename 表名
+ * @param string $Column 列名
+ * @return bool
+ */
+if (!function_exists('pdo_hasColumn')) {
+    function pdo_hasColumn($tablename,$Column){
+        return Util::schema()->hasColumn($tablename,$Column);
+    }
+}
+/**
+ * 执行SQL语句
+ * @param string $sql SQL语句
+ * @return bool
+ */
+if (!function_exists('pdo_unprepared')) {
+    function pdo_unprepared($sql){
+        $ret    = $sql;
+        if(!empty($ret = splitSqlFile($ret,";"))){
+            foreach($ret as $k=>$v){
+                Util::db()->unprepared($v);
+            }
+        }else{
+            return Util::db()->unprepared($sql);
+        }
+        return true;
+    }
+}
+/**
+ * 表前缀
+ * @param string $tablename 表名
+ * @return string
+ */
+if (!function_exists('pdo_tablename')) {
+    function pdo_tablename($tablename){
+        $prefix = config('plugin.webniu.database.connections.mysql.prefix');
+        return $prefix.$tablename;
+    }    
+}
+
+/**
+ * 转换一个安全路径
+ * @param string $value 路径
+ * @param string $default 默认值
+ * @return string
+ */
+if (!function_exists('safe_gpc_path')) {
+    function safe_gpc_path($value, $default = '') {
+        $path = safe_gpc_string($value);
+        $path = str_replace(array('..', '..\\', '\\\\', '\\', '..\\\\'), '', $path);
+    
+        if (empty($path) || $path != $value) {
+            $path = $default;
+        }
+    
+        return $path;
+    }
+}
+
+/**
+ * 转换一个安全字符串
+ * @param string $value 字符串
+ * @param string $default 默认值
+ * @return string
+ */
+if (!function_exists('safe_gpc_string')) {
+	function safe_gpc_string($value, $default = '') {
+        $value = safe_bad_str_replace($value);
+        $value = preg_replace('/&((#(\d{3,5}|x[a-fA-F0-9]{4}));)/', '&\\1', $value);
+    
+        if (empty($value) && $default != $value) {
+            $value = $default;
+        }
+    
+        return $value;
+    }
+}
+
+/**
+ * 转换一个安全数字
+ * @param string $value 数字
+ * @param int $default 默认值
+ * @return int|float
+ */
+if (!function_exists('safe_gpc_int')) {
+    function safe_gpc_int($value, $default = 0) {
+        if (false !== strpos($value, '.')) {
+        $value = floatval($value);
+        $default = floatval($default);
+        } else {
+        $value = intval($value);
+        $default = intval($default);
+        }
+
+        if (empty($value) && $default != $value) {
+        $value = $default;
+        }
+
+        return $value;
+    }
+}
+
+/**
+ * 转换一个安全数组
+ * @param array $value 数组
+ * @param array $default 默认值
+ * @return array
+ */
+if (!function_exists('safe_gpc_array')) {
+    function safe_gpc_array($value, $default = array()) {
+        if (empty($value) || !is_array($value)) {
+            return $default;
+        }
+        foreach ($value as &$row) {
+            if (is_numeric($row)) {
+                $row = safe_gpc_int($row);
+            } elseif (is_array($row)) {
+                $row = safe_gpc_array($row, $default);
+            } else {
+                $row = safe_gpc_string($row);
+            }
+        }
+
+        return $value;
+    }
+}
+
+/**
+ * 转换一个安全布尔值
+ * @param string $value 布尔值
+ * @return bool
+ */
+if (!function_exists('safe_gpc_boolean')) {
+    function safe_gpc_boolean($value) {
+        return boolval($value);
+    }   
+}
+
+/**
+ * 过滤掉一些不安全的字符串
+ * @param string $string 字符串
+ * @return string
+ */
+if (!function_exists('safe_bad_str_replace')) {
+    function safe_bad_str_replace($string) {
+        if (empty($string)) {
+            return '';
+        }
+        $badstr = array("\0", '%00', '%3C', '%3E', '<?', '<%', '<?php', '{php', '{if', '{loop', '../', '%0D%0A');
+        $newstr = array('_', '_', '&lt;', '&gt;', '_', '_', '_', '_', '_', '_', '.._', '_');
+        $string = str_replace($badstr, $newstr, $string);
+    
+        return $string;
+    }  
 }

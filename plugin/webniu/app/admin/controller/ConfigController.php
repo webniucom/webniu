@@ -34,17 +34,18 @@ class ConfigController extends Base
     public function index(): Response
     {
         try {
-            $data = options(['systemInfo', 'systemSetting', 'systemTheme']);
+            $data = options(['systemInfo', 'systemSetting', 'systemTheme','attachMent']);
             if (isEmpty2DArray($data)) {
                 $data = $this->getByDefault();
             }
             $data['systemPath'] = [
-                'menuList' => '/admin/rule/get',
+                'menuList' => '/webniu/admin/rule/get',
             ];
             $data['systemSetting']['isInstall'] = is_install();
         } catch (Throwable $e) {
             $data = $this->getByDefault();
         }
+        $data['systemInfo']['version'] = config('plugin.webniu.app.version');
         return $this->json(200, '读取成功', $data);
     }
 

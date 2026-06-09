@@ -48,16 +48,6 @@ class AdminController extends Crud
     }
 
     /**
-     * 浏览
-     * @return Response
-     * @throws Throwable
-     */
-    public function index(): Response
-    {
-        return raw_view('admin/index');
-    }
-
-    /**
      * 查询
      * @param Request $request
      * @return Response
@@ -67,6 +57,12 @@ class AdminController extends Crud
     {
         $data = [];
         [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        if (!empty($where['username']) && is_string($where['username'])) {
+            $where['username'] = ['like', "%{$where['username']}%"];
+        }
+        if (!empty($where['nickname']) && is_string($where['nickname'])) {
+            $where['nickname'] = ['like', "%{$where['nickname']}%"];
+        }
         $query = $this->doSelect($where, $field, $order);
         if ($format === 'select') {
             return $this->formatSelect($query->get());
@@ -81,6 +77,7 @@ class AdminController extends Crud
         }
         $login_admin_id = admin_id();
         foreach ($items as $index => $item) {
+            unset($items[$index]->password);
             $admin_id = $item['id'];
             $items[$index]['roles'] = isset($roles_map[$admin_id]) ? implode(',', $roles_map[$admin_id]) : '';
             $items[$index]['show_toolbar'] = $admin_id != $login_admin_id;
@@ -89,7 +86,7 @@ class AdminController extends Crud
         $data['total'] = $paginator->total();
         $data['size'] = $paginator->perPage();
         $data['current'] = $paginator->currentPage();
-        return json(['code' => 200, 'msg' => '请求成功','data' => $data]);
+        return $this->json(200, 'ok', $data);
     }
 
     /**
@@ -107,10 +104,10 @@ class AdminController extends Crud
             $role_ids = $request->post('roles');
             $role_ids = $role_ids ? explode(',', $role_ids) : [];
             if (!$role_ids) {
-                return $this->json(1, '至少选择一个角色组');
+                return $this->json(400, '至少选择一个角色组');
             }
             if (!Auth::isSuperAdmin() && array_diff($role_ids, Auth::getScopeRoleIds())) {
-                return $this->json(1, '角色超出权限范围');
+                return $this->json(400, '角色超出权限范围');
             }
             AdminRole::where('admin_id', $admin_id)->delete();
             foreach ($role_ids as $id) {
@@ -121,7 +118,7 @@ class AdminController extends Crud
             }
             return $this->json(200, 'ok', ['id' => $admin_id]);
         }
-        return raw_view('admin/insert');
+        return $this->json(400, '方法错误');
     }
 
     /**
@@ -137,30 +134,33 @@ class AdminController extends Crud
             [$id, $data] = $this->updateInput($request);
             $admin_id = $request->post('id');
             if (!$admin_id) {
-                return $this->json(1, '缺少参数');
+                return $this->json(400, '缺少参数');
             }
 
             // 不能禁用自己
-            if (isset($data['status']) && $data['status'] == 1 && $id == admin_id()) {
-                return $this->json(1, '不能禁用自己');
+            if (isset($data['status']) && $data['status'] == 0 && $id == admin_id()) {
+                return $this->json(400, '不能禁用自己');
             }
 
             // 需要更新角色
             $role_ids = $request->post('roles');
             if ($role_ids !== null) {
                 if (!$role_ids) {
-                    return $this->json(1, '至少选择一个角色组');
+                    return $this->json(400, '至少选择一个角色组');
                 }
-                $role_ids = explode(',', $role_ids);
+                // 判断 $role_ids 是数组还是字符串
+                if (is_string($role_ids)) {
+                    $role_ids = explode(',', $role_ids);
+                }
 
                 $is_supper_admin = Auth::isSuperAdmin();
                 $exist_role_ids = AdminRole::where('admin_id', $admin_id)->pluck('role_id')->toArray();
                 $scope_role_ids = Auth::getScopeRoleIds();
                 if (!$is_supper_admin && !array_intersect($exist_role_ids, $scope_role_ids)) {
-                    return $this->json(1, '无权限更改该记录');
+                    return $this->json(400, '无权限更改该记录');
                 }
                 if (!$is_supper_admin && array_diff($role_ids, $scope_role_ids)) {
-                    return $this->json(1, '角色超出权限范围');
+                    return $this->json(400, '角色超出权限范围');
                 }
 
                 // 删除账户角色
@@ -177,10 +177,9 @@ class AdminController extends Crud
             }
 
             $this->doUpdate($id, $data);
-            return $this->json(0);
+            return $this->json(200, 'ok');
         }
-
-        return raw_view('admin/update');
+        return $this->json(400, '方法错误');
     }
 
     /**
@@ -193,14 +192,14 @@ class AdminController extends Crud
         $primary_key = $this->model->getKeyName();
         $ids = $request->post($primary_key);
         if (!$ids) {
-            return $this->json(0);
+            return $this->json(400, '缺少参数');
         }
         $ids = (array)$ids;
         if (in_array(admin_id(), $ids)) {
-            return $this->json(1, '不能删除自己');
+            return $this->json(400, '不能删除自己');
         }
         if (!Auth::isSuperAdmin() && array_diff($ids, Auth::getScopeAdminIds())) {
-            return $this->json(1, '无数据权限');
+            return $this->json(400, '无数据权限');
         }
         $this->model->whereIn($primary_key, $ids)->each(function (Admin $admin) {
             $admin->delete();
@@ -208,7 +207,7 @@ class AdminController extends Crud
         AdminRole::whereIn('admin_id', $ids)->each(function (AdminRole $admin_role) {
             $admin_role->delete();
         });
-        return $this->json(0);
+        return $this->json(200, 'ok');
     }
 
 

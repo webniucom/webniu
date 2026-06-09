@@ -22,13 +22,19 @@ class AccountController extends Crud
      * 不需要登录的方法
      * @var string[]
      */
-    protected $noNeedLogin = ['login', 'logout', 'captcha', 'refreshToken','register'];
+    protected $noNeedLogin = ['login', 'logout', 'captcha', 'refreshToken', 'register'];
 
     /**
      * 不需要鉴权的方法
      * @var string[]
      */
     protected $noNeedAuth = ['info'];
+
+    /**
+     * 禁用自动获权限的方法
+     * @var string[]
+     */
+    protected $useAuth = ['insert', 'select', 'delete'];
 
     /**
      * @var Admin
@@ -67,7 +73,6 @@ class AccountController extends Crud
             return $this->json(400, '验证码错误');
         }
         $request->session()->forget('captcha-login');
-        print_r($request->post());
         $username = $request->post('userName', '');
         $password = $request->post('password', '');
         if (!$username) {
@@ -81,7 +86,7 @@ class AccountController extends Crud
         if (!$admin || !Util::passwordVerify($password, $admin->password)) {
             return $this->json(400, '账户不存在或密码错误');
         }
-        if ($admin->status != 0) {
+        if ($admin->status != 1) {
             return $this->json(400, '当前账户暂时无法登录');
         }
         $admin->login_at = date('Y-m-d H:i:s');
@@ -91,10 +96,10 @@ class AccountController extends Crud
         $session = $request->session();
         $admin['password'] = md5($admin['password']);
         $session->set('admin', $admin);
-        
+
         $accessToken = $request->sessionId();
         $refreshToken = RefreshToken::generate($admin['id'], $accessToken, 7);
-        
+        adminlog();
         return $this->json(200, '登录成功', [
             'nickname' => $admin['nickname'],
             'token' => $accessToken,
@@ -133,18 +138,18 @@ class AccountController extends Crud
     {
         $refreshToken = $request->post('refresh_token');
         if (!$refreshToken) {
-            return $this->json(1, '刷新令牌不能为空');
+            return $this->json(400, '刷新令牌不能为空');
         }
 
         $tokenData = RefreshToken::validate($refreshToken);
         if (!$tokenData) {
-            return $this->json(1, '刷新令牌无效或已过期');
+            return $this->json(400, '刷新令牌无效或已过期');
         }
 
         $admin = Admin::find($tokenData['admin_id']);
-        if (!$admin || $admin->status != 0) {
+        if (!$admin || $admin->status != 1) {
             RefreshToken::revoke($refreshToken);
-            return $this->json(1, '账户不存在或已被禁用');
+            return $this->json(400, '账户不存在或已被禁用');
         }
 
         $admin->login_at = date('Y-m-d H:i:s');
@@ -153,14 +158,14 @@ class AccountController extends Crud
         $adminArray = $admin->toArray();
         $adminArray['password'] = md5($adminArray['password']);
         $adminArray['roles'] = \plugin\webniu\app\model\AdminRole::where('admin_id', $admin->id)->pluck('role_id')->toArray();
-        
+
         $session = $request->session();
         $session->set('admin', $adminArray);
 
         $newAccessToken = $request->sessionId();
         RefreshToken::refresh($refreshToken, $newAccessToken);
 
-        return $this->json(0, '刷新成功', [
+        return $this->json(200, '刷新成功', [
             'nickname' => $adminArray['nickname'],
             'token' => $newAccessToken,
             'refresh_token' => $refreshToken,
@@ -176,26 +181,53 @@ class AccountController extends Crud
     {
         $admin = admin();
         if (!$admin) {
-            return $this->json(400);
+            return $this->json(400, '未登录');
         }
-        $info = [
+        print_r($admin);
+        $info = [];
+        $info['isSuperAdmin'] = Auth::isSuperAdmin();
+        $info['buttons'] = [];
+        $info['info'] = [
             'id' => $admin['id'],
-            'user_name' => $admin['username'],
-            'nick_name' => $admin['nickname'],
+            'username' => $admin['username'],
+            'nickname' => $admin['nickname'],
             'avatar' => $admin['avatar'],
             'email' => $admin['email'],
             'mobile' => $admin['mobile'],
+            'gender' => $admin['gender'],
+            'introduction' => $admin['introduction'],
+            'updated_at' => $admin['updated_at'],
         ];
-        $info = array_key_to_camel($info);
-        $info['isSuperAdmin'] = Auth::isSuperAdmin();
-        $info['buttons'] = ['B_CODE1', 'B_CODE2', 'B_CODE3'];
-        $info['roles'] = ['R_SUPER'];
+        $info['roles'] = $admin['roles'];
         $info['token'] = $request->sessionId();
+        $info['fastEnter'] = [
+            "minWidth" => 1200,
+            "applications" => [
+                [
+                    "name" => '工作台',
+                    "description" => '系统概览与数据统计',
+                    "icon" => 'ri:pie-chart-line',
+                    "iconColor" => '#377dff',
+                    "enabled" => true,
+                    "order" => 1,
+                    "routeName" => 'Console'
+                ],
+                [
+                    "name" => '工作台',
+                    "description" => '系统概览与数据统计',
+                    "icon" => 'ri:pie-chart-line',
+                    "iconColor" => '#377dff',
+                    "enabled" => true,
+                    "order" => 1,
+                    "routeName" => 'Console'
+                ]
+            ]
+        ];
         return $this->json(200, 'ok', $info);
     }
 
     /**
-     * 更新
+     * 更新资料
      * @param Request $request
      * @return Response
      */
@@ -206,6 +238,8 @@ class AccountController extends Crud
             'avatar' => 'avatar',
             'email' => 'email',
             'mobile' => 'mobile',
+            'gender' => 'gender',
+            'introduction' => 'introduction',
         ];
 
         $data = $request->post();
@@ -225,7 +259,7 @@ class AccountController extends Crud
             $admin[$key] = $value;
         }
         $request->session()->set('admin', $admin);
-        return $this->json(0);
+        return $this->json(200, 'ok');
     }
 
     /**
@@ -238,19 +272,19 @@ class AccountController extends Crud
         $hash = Admin::find(admin_id())['password'];
         $password = $request->post('password');
         if (!$password) {
-            return $this->json(2, '密码不能为空');
+            return $this->json(400, '密码不能为空');
         }
         if ($request->post('password_confirm') !== $password) {
-            return $this->json(3, '两次密码输入不一致');
+            return $this->json(400, '两次密码输入不一致');
         }
         if (!Util::passwordVerify($request->post('old_password'), $hash)) {
-            return $this->json(1, '原始密码不正确');
+            return $this->json(400, '原始密码不正确');
         }
         $update_data = [
             'password' => Util::passwordHash($password)
         ];
         Admin::where('id', admin_id())->update($update_data);
-        return $this->json(0);
+        return $this->json(200, 'ok');
     }
 
     /**
@@ -284,7 +318,7 @@ class AccountController extends Crud
             mkdir($limit_log_path, 0777, true);
         }
         $limit_file = $limit_log_path . '/' . md5($username) . '.limit';
-        $time = date('YmdH') . ceil(date('i')/5);
+        $time = date('YmdH') . ceil(date('i') / 5);
         $limit_info = [];
         if (is_file($limit_file)) {
             $json_str = file_get_contents($limit_file);
@@ -325,5 +359,4 @@ class AccountController extends Crud
             throw new BusinessException('请重启webman');
         }
     }
-
 }
