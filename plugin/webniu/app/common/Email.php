@@ -27,7 +27,10 @@ class Email
         $mailer->Subject = "=?UTF-8?B?".base64_encode($subject)."?=";
         $mailer->isHTML(true);
         $mailer->Body = $content;
-        $mailer->send();
+        $result = $mailer->send();
+        if (!$result) {
+            throw new BusinessException($mailer->ErrorInfo);
+        }
     }
 
     /**
@@ -45,8 +48,8 @@ class Email
         if (!$emailTemplate) {
             throw new BusinessException('模版不存在');
         }
-        $subject = $emailTemplate['subject'];
-        $content = $emailTemplate['content'];
+        $subject = $emailTemplate->subject;
+        $content = $emailTemplate->content;
         if ($templateData) {
             $search = [];
             foreach ($templateData as $key => $value) {
@@ -55,7 +58,7 @@ class Email
             $content = str_replace($search, array_values($templateData), $content);
         }
         $config = static::getConfig();
-        static::send($config['smtp']['from'] ?? '', $to, $subject, $content);
+        static::send($config['smtp_from'] ?? '', $to, $subject, $content);
     }
 
     /**
@@ -69,23 +72,23 @@ class Email
             throw new BusinessException('请先安装依赖，执行 composer require phpmailer/phpmailer 并重启');
         }
         $config = static::getConfig();
-        if (!$config || $config['smtp']['ip']=='') {
+        if (!$config || $config['smtp_type']=='0') {
             throw new BusinessException('未设置邮件配置');
         }
         $mailer = new PHPMailer();
         $mailer->SMTPDebug = false;
         $mailer->isSMTP();
-        $mailer->Host = $config['smtp']['ip'];
+        $mailer->Host = $config['smtp_ip'];
         $mailer->SMTPAuth = true;
         $mailer->CharSet = 'UTF-8';
-        $mailer->Username = $config['smtp']['username'];
-        $mailer->Password = $config['smtp']['password'];
+        $mailer->Username = $config['smtp_username'];
+        $mailer->Password = $config['smtp_password'];
         $map = [
             'ssl' => PHPMailer::ENCRYPTION_SMTPS,
             'tls' => PHPMailer::ENCRYPTION_STARTTLS,
         ];
-        $mailer->SMTPSecure = $map[$config['smtp']['secure']] ?? '';
-        $mailer->Port = $config['smtp']['port'];
+        $mailer->SMTPSecure = $map[$config['smtp_secure']] ?? '';
+        $mailer->Port = $config['smtp_port'];
         return $mailer;
     }
 
@@ -95,8 +98,9 @@ class Email
      */
     public static function getConfig()
     {
-        $config = options(['api']); 
-        return $config['api'];
+        $config = options('interfaceConfig');
+        print_r($config);
+        return $config['interfaceConfig'];
     }
 
 }

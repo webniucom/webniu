@@ -5,8 +5,9 @@ namespace plugin\webniu\app\admin\controller;
 use Exception;
 use plugin\webniu\app\common\Tree;
 use plugin\webniu\app\common\Util;
-use plugin\webniu\app\model\Role;
 use plugin\webniu\app\model\Rule;
+use plugin\webniu\app\model\Plugin;
+use plugin\webniu\app\common\RuleService;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
@@ -22,8 +23,7 @@ class RuleController extends Crud
      *
      * @var string[]
      */
-    protected $noNeedAuth = ['get', 'permission', 'menulist'];
-    //protected $noNeedLogin = ['get'];
+    protected $noNeedAuth = ['get'];
 
     /**
      * @var Rule
@@ -104,30 +104,8 @@ class RuleController extends Crud
     function get1(Request $request): Response
     {
         $types = $request->get('type', '0,1');
-        $types = is_string($types) ? explode(',', $types) : [0, 1];
-        $items = Rule::orderBy('sort', 'desc')->get()->toArray();
-
-        $formatted_items = [];
-        foreach ($items as $item) {
-            $meta = array_key_to_camel($item);
-            $formatted_items[] = [
-                'id'    => $item['id'],
-                'pid'   => $item['pid'],
-                'path'  => $item['path'],
-                'key'   => $item['key'],
-                'title' => $item['title'],
-                'type'  => $item['type'],
-                'icon'  => $item['icon'],
-                'component' => $item['component']
-            ];
-        }
-
-        $tree = new Tree($formatted_items);
-        $tree_items = $tree->getTree();
-        $this->removeNotContain($tree_items, 'type', $types);
-        $this->removeField($tree_items, ['id', 'pid','name']);
-        print_r($tree_items);
-        return $this->json(200, '读取成功', $tree_items);
+        $menus = RuleService::getMenus(admin('roles'), $types);
+        return $this->json(200, '读取成功', $menus);
     }
     /**
      * 获取菜单
@@ -138,121 +116,8 @@ class RuleController extends Crud
     function get(Request $request): Response
     {
         $this->syncRules();
-        $rules = $this->getRules(admin('roles'));
-        $types = $request->get('type', '0,1,2,3');
-        $types = is_string($types) ? explode(',', $types) : [0, 1, 2, 3];
-        $items = Rule::where('menu', 0)->orderBy('sort', 'desc')->get()->toArray();
-
-        $formatted_items = [];
-        foreach ($items as $item) {
-            $meta = array_key_to_camel($item);
-            $formatted_items[] = [
-                'id'    => $item['id'],
-                'pid'   => $item['pid'],
-                'type'  => $item['type'],
-                'path'  => $item['path'],
-                'name'  => $item['path'],
-                'component' => $item['component'],
-                'meta'  => $meta,
-            ];
-        }
-
-        $tree = new Tree($formatted_items);
-        $tree_items = $tree->getTree();
-        // 超级管理员权限为 *
-        if (!in_array('*', $rules)) {
-            $this->removeNotContain($tree_items, 'id', $rules);
-        }
-        $this->removeNotContain($tree_items, 'type', $types);
-        $tree_items = $this->processAuthList($tree_items);
-        $menus = $this->empty_filter(Tree::arrayValues($tree_items));
+        $menus = RuleService::getMenus(admin('roles'));
         return $this->json(200, '读取成功', $menus);
-    }
-
-
-    /**
-     * 递归处理树结构，菜单项
-     * @param array $tree
-     * @return array
-     */
-    protected function processAuthList(array $tree): array
-    {
-        foreach ($tree as &$node) {
-            $authList = [];
-            $children = [];
-
-            // 处理子节点
-            if (isset($node['children']) && is_array($node['children'])) {
-                foreach ($node['children'] as $child) {
-                    if (isset($child['type']) && $child['type'] == 2) {
-                        // type=2的节点放入authList
-                        $authList[] = [
-                            'title' => $child['meta']['title'],
-                            'authMark' => $child['meta']['authMark'],
-                        ];
-                    } else {
-                        // type!=2的节点先递归处理，然后放入children
-                        $processedChild = $this->processAuthList([$child]);
-                        $children[] = $processedChild[0];
-                    }
-                }
-            }
-
-            // 设置authList和children
-            if (!empty($authList)) {
-                $node['meta']['authList'] = $authList;
-            }
-            if (!empty($children)) {
-                $node['children'] = $children;
-            } else {
-                unset($node['children']);
-            }
-        }
-
-        return $tree;
-    }
-
-    private function empty_filter($menus)
-    {
-        return array_map(
-            function ($menu) {
-                if (isset($menu['children'])) {
-                    $menu['children'] = $this->empty_filter($menu['children']);
-                }
-                return $menu;
-            },
-            array_values(array_filter(
-                $menus,
-                function ($menu) {
-                    return $menu['type'] != 0 || isset($menu['children']) && count($this->empty_filter($menu['children'])) > 0;
-                }
-            ))
-        );
-    }
-
-    /**
-     * 获取权限
-     * @param Request $request
-     * @return Response
-     * @throws Exception
-     */
-    public function permission(Request $request): Response
-    {
-        $rules = $this->getRules(admin('roles'));
-        // 超级管理员
-        if (in_array('*', $rules)) {
-            return $this->json(0, 'ok', ['*']);
-        }
-        $keys = Rule::whereIn('id', $rules)->pluck('key');
-        $permissions = [];
-        foreach ($keys as $key) {
-            if (!$key = Util::controllerToUrlPath($key)) {
-                continue;
-            }
-            $code = str_replace('/', '.', trim($key, '/'));
-            $permissions[] = $code;
-        }
-        return $this->json(0, 'ok', $permissions);
     }
 
     /**
@@ -274,7 +139,7 @@ class RuleController extends Crud
                 $reflection = new \ReflectionClass($class);
                 $properties = $reflection->getDefaultProperties();
                 $no_need_auth = array_merge($properties['noNeedLogin'] ?? [], $properties['noNeedAuth'] ?? []);
-                $use_auth = array_merge($properties['useAuth'] ?? []);
+                $use_auth = array_merge($properties['noAuthMark'] ?? []);
                 $class = $reflection->getName();
                 $pid = $item->id;
                 $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -364,7 +229,9 @@ class RuleController extends Crud
             return $this->json(400, "路由名称 {$data['path']} 已经存在");
         }
         $data['pid'] = empty($data['pid']) ? 0 : $data['pid'];
-        print_r($data);
+        if($data['model'] != 'webniu'){
+            $data['menu'] = 1;
+        }
         $this->doInsert($data);
         return $this->json(200, '创建成功');
     }
@@ -409,7 +276,6 @@ class RuleController extends Crud
         if (isset($data['key'])) {
             $data['key'] = str_replace('\\\\', '\\', $data['key']);
         }
-        print_r($data);
         $this->doUpdate($id, $data);
         return $this->json(200, '更新成功');
     }
@@ -432,95 +298,4 @@ class RuleController extends Crud
         return $this->json(200, '删除成功');
     }
 
-    /**
-     * 删除数组中指定的字段（包括子数组中的）
-     * @param array $array
-     * @param string $key
-     * @return void
-     */
-    protected function removeField(&$array, $keys)
-    {
-        foreach ($array as &$item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            foreach ($keys as $key) {
-                if (isset($item[$key])) {
-                    unset($item[$key]);
-                }
-            }
-            // 递归处理子数组
-            if (isset($item['children']) && is_array($item['children'])) {
-                $this->removeField($item['children'], $keys);
-            }
-        }
-    }
-
-    /**
-     * 移除不包含某些数据的数组
-     * @param $array
-     * @param $key
-     * @param $values
-     * @return void
-     */
-    protected function removeNotContain(&$array, $key, $values)
-    {
-        foreach ($array as $k => &$item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            if (!$this->arrayContain($item, $key, $values)) {
-                unset($array[$k]);
-            } else {
-                if (!isset($item['children'])) {
-                    continue;
-                }
-                $this->removeNotContain($item['children'], $key, $values);
-            }
-        }
-    }
-
-    /**
-     * 判断数组是否包含某些数据
-     * @param $array
-     * @param $key
-     * @param $values
-     * @return bool
-     */
-    protected function arrayContain(&$array, $key, $values): bool
-    {
-        if (!is_array($array)) {
-            return false;
-        }
-        if (isset($array[$key]) && in_array($array[$key], $values)) {
-            return true;
-        }
-        if (!isset($array['children'])) {
-            return false;
-        }
-        foreach ($array['children'] as $item) {
-            if ($this->arrayContain($item, $key, $values)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 获取权限规则
-     * @param $roles
-     * @return array
-     */
-    protected function getRules($roles): array
-    {
-        $rules_strings = $roles ? Role::whereIn('id', $roles)->pluck('rules') : [];
-        $rules = [];
-        foreach ($rules_strings as $rule_string) {
-            if (!$rule_string) {
-                continue;
-            }
-            $rules = array_merge($rules, explode(',', $rule_string));
-        }
-        return $rules;
-    }
 }

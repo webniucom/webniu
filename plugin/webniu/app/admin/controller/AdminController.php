@@ -100,15 +100,15 @@ class AdminController extends Crud
         if ($request->method() === 'POST') {
             $data = $this->insertInput($request);
             unset($data['id']);
-            $admin_id = $this->doInsert($data);
             $role_ids = $request->post('roles');
-            $role_ids = $role_ids ? explode(',', $role_ids) : [];
-            if (!$role_ids) {
+            $role_ids = is_array($role_ids) ? $role_ids : explode(',', $role_ids);
+            if (empty($role_ids)) {
                 return $this->json(400, '至少选择一个角色组');
             }
             if (!Auth::isSuperAdmin() && array_diff($role_ids, Auth::getScopeRoleIds())) {
                 return $this->json(400, '角色超出权限范围');
             }
+            $admin_id = $this->doInsert($data);
             AdminRole::where('admin_id', $admin_id)->delete();
             foreach ($role_ids as $id) {
                 $admin_role = new AdminRole;

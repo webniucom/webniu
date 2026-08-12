@@ -5,8 +5,13 @@ namespace plugin\webniu\app\admin\controller;
 use plugin\webniu\app\common\Auth;
 use plugin\webniu\app\common\Util;
 use plugin\webniu\app\model\Admin;
+use plugin\webniu\app\model\AdminRole;
 use plugin\webniu\app\model\RefreshToken;
+use plugin\webniu\app\model\Quick;
+use plugin\webniu\api\Captcha;
 use support\exception\BusinessException;
+use plugin\webniu\app\common\Email;
+use plugin\webniu\app\model\PasswordReset;
 use support\Request;
 use support\Response;
 use Throwable;
@@ -22,19 +27,19 @@ class AccountController extends Crud
      * 不需要登录的方法
      * @var string[]
      */
-    protected $noNeedLogin = ['login', 'logout', 'captcha', 'refreshToken', 'register'];
+    protected $noNeedLogin = ['login', 'logout', 'captcha', 'refreshToken', 'register', 'forget', 'reset', 'upcache'];
 
     /**
      * 不需要鉴权的方法
      * @var string[]
      */
-    protected $noNeedAuth = ['info'];
+    protected $noNeedAuth = ['info','update'];
 
     /**
      * 禁用自动获权限的方法
      * @var string[]
      */
-    protected $useAuth = ['insert', 'select', 'delete'];
+    protected $noAuthMark = ['insert', 'select', 'delete'];
 
     /**
      * @var Admin
@@ -68,12 +73,21 @@ class AccountController extends Crud
     public function login(Request $request): Response
     {
         $this->checkDatabaseAvailable();
-        $captcha = $request->post('captcha', '');
-        if ($captcha && strtolower($captcha) !== session('captcha-login')) {
-            return $this->json(400, '验证码错误');
+        //读取配置
+        $setting = options('systemSetting')['systemSetting'] ?? [];
+        if (isset($setting['isCaptcha']) && $setting['isCaptcha']) {
+            $captcha    = $request->post('captcha', '');
+            try {
+                Captcha::verify(null, strtolower($captcha), session('captcha-image-login'));
+            } catch (BusinessException $exception) {
+                return json(['code' => 400, 'msg' => $exception->getMessage(), 'data' => [
+                    'field' => 'captcha'
+                ]]);
+            }
+            $request->session()->forget('captcha-image-login');
         }
-        $request->session()->forget('captcha-login');
-        $username = $request->post('userName', '');
+
+        $username = $request->post('username', '');
         $password = $request->post('password', '');
         if (!$username) {
             return $this->json(400, '用户名不能为空');
@@ -100,18 +114,73 @@ class AccountController extends Crud
         $accessToken = $request->sessionId();
         $refreshToken = RefreshToken::generate($admin['id'], $accessToken, 7);
         adminlog();
-        return $this->json(200, '登录成功', [
+        $return = [
             'nickname' => $admin['nickname'],
             'token' => $accessToken,
-            'refresh_token' => $refreshToken,
-        ]);
+            'refresh_token' => $refreshToken
+        ];
+        if ($admin['id'] != 1) {
+            $quick = Quick::where([
+                ['admin_id', '=', $admin['id']],
+                ['is_login_jump', '=', 1],
+                ['is_enable', '=', 1],
+            ])->first();
+            if ($quick) {
+                $return['redirection'] = $quick->type == 1 ? $quick->path : $quick->link;
+            }
+        }
+        return $this->json(200, '登录成功', $return);
     }
 
     public function register(Request $request): Response
     {
         $data = $this->insertInput($request);
-        //print_r($data);
-        return $this->json(200, '注册成功', ['id' => 2]);
+        unset($data['id']);
+        // 图形验证码验证
+        $captcha    = $request->post('captcha', '');
+        try {
+            Captcha::verify(null, strtolower($captcha), session('captcha-image-register'));
+        } catch (BusinessException $exception) {
+            return json(['code' => 400, 'msg' => $exception->getMessage(), 'data' => [
+                'field' => 'captcha'
+            ]]);
+        }
+        $systemSetting = options('systemSetting')['systemSetting'] ?? [];
+        if (!isset($systemSetting['isRegister']) || !$systemSetting['isRegister']) {
+            return $this->json(400, '注册功能已关闭用，请联系管理员');
+        }
+
+        if (!isset($systemSetting['roles']) || count($systemSetting['roles']) == 0) {
+            return $this->json(400, '没有可用角色组，请联系管理员');
+        }
+
+        $admin = Admin::where('username', $data['username'])->first();
+        if ($admin) {
+            return $this->json(400, '账户已存在');
+        }
+        if (is_type($data['username'], 'mobile')) {
+            if (Admin::where('mobile', $data['username'])->first()) {
+                return $this->json(400, '手机号已存在');
+            }
+            $data['mobile'] = $data['username'];
+        }
+        if (is_type($data['username'], 'email')) {
+            if (Admin::where('email', $data['username'])->first()) {
+                return $this->json(400, '邮箱已存在');
+            }
+            $data['email'] = $data['username'];
+        }
+        $data['status'] = 1;
+        $admin_id = $this->doInsert($data);
+        $role_ids = $systemSetting['roles'];
+        AdminRole::where('admin_id', $admin_id)->delete();
+        foreach ($role_ids as $id) {
+            $admin_role = new AdminRole;
+            $admin_role->admin_id = $admin_id;
+            $admin_role->role_id = $id;
+            $admin_role->save();
+        }
+        return $this->json(200, '注册成功', ['id' => $admin_id]);
     }
 
     /**
@@ -128,6 +197,117 @@ class AccountController extends Crud
         $request->session()->delete('admin');
         return $this->json(200, '退出成功');
     }
+
+    /**
+     * 更新缓存
+     * @param Request $request
+     * @return Response
+     */
+    public function upcache(Request $request): Response
+    {
+        return $this->json(200, '缓存更新成功');
+    }
+
+    /**
+     * 忘记密码
+     * @param Request $request
+     * @return Response
+     */
+    public function forget(Request $request): Response
+    {
+        // 图形验证码验证
+        $captcha    = $request->post('captcha', '');
+        try {
+            Captcha::verify(null, strtolower($captcha), session('captcha-image-forget'));
+        } catch (BusinessException $exception) {
+            return json(['code' => 400, 'msg' => $exception->getMessage(), 'data' => [
+                'field' => 'captcha'
+            ]]);
+        }
+        $options = options(['systemSetting', 'interfaceConfig']);
+        if (!$options['systemSetting']['forgetPassword']) {
+            return $this->json(400, '忘记密码功能已关闭用，请联系管理员');
+        }
+        if (!$options['interfaceConfig']['smtp_type']) {
+            return $this->json(400, '邮箱配置未完成，请联系管理员');
+        }
+        $email = $request->post('email', '');
+        if (!$email) {
+            return $this->json(400, '邮箱不能为空');
+        }
+
+        $admin = Admin::where('email', $email)->first();
+        if (!$admin) {
+            return $this->json(400, '邮箱不存在');
+        }
+        $PasswordReset = new PasswordReset;
+        $token = $PasswordReset::createToken($email);
+        // 构建重置链接
+        $resetUrl = autourl('/webniu/#/auth/reset-password', ['token' => $token]);
+        // 构建邮件内容（嵌入链接）
+        $emailContent = <<<HTML
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2>密码找回</h2>
+    <p>您好，{$admin->nickname}！</p>
+    <p>您正在进行密码找回操作，请点击下方链接重置密码：</p>
+    <p><a href="{$resetUrl}" style="display: inline-block; padding: 5px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">立即重置密码</a></p>
+    <p>该链接有效期为1小时，请尽快操作。</p>
+    <p>如果不是您本人操作，请忽略此邮件。</p>
+</div>
+HTML;
+        Email::send($options['interfaceConfig']['smtp_from'], $email, '密码找回', $emailContent);
+        return $this->json(200, '密码找回邮件已发送');
+    }
+
+    /**
+     * 处理密码重置
+     * @param Request $request
+     * @return Response
+     */
+    public function reset(Request $request): Response
+    {
+        $token = $request->post('token');
+        $password = $request->post('password');
+        $confirmPassword = $request->post('confirm_password');
+        $captcha    = $request->post('captcha', '');
+        try {
+            Captcha::verify(null, strtolower($captcha), session('captcha-image-reset'));
+        } catch (BusinessException $exception) {
+            return json(['code' => 400, 'msg' => $exception->getMessage(), 'data' => [
+                'field' => 'captcha'
+            ]]);
+        }
+        // 验证参数
+        if (!$token || !$password || !$confirmPassword) {
+            return $this->json(400, '请填写完整信息');
+        }
+
+        if ($password !== $confirmPassword) {
+            return $this->json(400, '两次输入的密码不一致');
+        }
+        $PasswordReset = new PasswordReset;
+        // 验证token
+        $resetRecord = $PasswordReset->validateToken($token);
+
+        if (!$resetRecord) {
+            return $this->json(400, '链接无效或已过期');
+        }
+
+        // 更新密码
+        $admin = Admin::where('email', $resetRecord->email)->first();
+        if (!$admin) {
+            return $this->json(400, '用户不存在');
+        }
+        $admin->password = Util::passwordHash($password);
+        $admin->save();
+
+        // 删除已使用的token
+        $PasswordReset->removeToken($token);
+
+        return $this->json(200, '密码重置成功，请重新登录');
+    }
+
+
 
     /**
      * 刷新令牌
@@ -183,7 +363,6 @@ class AccountController extends Crud
         if (!$admin) {
             return $this->json(400, '未登录');
         }
-        print_r($admin);
         $info = [];
         $info['isSuperAdmin'] = Auth::isSuperAdmin();
         $info['buttons'] = [];
@@ -200,28 +379,34 @@ class AccountController extends Crud
         ];
         $info['roles'] = $admin['roles'];
         $info['token'] = $request->sessionId();
+        $quick = Quick::where([
+            ['admin_id', '=', admin('id')],
+            ['is_enable', '=', 1],
+        ])->get();
+        $applications = [];
+        if (count($quick) > 0) {
+            foreach ($quick as $val) {
+                $abc = [
+                    "name" => $val->title,
+                    "description" => $val->description,
+                    "icon" => $val->icon,
+                    "iconColor" => $val->icon_color,// '#377dff'
+                    "enabled" => $val->is_enable,
+                    "order" => $val->sort,
+                    "is_blank" => $val->is_blank,
+                ];
+                if ($val->type == 1) {
+                    $abc['routeName'] = $val->path;
+                } else {
+                    $abc['link'] = $val->link;
+                }
+                $applications[] = $abc;
+            }
+        }
         $info['fastEnter'] = [
-            "minWidth" => 1200,
-            "applications" => [
-                [
-                    "name" => '工作台',
-                    "description" => '系统概览与数据统计',
-                    "icon" => 'ri:pie-chart-line',
-                    "iconColor" => '#377dff',
-                    "enabled" => true,
-                    "order" => 1,
-                    "routeName" => 'Console'
-                ],
-                [
-                    "name" => '工作台',
-                    "description" => '系统概览与数据统计',
-                    "icon" => 'ri:pie-chart-line',
-                    "iconColor" => '#377dff',
-                    "enabled" => true,
-                    "order" => 1,
-                    "routeName" => 'Console'
-                ]
-            ]
+            "isEnable" => true,
+            "minWidth" => 300,
+            "applications" => $applications,
         ];
         return $this->json(200, 'ok', $info);
     }

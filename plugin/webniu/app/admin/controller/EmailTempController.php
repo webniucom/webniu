@@ -111,15 +111,6 @@ class EmailTempController extends Crud
     public function update(Request $request): Response
     {
         if ($request->method() === 'POST') {
-            if($name = $request->post('name',false)){
-                if($this->model->where([
-                    ['uniacid','=','0'],
-                    ['name','=',$name]
-                ])->count()>0){
-                    return $this->json(400, '名称已存在', []);
-                };
-            };
-            
             return parent::update($request);
         }
         return $this->json(400, '请求方法错误', []);

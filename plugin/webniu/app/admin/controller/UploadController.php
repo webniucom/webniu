@@ -5,6 +5,7 @@ namespace plugin\webniu\app\admin\controller;
 use Exception;
 use Intervention\Image\ImageManagerStatic as Image;
 use plugin\webniu\app\model\Upload;
+use plugin\webniu\app\common\Upload as UploadCommon;
 use plugin\webniu\app\model\UploadsGroup;
 use support\exception\BusinessException;
 use support\Request;
@@ -43,7 +44,7 @@ class UploadController extends Crud
      */
     public function index(): Response
     {
-        return raw_view('upload/index');
+        return $this->json(200, '无资源');
     }
 
     /**
@@ -53,7 +54,7 @@ class UploadController extends Crud
      */
     public function attachment(): Response
     {
-        return raw_view('upload/attachment');
+        return $this->json(200, '无资源');
     }
 
     /**
@@ -85,7 +86,6 @@ class UploadController extends Crud
     {
         $category = $request->post('category');
         $ids = $this->deleteInput($request);
-        print_r($ids);
         Upload::whereIn('id', $ids)->update(['category' => $category]);
         return $this->json(200);
     }
@@ -102,20 +102,17 @@ class UploadController extends Crud
         if (!$file || !$file->isValid()) {
             return $this->json(400, '未找到文件');
         }
-        $data = $this->base($request, '/upload/files/' . date('Ymd'));
+        $data = $this->base($request, '/upload/files/' . date('Ymd'), true);
         $upload = new Upload;
         $upload->admin_id = admin_id();
         $upload->name = $data['name'];
-        [
-            $upload->url,
-            $upload->name,
-            $_,
-            $upload->file_size,
-            $upload->mime_type,
-            $upload->image_width,
-            $upload->image_height,
-            $upload->ext
-        ] = array_values($data);
+        $upload->url          = $data['url'] ?? '';
+        $upload->storage      = 'local';
+        $upload->file_size    = $data['size'] ?? 0;
+        $upload->mime_type    = $data['mime_type'] ?? '';
+        $upload->image_width  = $data['image_width'] ?? ($data['image_with'] ?? 0);
+        $upload->image_height = $data['image_height'] ?? 0;
+        $upload->ext          = $data['ext'] ?? '';
         $upload->category = $request->post('category');
         $upload->save();
         return $this->json(200, '上传成功', [
@@ -140,14 +137,14 @@ class UploadController extends Crud
         $query = $query->orderBy('sort', 'asc');
         return $this->doFormat($query, $format, $limit);
     }
-    
+
     /**
      * 通用格式化
      * @param $items
      * @param $total
      * @return Response
      */
-    protected function formatNormal($items,$total): Response
+    protected function formatNormal($items, $total): Response
     {
         return json(['code' => 200, 'msg' => 'success', 'data' => [
             'records' => $items,
@@ -364,61 +361,177 @@ class UploadController extends Crud
         return $result;
     }
 
-    /**
-     * 获取上传数据
-     * @param Request $request
-     * @param $relative_dir
-     * @return array
-     * @throws BusinessException|\Random\RandomException
-     */
-    protected function base(Request $request, $relative_dir): array
+    protected function base(Request $request, $relative_dir ,$edit = false,): array
     {
-        $relative_dir = ltrim($relative_dir, '\\/');
         $file = current($request->file());
         if (!$file || !$file->isValid()) {
             throw new BusinessException('未找到上传文件', 400);
         }
 
-        $admin_public_path = rtrim(config('plugin.webniu.app.public_path', ''), '\\/');
-        $base_dir = $admin_public_path ? $admin_public_path . DIRECTORY_SEPARATOR : base_path() . '/plugin/webniu/public/';
-        $full_dir = $base_dir . $relative_dir;
-        if (!is_dir($full_dir)) {
-            mkdir($full_dir, 0777, true);
+        $ext = strtolower($file->getUploadExtension() ?: '');
+        $is_image = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+
+        if ($is_image && $edit) {
+            $tmp_dir = sys_get_temp_dir() . '/webniu_upload_tmp';
+            if (!is_dir($tmp_dir)) {
+                mkdir($tmp_dir, 0777, true);
+            }
+
+            $tmp_path = $tmp_dir . '/' . bin2hex(random_bytes(16)) . '.' . $ext;
+            $file->move($tmp_path);
+
+            try {
+                $this->processImage($tmp_path);
+                $result = UploadCommon::saveByPath($tmp_path, $relative_dir);
+                @unlink($tmp_path);
+                return $result;
+            } catch (Exception $e) {
+                @unlink($tmp_path);
+                throw $e;
+            }
         }
 
-        $ext = $file->getUploadExtension() ?: null;
-        $mime_type = $file->getUploadMimeType();
-        $file_name = $file->getUploadName();
-        $file_size = $file->getSize();
-
-        if (!$ext && $file_name === 'blob') {
-            [$___image, $ext] = explode('/', $mime_type);
-            unset($___image);
-        }
-
-        $ext = strtolower($ext);
-        $ext_forbidden_map = ['php', 'php3', 'php5', 'css', 'js', 'html', 'htm', 'asp', 'jsp'];
-        if (in_array($ext, $ext_forbidden_map)) {
-            throw new BusinessException('不支持该格式的文件上传', 400);
-        }
-
-        $relative_path = $relative_dir . '/' . bin2hex(pack('Nn', time(), random_int(1, 65535))) . ".$ext";
-        $full_path = $base_dir . $relative_path;
-        $file->move($full_path);
-        $image_with = $image_height = 0;
-        if ($img_info = getimagesize($full_path)) {
-            [$image_with, $image_height] = $img_info;
-            $mime_type = $img_info['mime'];
-        }
-        return [
-            'url' => "/app/webniu/$relative_path",
-            'name' => $file_name,
-            'realpath' => $full_path,
-            'size' => $file_size,
-            'mime_type' => $mime_type,
-            'image_with' => $image_with,
-            'image_height' => $image_height,
-            'ext' => $ext,
-        ];
+        return UploadCommon::save($file, $relative_dir);
     }
+
+    /**
+     * 处理图片（压缩 + 水印）
+     * @param string $image_path
+     * @return void
+     * @throws Exception
+     */
+    protected function processImage(string $image_path): void
+    {
+        $waterMark = options('waterMark')['waterMark'] ?? [];
+        $img = Image::make($image_path);
+        if (!empty($waterMark['pic_thumb_type'])) {
+            $maxWidth = (int)($waterMark['pic_thumb_width'] ?? 800);
+            $percent = (float)($waterMark['pic_thumb_percent'] ?? 0.5);
+            $width = $img->width();
+            $height = $img->height();
+
+            if ($width > $maxWidth) {
+                $ratio = $maxWidth / $width;
+                $img->resize($width * $ratio, $height * $ratio, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            } elseif ($percent > 0 && $percent < 1) {
+                $img->resize($width * $percent, $height * $percent, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            }
+        }
+
+        if (!empty($waterMark['pic_mark_type'])) {
+            $style = $waterMark['pic_mark_style'] ?? '1';
+            $position = $this->convertPosition($waterMark['pic_mark_weizhi'] ?? 'middle-right');
+
+            if ($style == '0') {
+                $text = $waterMark['pic_thumb_text'] ?? '';
+                if (!empty($text)) {
+                    $size = (int)($waterMark['pic_thumb_size'] ?? 24);
+                    $color = $waterMark['pic_thumb_color'] ?? '#000000';
+
+                    $font_path = base_path() . '/plugin/webniu/public/font/iconfont.ttf';
+
+                    $x = 20;
+                    $y = 20;
+                    $align = 'right';
+                    $valign = 'bottom';
+
+                    switch ($position) {
+                        case 'top-left':
+                            $align = 'left';
+                            $valign = 'top';
+                            break;
+                        case 'top-right':
+                        case 'top':
+                            $x = (int)($img->width() - 20);
+                            $y = 20;
+                            $align = 'right';
+                            $valign = 'top';
+                            break;
+                        case 'left':
+                            $align = 'left';
+                            $valign = 'center';
+                            $y = (int)($img->height() / 2);
+                            break;
+                        case 'right':
+                            $x = (int)($img->width() - 20);
+                            $align = 'right';
+                            $valign = 'center';
+                            $y = (int)($img->height() / 2);
+                            break;
+                        case 'center':
+                            $x = (int)($img->width() / 2);
+                            $y = (int)($img->height() / 2);
+                            $align = 'center';
+                            $valign = 'center';
+                            break;
+                        case 'bottom-left':
+                            $y = (int)($img->height() - 20);
+                            $align = 'left';
+                            $valign = 'bottom';
+                            break;
+                        case 'bottom':
+                            $x = (int)($img->width() / 2);
+                            $y = (int)($img->height() - 20);
+                            $align = 'center';
+                            $valign = 'bottom';
+                            break;
+                        case 'bottom-right':
+                        default:
+                            $x = (int)($img->width() - 20);
+                            $y = (int)($img->height() - 20);
+                            $align = 'right';
+                            $valign = 'bottom';
+                            break;
+                    }
+
+                    $img->text($text, $x, $y, function ($font) use ($size, $color, $font_path, $align, $valign) {
+                        $font->size($size);
+                        $font->color($color);
+                        $font->align($align);
+                        $font->valign($valign);
+                        // if ($font_path && is_file($font_path)) {
+                        //     $font->file($font_path);
+                        // }
+                    });
+                }
+            } else {
+                $markImg = $waterMark['pic_thumb_img'] ?? '';
+                if (!empty($markImg)) {
+                    $markPath = str_replace('/app/webniu/', base_path() . '/plugin/webniu/public/', $markImg);
+                    if (is_file($markPath)) {
+                        $img->insert($markPath, $position, 20, 20);
+                    }
+                }
+            }
+        }
+
+        $img->save($image_path);
+    }
+
+    /**
+     * 转换位置配置为 Intervention Image 位置常量
+     * @param string $position
+     * @return string
+     */
+    protected function convertPosition(string $position): string
+    {
+        $map = [
+            'top-left'     => 'top-left',
+            'top'          => 'top',
+            'top-right'    => 'top-right',
+            'left'         => 'left',
+            'middle-right' => 'right',
+            'right'        => 'right',
+            'bottom-left'  => 'bottom-left',
+            'bottom'       => 'bottom',
+            'bottom-right' => 'bottom-right',
+            'center'       => 'center',
+        ];
+        return $map[$position] ?? 'bottom-right';
+    }
+
 }

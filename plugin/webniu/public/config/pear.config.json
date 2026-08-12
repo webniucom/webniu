@@ -24,7 +24,10 @@
 		"single_limit": "1",
 		"total_limit": "10",
 		"nums": "10",
-		"storage_type": "0"
+		"storage_type": "0",
+		"ftp_pasv": "0",
+		"oss_local": "0",
+		"verify_ssl": false
 	},
 	"waterMark": {
 		"pic_mark_style": "1",

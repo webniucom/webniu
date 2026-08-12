@@ -40,7 +40,10 @@ class IndexController
         if (is_file(base_path('plugin/webniu/config/database.php'))) {
             statistics();
         }
-        return raw_view('index/index');
+        return public_view('admin/dist/index', [
+            'confit_url' => '/webniu/admin/config',
+            'worktab' => 'webniu',
+        ]);
     }
 
     /**
@@ -53,11 +56,11 @@ class IndexController
     {
         $top_data   = [];
         $version = Util::db()->select('select VERSION() as version');
-        $mysql_version = $version[0]->version ?? 'unknown'; 
+        $mysql_version = $version[0]->version ?? 'unknown';
         $top_data['version'] =  [
             'php_version'   => PHP_VERSION,
             'workerman_version' =>  Worker::VERSION,
-            'webman_version'=> Util::getPackageVersion('workerman/webman-framework'),
+            'webman_version' => Util::getPackageVersion('workerman/webman-framework'),
             'admin_version' => config('plugin.webniu.app.version'),
             'mysql_version' => $mysql_version,
             'think_cache'   => Util::getPackageVersion('webman/think-cache'),
@@ -65,17 +68,17 @@ class IndexController
         ];
         $top_data['user_num']         = User::count();
         $top_data['manage_num']        = Admin::count();
-        $top_data['page_num']         = Statistics::where('model','webniu')->sum('count');
+        $top_data['page_num']         = Statistics::where('model', 'webniu')->sum('count');
         $top_data['plugin_num']       = Plugin::count();
-        $plugin = Plugin::where('installed','1')->select('identifier','name')->get();
+        $plugin = Plugin::where('installed', '1')->select('identifier', 'name')->get();
         $top_data['plugin']             = [];
-        if($plugin){
+        if ($plugin) {
             $count = count($plugin);
-            foreach($plugin as $key=>$val){
-               $top_data['plugin'][] = [
-                   'value' => 100/$count,
-                   'name' => $val->name,
-               ];
+            foreach ($plugin as $key => $val) {
+                $top_data['plugin'][] = [
+                    'value' => intval(100 / $count),
+                    'name' => $val->name,
+                ];
             }
         }
         $day15_series = [];
@@ -83,7 +86,7 @@ class IndexController
         $now = time();
         for ($i = 0; $i < 15; $i++) {
             $date = date('Y-m-d', $now - 24 * 60 * 60 * $i);
-            $day15_series[] = Statistics::where('model','=',"webniu")->where('created_at', '=', "$date 00:00:00")->sum('count');
+            $day15_series[] = Statistics::where('model', '=', "webniu")->where('created_at', '=', "$date 00:00:00")->sum('count');
             $day15_labels[] = substr($date, 5);
         }
         $top_data['day15_detail']   = [
@@ -92,5 +95,4 @@ class IndexController
         ];
         return json(['code' => 200, 'data' => $top_data, 'msg' => 'ok']);
     }
-
 }

@@ -305,7 +305,15 @@ EOF;
      */
     protected function addMenu(array $menu, \PDO $pdo,$prefix): int
     {
-        $allow_columns = ['pid','type','title','name','icon','path','key','is_hide','href','component','sort'];
+        $allow_columns = [
+            'model', 'menu', 'pid', 'type', 'title',
+            'name', 'icon', 'path', 'key', 'href', 'component',
+            'link', 'show_text_badge', 'auth_mark', 'show_badge',
+            'is_hide', 'is_hide_tab', 'is_iframe', 'is_enable',
+            'is_full_page', 'is_blank', 'keep_alive', 'fixed_tab','active_path',
+            'sort', 'created_at', 'updated_at'
+        ];
+
         $data = [];
         foreach ($allow_columns as $column) {
             if (isset($menu[$column])) {

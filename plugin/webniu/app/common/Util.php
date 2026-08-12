@@ -607,4 +607,12 @@ class Util
         return new Client($options);
     }
 
+    /**
+     * 生成验证码
+     * @return string
+     */
+    public static function buildCode(): string
+    {
+        return md5(uniqid());
+    }
 }

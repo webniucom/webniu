@@ -34,9 +34,7 @@ class Middleware implements MiddlewareInterface
                 if ($code === 401) {
                     $response = admin_error_401_script();
                 } else {
-                    $request->app = '';
-                    $request->plugin = 'webniu';
-                    $response = view('common/error/403')->withStatus(403);
+                    $response = json(['code' => $code, 'msg' => $msg, 'type' => 'error']);
                 }
             }
         } else {

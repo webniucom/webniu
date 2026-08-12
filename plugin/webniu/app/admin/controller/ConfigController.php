@@ -107,28 +107,13 @@ class ConfigController extends Base
      */
     public function setconfig(Request $request): Response
     {
-        $admin = admin();
-        $model = $request->input('model', 'system');
         $name = $request->input('label', false);
         $value = $request->input('value', false);
         if (empty($name) || empty($value)) {
             throw new BusinessException('参数错误');
         }
-        $option = Option::where([
-            ['name', '=', $name],
-            ['model', '=', $model],
-        ])->first();
-        if ($option) {
-            $option->value = json_encode($value);
-            $option->updated_at = date('Y-m-d H:i:s');
-            $option->save();
-        } else {
-            $option = new Option();
-            $option->name = $name;
-            $option->model = $model;
-            $option->value = json_encode($value);
-            $option->username = $admin['username'];
-            $option->save();
+        if (!setoptions($name, $value)) {
+            throw new BusinessException('保存失败');
         }
         return $this->json(200, '保存成功');
     }

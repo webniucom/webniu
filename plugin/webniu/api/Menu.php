@@ -12,11 +12,15 @@ class Menu
     /**
      * 根据key获取菜单
      * @param $key
+     * @param $model
      * @return array
      */
-    public static function get($key)
+    public static function get($key, $model = 'webniu')
     {
-        $menu = Rule::where('key', $key)->first();
+        $menu = Rule::where([
+            'key' => $key,
+            'model' => $model
+        ])->first();
         return $menu ? $menu->toArray() : null;
     }
 
@@ -38,7 +42,6 @@ class Menu
     public static function add(array $menu)
     {
         $item = new Rule;
-        print_r($menu);
         foreach ($menu as $key => $value) {
             
             $item->$key = $value;
@@ -65,22 +68,33 @@ class Menu
             return;
         }
         $children = $menu_tree['children'] ?? [];
+        $model = $menu_tree['model'] ?? 'webniu';
         unset($menu_tree['children']);
-        if ($old_menu = Menu::get($menu_tree['key'])) {
+        if (isset($menu_tree['key']) && $old_menu = Menu::get($menu_tree['key'], $model)) {
             $pid = $old_menu['id'];
-            Rule::where('key', $menu_tree['key'])->update($menu_tree);
+            if(isset($menu_tree['model'])){
+                $model = $old_menu['model'];
+            }
+            Rule::where([
+                'key' => $menu_tree['key'],
+                'model' => $model
+            ])->update($menu_tree);
         } else {
             $pid = static::add($menu_tree);
+            if(isset($menu_tree['model'])){
+                $model = $menu_tree['model'];
+            }
         }
         foreach ($children as $menu) {
             $menu['pid'] = $pid;
+            $menu['model'] = $model;
             static::import($menu);
         }
     }
 
     /**
      * 准备删除菜单
-     * @param $key
+     * @param array $menu_tree
      * @return void
      */
     public static function delete($menu_tree)
@@ -92,18 +106,22 @@ class Menu
             }
         } 
         foreach ($menu_tree as $menu) { 
-            static::impdelete($menu['key']);
+            static::impdelete($menu['key'], $menu['model'] ?? 'webniu');
         }
     }
 
     /**
      * 删除菜单
      * @param $key
+     * @param $model
      * @return void
      */
-    public static function impdelete($key)
+    public static function impdelete($key, $model = 'webniu')
     {
-        $item = Rule::where('key', $key)->first();
+        $item = Rule::where([
+            'key' => $key,
+            'model' => $model
+        ])->first();
         if (!$item) {
             return;
         }

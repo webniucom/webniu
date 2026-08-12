@@ -110,11 +110,22 @@ class Crud extends Base
         // 按照数据限制字段返回数据
         if (!Auth::isSuperAdmin()) {
             if ($this->dataLimit === 'personal') {
-                $where[$this->dataLimitField] = admin_id();
+                if ($this->multiAdminMode) {
+                    $where[] = ['exp', "JSON_CONTAINS({$this->dataLimitField}, '" . admin_id() . "')"];
+                } else {
+                    $where[$this->dataLimitField] = admin_id();
+                }
             } elseif ($this->dataLimit === 'auth') {
                 $primary_key = $this->model->getKeyName();
-                if (!Auth::isSuperAdmin() && (!isset($where[$primary_key]) || $this->dataLimitField != $primary_key)) {
-                    $where[$this->dataLimitField] = ['in', Auth::getScopeAdminIds(true)];
+                if ($this->multiAdminMode) {
+                    if (!Auth::isSuperAdmin() && (!isset($where[$primary_key]) || $this->dataLimitField != $primary_key)) {
+                        $scopeAdminIds = Auth::getScopeAdminIds(true);
+                        $where[$this->dataLimitField] = ['exp', "JSON_OVERLAPS({$this->dataLimitField}, '" . json_encode(array_values($scopeAdminIds), JSON_NUMERIC_CHECK) . "')"];
+                    }
+                } else {
+                    if (!Auth::isSuperAdmin() && (!isset($where[$primary_key]) || $this->dataLimitField != $primary_key)) {
+                        $where[$this->dataLimitField] = ['in', Auth::getScopeAdminIds(true)];
+                    }
                 }
             }
         }
@@ -128,7 +139,7 @@ class Crud extends Base
      * @param string $order
      * @return EloquentBuilder|QueryBuilder|Model
      */
-    protected function doSelect(array $where, ?string $field = null, string $order= 'desc')
+    protected function doSelect(array $where, ?string $field = null, string $order = 'desc')
     {
         $model = $this->model;
         foreach ($where as $column => $value) {
@@ -149,8 +160,10 @@ class Crud extends Base
                         $valArr = explode(",", trim($value[1]));
                     }
                     $model = $model->whereNotIn($column, $valArr);
-                }elseif ($value[0] == 'null') {
+                } elseif ($value[0] == 'null') {
                     $model = $model->whereNull($column);
+                } elseif ($value[0] == 'exp') {
+                    $model = $model->whereRaw($value[1]);
                 } elseif ($value[0] == 'not null') {
                     $model = $model->whereNotNull($column);
                 } elseif ($value[0] !== '' || $value[1] !== '') {
@@ -180,6 +193,7 @@ class Crud extends Base
             'tree' => 'formatTree',
             'table_tree' => 'formatTableTree',
             'normal' => 'formatNormal',
+            'custom' => 'formatCustom',
         ];
         $paginator = $query->paginate($limit);
         $total = $paginator->total();
@@ -207,7 +221,11 @@ class Crud extends Base
 
         if (!Auth::isSuperAdmin()) {
             if ($this->dataLimit === 'personal') {
-                $data[$this->dataLimitField] = admin_id();
+                if ($this->multiAdminMode) {
+                    $data[$this->dataLimitField] = json_encode(explode(",", admin_id()), JSON_NUMERIC_CHECK);
+                } else {
+                    $data[$this->dataLimitField] = admin_id();
+                }
             } elseif ($this->dataLimit === 'auth') {
                 if (!empty($data[$this->dataLimitField])) {
                     $admin_id = $data[$this->dataLimitField];
@@ -215,11 +233,19 @@ class Crud extends Base
                         throw new BusinessException('无数据权限');
                     }
                 } else {
-                    $data[$this->dataLimitField] = admin_id();
+                    if ($this->multiAdminMode) {
+                        $data[$this->dataLimitField] = json_encode(explode(",", admin_id()), JSON_NUMERIC_CHECK);
+                    } else {
+                        $data[$this->dataLimitField] = admin_id();
+                    }
                 }
             }
         } elseif ($this->dataLimit && empty($data[$this->dataLimitField])) {
-            $data[$this->dataLimitField] = admin_id();
+            if ($this->multiAdminMode) {
+                $data[$this->dataLimitField] = json_encode(explode(",", admin_id()), JSON_NUMERIC_CHECK);
+            } else {
+                $data[$this->dataLimitField] = admin_id();
+            }
         }
         return $data;
     }
@@ -259,8 +285,15 @@ class Crud extends Base
 
         if (!Auth::isSuperAdmin()) {
             if ($this->dataLimit == 'personal') {
-                if ($model->{$this->dataLimitField} != admin_id()) {
-                    throw new BusinessException('无数据权限');
+                if ($this->multiAdminMode) {
+                    $admin_ids = json_decode($model->{$this->dataLimitField}, true);
+                    if (!in_array(admin_id(), $admin_ids)) {
+                        throw new BusinessException('无数据权限');
+                    }
+                } else {
+                    if ($model->{$this->dataLimitField} != admin_id()) {
+                        throw new BusinessException('无数据权限');
+                    }
                 }
             } elseif ($this->dataLimit == 'auth') {
                 $scopeAdminIds = Auth::getScopeAdminIds(true);
@@ -268,10 +301,22 @@ class Crud extends Base
                     $data[$this->dataLimitField] ?? false, // 检查要更新的数据admin_id是否是有权限的值
                     $model->{$this->dataLimitField} ?? false // 检查要更新的记录的admin_id是否有权限
                 ];
-                foreach ($admin_ids as $admin_id) {
-                    if ($admin_id && !in_array($admin_id, $scopeAdminIds)) {
-                        throw new BusinessException('无数据权限');
+                foreach ($admin_ids as $key => $admin_id) {
+                    if($this->multiAdminMode){
+                        if($key == 0){
+                            $admin_ids = explode(',', $admin_id);
+                        }else{
+                            $admin_ids = json_decode($admin_id, true);
+                        }
+                        if ($admin_ids && !array_intersect($admin_ids, $scopeAdminIds)) {
+                            throw new BusinessException('无数据权限0000');
+                        }
+                    }else{
+                        if ($admin_id && !in_array($admin_id, $scopeAdminIds)) {
+                            throw new BusinessException('无数据权限');
+                        }
                     }
+                     
                 }
             }
         }
@@ -317,7 +362,7 @@ class Crud extends Base
             throw new BusinessException('表不存在', 2);
         }
         $columns = array_column($allow_column, 'Type', 'Field');
-        $data = array_key_to_snake($data);// 接口字段转下划线字段
+        $data = array_key_to_snake($data); // 接口字段转下划线字段
         foreach ($data as $col => $item) {
             if (!isset($columns[$col])) {
                 unset($data[$col]);
@@ -353,7 +398,7 @@ class Crud extends Base
             throw new BusinessException('该表无主键，不支持删除');
         }
         $ids = (array)$request->post($primary_key, []);
-        if (!Auth::isSuperAdmin()){
+        if (!Auth::isSuperAdmin()) {
             $admin_ids = [];
             if ($this->dataLimit) {
                 $admin_ids = $this->model->where($primary_key, $ids)->pluck($this->dataLimitField)->toArray();
@@ -444,6 +489,20 @@ class Crud extends Base
      * @return Response
      */
     protected function formatNormal($items, $total): Response
+    {
+        return json(['code' => 200, 'msg' => 'success', 'data' => [
+            'records' => $items,
+            'total' => $total
+        ]]);
+    }
+
+    /**
+     * 自定义格式化
+     * @param $items
+     * @param $total
+     * @return Response
+     */
+    protected function formatCustom($items, $total): Response
     {
         return json(['code' => 200, 'msg' => 'success', 'data' => [
             'records' => $items,

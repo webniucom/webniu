@@ -29,10 +29,16 @@ class Base
     protected $noNeedAuth = [];
 
     /**
+     * 无需中间件的方法
+     * @var array
+     */
+    protected $noMiddleware = [];
+
+    /**
      * 禁用自动获权限的方法
      * @var array
      */
-    protected $useAuth = [];
+    protected $noAuthMark = [];
 
     /**
      * 数据限制
@@ -42,6 +48,15 @@ class Base
      * @var string
      */
     protected $dataLimit = null;
+
+    /**
+     * 多管理员模式
+     * 数据格式：[1,2,3,4,5]
+     * 说明：开启后，管理员ID以数组形式存储，每个管理员ID之间用逗号隔开
+     * 字段类型：varchar
+     * @var bool
+     */
+    protected $multiAdminMode = false;
 
     /**
      * 数据限制字段

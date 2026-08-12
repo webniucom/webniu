@@ -58,6 +58,20 @@ class RoleController extends Crud
         return $this->doFormat($query, $format, $limit);
     }
  
+    /**
+     * 格式化表格树
+     * @param $items
+     * @return Response
+     */
+    protected function formatTableTree($items): Response
+    {
+        $tree = new Tree($items);
+        $getTree = $tree->getTree();
+        foreach ($getTree as $key => $item) {
+            $getTree[$key]['disabled'] = true;
+        }
+        return $this->json(200, 'ok', $getTree);
+    }
 
     /**
      * 插入
@@ -189,16 +203,34 @@ class RoleController extends Crud
         if (empty($role_id)) {
             return $this->json(200, 'ok', []);
         }
-        if (!Auth::isSuperAdmin() && !in_array($role_id, Auth::getScopeRoleIds(true))) {
+        //逗号转换数组
+        $role_id = explode(',', $role_id);
+        if (!Auth::isSuperAdmin() && array_diff($role_id, Auth::getScopeRoleIds(true))) {
             return $this->json(400, '角色组超出权限范围');
         }
-        $rule_id_string = Role::where('id', $role_id)->value('rules');
-        if ($rule_id_string === '') {
+        $rule_id_string = Role::whereIn('id', $role_id)->pluck('rules');
+        
+        if (empty($rule_id_string)) {
             return $this->json(200, 'ok', []);
         }
+        $rule_id_string = $rule_id_string->toArray();
+        // 把二维数组 的值 合并到一个数组中
+        foreach ($rule_id_string as $item) {
+            if ($item !== '*') {
+                $rule_id_string = array_merge($rule_id_string, explode(',', $item));
+            }else{
+                //跳出循环
+                $rule_id_string = '*';
+                break;
+            }
+        }
+
         $rules = Rule::get();
         $include = [];
         if ($rule_id_string !== '*') {
+            // 去重
+            $rule_id_string = array_unique($rule_id_string);
+            $rule_id_string = implode(',', $rule_id_string);
             $include = explode(',', $rule_id_string);
         }
         $items = [];
@@ -207,6 +239,7 @@ class RoleController extends Crud
                 'name' => $item->title ?? $item->name ?? $item->id,
                 'label' => $item->title ?? $item->name ?? $item->id,
                 'value' => (string)$item->id,
+                'model' => $item->model,
                 'id' => $item->id,
                 'pid' => $item->pid,
             ];

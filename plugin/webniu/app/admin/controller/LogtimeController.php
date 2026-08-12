@@ -21,12 +21,14 @@ class LogtimeController extends Crud
      */
     protected $dataLimit = 'personal';
 
+    protected $noNeedAuth = ['select'];
+
 
     /**
      * 禁用自动获权限的方法
      * @var string[]
      */
-    protected $useAuth = ['insert', 'update', 'delete'];
+    protected $noAuthMark = ['insert', 'update', 'delete'];
 
 
 

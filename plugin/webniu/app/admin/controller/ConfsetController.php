@@ -42,6 +42,24 @@ class ConfsetController extends Crud
         $query = $this->doSelect($where, $field, $order);
         return $this->doFormat($query, $format, $limit);
     }
+
+    /**
+     * 生成SQL
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
+    public function generatesql(Request $request): Response
+    {
+
+        [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        $query = $this->doSelect($where, $field, $order);
+        $paginator = $query->paginate($limit);
+        $total = $paginator->total();
+        $items = $paginator->items();
+        return raw_view('index/generatesql', ['items' => $items]);
+    }
+
     /**
      * 插入
      * @param Request $request

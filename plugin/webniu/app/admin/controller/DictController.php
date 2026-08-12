@@ -5,6 +5,8 @@ namespace plugin\webniu\app\admin\controller;
 use plugin\webniu\app\model\Dict;
 use plugin\webniu\app\model\DictGroup;
 use plugin\webniu\app\common\Tree;
+use plugin\webniu\app\common\RuleService;
+use plugin\webniu\app\model\Role;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
@@ -94,6 +96,39 @@ class DictController extends Crud
     }
 
     /**
+     * 自定义格式化
+     * @param $items
+     * @param $total
+     * @return Response
+     */
+    protected function formatCustom($items, $total): Response
+    {
+        $records = [
+            [
+                'id' => 0,
+                'label' => '系统菜单',
+                'value' => 'rules',
+            ],
+            [
+                'id' => 0,
+                'label' => '系统角色',
+                'value' => 'roles',
+            ],
+        ];
+        foreach ($items as $item) {
+            $records[] = [
+                'id' => $item['id'],
+                'label' => $item['label'],
+                'value' => $item['value'],
+            ];
+        }
+        return json(['code' => 200, 'msg' => 'success', 'data' => [
+            'records' => $records,
+            'total' => $total
+        ]]);
+    }
+
+    /**
      * 添加分组
      * @param Request $request
      * @return Response
@@ -103,7 +138,15 @@ class DictController extends Crud
     {
         $this->model = new DictGroup;
         if ($request->method() === 'POST') {
+            $systemlabel = ['rules','roles'];
             $data = $this->insertInput($request);
+            if (in_array($data['value'], $systemlabel)) {
+                return $this->json(400, '['.$data['value'].']系统标签不能使用');
+            }
+            $group = $this->model->where('value', $data['value'])->first();
+            if ($group) {
+                return $this->json(400, '分组标签已存在');
+            }
             $id = $this->doInsert($data);
             return $this->json(200, '添加成功', ['id' => $id]);
         }
@@ -149,23 +192,37 @@ class DictController extends Crud
      */
     public function get(Request $request, $name): Response
     {
-        $dict = $this->model->orderBy('sort', 'asc')->where([
-            'group' => $name,
-            'status' => 1,
-        ])->get()->toArray();
-        if (!$dict) {
-            return $this->json(404, '字典不存在');
-        }
         $new_dict = [];
-        foreach ($dict as $item) {
-            $new_dict[] = [
-                'id'    => $item['id'],
-                'pid'   => $item['pid'],
-                'label' => $item['label'],
-                'value' => $item['value'],
-                'disabled' => $item['disabled'] == 1 ? true : false,
-            ];
+        $systemlabel = ['rules','roles']; 
+        if (in_array($name, $systemlabel)) {
+            if($name == 'rules'){
+                $new_dict = RuleService::getMenus(admin('roles'));
+                return $this->json(200, '读取成功', $new_dict);
+            }
+            if($name == 'roles'){
+                $this->model = new Role;
+                $new_dict = $this->model->get();
+            }
+        }else{
+            $dict = $this->model->orderBy('sort', 'asc')->where([
+                'group' => $name,
+                'status' => 1,
+            ])->get()->toArray();
+            if (!$dict) {
+                return $this->json(404, '字典不存在');
+            }
+            
+            foreach ($dict as $item) {
+                $new_dict[] = [
+                    'id'    => $item['id'],
+                    'pid'   => $item['pid'],
+                    'label' => $item['label'],
+                    'value' => $item['value'],
+                    'disabled' => $item['disabled'] == 1 ? true : false,
+                ];
+            }
         }
+         
         $tree = new Tree($new_dict);
         $tree_items = $tree->getTree();
         return $this->json(200, 'ok',$tree_items);
