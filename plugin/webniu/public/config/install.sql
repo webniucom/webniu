@@ -500,7 +500,7 @@ INSERT INTO `__PREFIX__confset` VALUES (NULL, 'system', 'interfaceConfig', 'call
 UNLOCK TABLES;
 
 LOCK TABLES `__PREFIX__plugin` WRITE;
-INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu',1,'网牛引擎','基于webman框架开发的中后台管理系统','webniu','webniu','/app/webniu/images/logo.png',NULL,'/app/webniu/admin/index','0','__VERSION__',1,0,0,'0','__YYYYMDHIS__','__YYYYMDHIS__');
+INSERT INTO `__PREFIX__plugin` VALUES (NULL,'webniu',1,'网牛引擎','基于webman框架开发的中后台管理系统','webniu','webniu','/app/webniu/images/logo.png',NULL,'/app/webniu/admin/index','0','__VERSION__','__VERSION__',1,0,0,'0','__YYYYMDHIS__','__YYYYMDHIS__');
 UNLOCK TABLES;
 
 LOCK TABLES `__PREFIX__options` WRITE;
