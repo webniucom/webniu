@@ -99,7 +99,6 @@ class Email
     public static function getConfig()
     {
         $config = options('interfaceConfig');
-        print_r($config);
         return $config['interfaceConfig'];
     }
 

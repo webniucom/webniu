@@ -896,9 +896,9 @@ if (!function_exists('tomedia')) {
  * @return Response
  */
 if (!function_exists('public_view')) {
-    function public_view(string $template, array $vars = []): Response
+    function public_view(string $template, array $vars = [], string $plugin = 'webniu'): Response
     {
-        $path = base_path() . '/plugin/webniu/public/' . ltrim($template, '/');
+        $path = base_path() . "/plugin/$plugin/public/" . ltrim($template, '/');
         if (!str_ends_with($path, '.html')) {
             $path .= '.html';
         }

@@ -45,7 +45,7 @@ class RuleController extends Crud
      */
     public function index(): Response
     {
-        return raw_view('rule/index');
+        return $this->json(200, '完成');
     }
 
     /**
@@ -95,25 +95,14 @@ class RuleController extends Crud
         $tree = new Tree($items);
         return $this->json(200, '完成', $tree->getTree());
     }
-    /**
-     * 临时查询
-     * @param Request $request
-     * @return Response
-     * @throws BusinessException
-     */
-    function get1(Request $request): Response
-    {
-        $types = $request->get('type', '0,1');
-        $menus = RuleService::getMenus(admin('roles'), $types);
-        return $this->json(200, '读取成功', $menus);
-    }
+    
     /**
      * 获取菜单
      * @param Request $request
      * @return Response
      * @throws Exception
      */
-    function get(Request $request): Response
+    public function get(Request $request): Response
     {
         $this->syncRules();
         $menus = RuleService::getMenus(admin('roles'));
@@ -164,11 +153,13 @@ class RuleController extends Crud
                     }
                     $menu               = new Rule;
                     $menu->model        = $item->model;
+                    $menu->plugin       = $item->plugin;
                     $menu->menu         = $item->model == 'webniu' ? 0 : 1;
                     $menu->pid          = $pid;
                     $menu->auth_mark    = $method_name;
                     $menu->key          = $name;
                     $menu->title        = $title;
+                    $menu->open         = $item->open;
                     $menu->type         = 2;
                     $menu->is_enable    = 1;
                     $menu->save();
@@ -245,6 +236,10 @@ class RuleController extends Crud
     public function update(Request $request): Response
     {
         [$id, $data] = $this->updateInput($request);
+        if(!isset($data['active_path'])){
+            $data['active_path'] = '';
+        }
+        
         if (!$row = $this->model->find($id)) {
             return $this->json(400, '记录不存在');
         }

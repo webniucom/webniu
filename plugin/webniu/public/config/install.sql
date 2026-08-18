@@ -239,8 +239,9 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__roles` (
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__rules` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `model` varchar(255) DEFAULT 'webniu',
-  `menu` int DEFAULT '0',
+  `model` varchar(255) DEFAULT 'webniu' COMMENT '平台',
+  `plugin` varchar(255) DEFAULT NULL COMMENT '插件',
+  `menu` int DEFAULT '0' COMMENT '菜单',
   `pid` int unsigned DEFAULT '0' COMMENT '父级',
   `type` int DEFAULT NULL COMMENT '类型',
   `title` varchar(255) DEFAULT NULL COMMENT '标题',
@@ -249,6 +250,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__rules` (
   `path` varchar(255) DEFAULT NULL COMMENT '路径',
   `key` varchar(255) DEFAULT NULL COMMENT '键',
   `href` varchar(255) DEFAULT NULL COMMENT '链接',
+  `open` int DEFAULT '0' COMMENT '打开方式',
   `component` varchar(255) DEFAULT NULL COMMENT '组件',
   `link` varchar(255) DEFAULT NULL COMMENT '链接',
   `show_text_badge` varchar(255) DEFAULT NULL COMMENT '显示文本',
@@ -506,3 +508,4 @@ UNLOCK TABLES;
 LOCK TABLES `__PREFIX__options` WRITE;
 INSERT INTO `__PREFIX__options` VALUES (NULL,'system','globalplugin','{\"delinstall\":1,\"delupdate\":1,\"delplugin\":1}','admin','__YYYYMDHIS__', '__YYYYMDHIS__');
 UNLOCK TABLES;
+

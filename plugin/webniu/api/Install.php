@@ -44,8 +44,25 @@ class Install
         if (isset($context['previous_menus'])) {
             static::removeUnnecessaryMenus($context['previous_menus']);
         }
+        if(static::getSql('update')) { }
         // 导入新菜单
         Menu::import(static::getMenus());
+
+    }
+
+    /**
+     * 执行SQL
+     * @param $type
+     * @return array|mixed
+     */
+    public static function getSql($type)
+    {
+        clearstatcache();
+        if (is_file($sql_file = __DIR__ ."/../public/config/$type.php")) {
+            include $sql_file;
+            return true;
+        } 
+        return false;
     }
 
     /**

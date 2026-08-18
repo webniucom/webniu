@@ -4,6 +4,7 @@ namespace plugin\webniu\app\admin\controller;
 
 use Illuminate\Database\Capsule\Manager;
 use plugin\webniu\app\common\Util;
+use plugin\webniu\app\model\Option;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
@@ -15,6 +16,11 @@ use Workerman\Worker;
  */
 class InstallController extends Base
 {
+    /**
+     * @var Model
+     */
+    protected $model = null;
+
     /**
      * 不需要登录的方法
      * @var string[]
@@ -294,6 +300,37 @@ EOF;
         $smt->bindValue('admin_id', $admin_id);
         $smt->execute();
         $request->session()->flush();
+        $config = file_get_contents(base_path('plugin/webniu/public/config/pear.config.json'));
+        if ($config) {
+            $result = json_decode($config, true);
+            $pear_key   = randStr(12);
+            $result['systemSetting']['fingerprint'] = $pear_key;
+            $client     = Util::httpClient();
+            $site_url = '/api/v1/site';
+            try {
+                $this->model = new Option;
+                foreach ($result as $key => $item) {
+                    $this->model->updateOrInsert([
+                        'model' => 'system',
+                        'name' => $key,
+                    ], [
+                        'value' => json_encode($item),
+                        'username' => 'system',
+                        'updated_at' => date('Y-m-d H:i:s'),
+                        'created_at' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+                $form_params = [
+                    'title' => $result['systemInfo']['title'],
+                    'fingerprint' => $pear_key,
+                    'port' => $request->getRemotePort(),
+                    'domain' => hosturl(),
+                    'version' => config('plugin.webniu.app.version')
+                ];
+                $client->post($site_url, ['form_params' => $form_params]);
+            } catch (\Exception $e) {
+            }
+        }
         return $this->json(200, '管理员成功创建');
     }
 
@@ -306,8 +343,8 @@ EOF;
     protected function addMenu(array $menu, \PDO $pdo,$prefix): int
     {
         $allow_columns = [
-            'model', 'menu', 'pid', 'type', 'title',
-            'name', 'icon', 'path', 'key', 'href', 'component',
+            'model', 'plugin', 'menu', 'pid', 'type', 'title',
+            'name', 'icon', 'path', 'key', 'href', 'open', 'component',
             'link', 'show_text_badge', 'auth_mark', 'show_badge',
             'is_hide', 'is_hide_tab', 'is_iframe', 'is_enable',
             'is_full_page', 'is_blank', 'keep_alive', 'fixed_tab','active_path',
@@ -373,6 +410,7 @@ EOF;
         }
         foreach ($children as $menu) {
             $menu['pid'] = $pid;
+            $menu['plugin'] = $menu_tree['plugin'];
             $this->importMenu($menu, $pdo,$prefix);
         }
 

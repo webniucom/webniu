@@ -43,7 +43,6 @@ class Menu
     {
         $item = new Rule;
         foreach ($menu as $key => $value) {
-            
             $item->$key = $value;
             if($key == 'model' && isset($menu['model'])){
                 $item->model= $menu['model'];
@@ -69,25 +68,34 @@ class Menu
         }
         $children = $menu_tree['children'] ?? [];
         $model = $menu_tree['model'] ?? 'webniu';
+        $plugin = $menu_tree['plugin'] ?? null;
+        $open = $menu_tree['open'] ?? 0;
         unset($menu_tree['children']);
-        if (isset($menu_tree['key']) && $old_menu = Menu::get($menu_tree['key'], $model)) {
+        if (isset($menu_tree['key']) && $old_menu = Menu::get($menu_tree['key'], $model, $plugin)) {
             $pid = $old_menu['id'];
             if(isset($menu_tree['model'])){
                 $model = $old_menu['model'];
+                $plugin = $old_menu['plugin'];
+                $open = $old_menu['open'];
             }
             Rule::where([
                 'key' => $menu_tree['key'],
-                'model' => $model
+                'model' => $model,
+                'plugin' => $plugin
             ])->update($menu_tree);
         } else {
             $pid = static::add($menu_tree);
             if(isset($menu_tree['model'])){
-                $model = $menu_tree['model'];
+                $model = $menu_tree['model'] ?? 'webniu';
+                $plugin = $menu_tree['plugin'] ?? null;
+                $open = $menu_tree['open'] ?? 0;
             }
         }
         foreach ($children as $menu) {
             $menu['pid'] = $pid;
             $menu['model'] = $model;
+            $menu['plugin'] = $plugin;
+            $menu['open'] = $open;
             static::import($menu);
         }
     }

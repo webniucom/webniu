@@ -14,7 +14,8 @@
 		"isCaptcha": true,
 		"isRegister": false,
 		"m_phone_verify": false,
-		"forgetPassword": false
+		"forgetPassword": false,
+		"fingerprint": ""
 	},
 	"attachMent": {
 		"exclude": "php,php3,php5,css,js,html,htm,asp,jsp,exe",

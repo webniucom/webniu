@@ -1,6 +1,8 @@
 <?php
 return [
     [
+        'model' => 'webniu',
+        'plugin' => 'webniu',
         'path' => 'admin',
         'key' => 'admin',
         'title' => '后台管理',
@@ -155,7 +157,7 @@ return [
                         'children' => [],
                     ],
                     [
-                        'path' => 'account',
+                        'path' => 'userinfo',
                         'key' => 'plugin\\webniu\\app\\admin\\controller\\AccountController',
                         'title' => '基本资料',
                         'type' => 1,
@@ -198,6 +200,8 @@ return [
         ],
     ],
     [
+        'model' => 'webniu',
+        'plugin' => 'webniu',
         'path' => 'apps',
         'key' => 'apps',
         'title' => '应用插件',

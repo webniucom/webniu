@@ -11,6 +11,7 @@ use support\Log;
 use support\Request;
 use support\Response;
 use plugin\webniu\app\model\Plugin;
+use plugin\webniu\app\model\Rule;
 use support\think\Cache;
 use ZIPARCHIVE;
 use function array_diff;
@@ -59,7 +60,7 @@ class PluginController extends Crud
             $response   = $client->post('/api/v1/plugin', ['form_params' => $query]);
             $content    = $response->getBody()->getContents();
             $data       = json_decode($content, true);
-            if ($data['code'] == 0) {
+            if ($data['code'] == 200) {
                 confset_set(['model' => 'apptem', 'name' => 'plugin', 'label' => '插件模板',], ['name' => 'plugin', 'label' => '插件类型', 'type' => 'select', 'key' => 'type', 'disabled' => 1, 'options' => json_encode($data['data']['type']), 'status' => 1,]);
                 confset_set(['model' => 'apptem', 'name' => 'plugin', 'label' => '插件模板',], ['name' => 'plugin', 'label' => '插件分类', 'type' => 'select', 'key' => 'class', 'disabled' => 1, 'options' => json_encode($data['data']['class']), 'status' => 1,]);
                 foreach ($data['data'] as $key => $val) {
@@ -258,6 +259,9 @@ EOF;
                 Util::resumeFileMonitor();
                 Util::reloadWebman();
             }
+            if ($post['identifier']) {
+                Rule::where('plugin', $post['identifier'])->update(['open' => $post['open']]);
+            }
             return parent::update($request);
         }
         return raw_view('plugin/update');
@@ -293,11 +297,6 @@ EOF;
         return $this->json(200, '读取成功', $data);
     }
 
-    public function system(Request $request): Response
-    {
-        return $this->json(200, 'ok', []);
-    }
-
     /**
      * 安装更新
      * @param Request $request
@@ -307,7 +306,7 @@ EOF;
     public function install(Request $request): Response
     {
         $post       = $request->post();
-        print_r($post);
+        $globalplugin = options('globalplugin');
         $wn_version = config('plugin.webniu.app.version');
         if (isset($post['webniu_version']) && !version_compare_custom($wn_version, $post['webniu_version'], '>=')) {
             return $this->json(400, '网牛引擎版本过低,请升级网牛引擎到 v' . $post['webniu_version'] . ' 以上版本');
@@ -350,11 +349,15 @@ EOF;
                 }
                 if (!empty($zip)) {
                     $zip->extractTo(base_path() . '/plugin/');
-                    unset($zip);
+                    if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin']) {
+                        unset($zip);
+                    }
                 } else {
                     $this->unzipWithCmd($cmd);
                 }
-                //unlink($zip_file);
+                if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin']) {
+                    unlink($zip_file);
+                }
             }
 
             $context = null;
@@ -379,10 +382,14 @@ EOF;
             if ($installed == 'waitapps') {
                 //判断文件是否存在 在 删除
                 if (is_file(base_path() . "/plugin/{$name}/public/config/install.php")) {
-                    //unlink(base_path() . "/plugin/{$name}/public/config/install.php");
+                    if (isset($globalplugin['globalplugin']['delinstall']) && $globalplugin['globalplugin']['delinstall']) {
+                        unlink(base_path() . "/plugin/{$name}/public/config/install.php");
+                    }
                 }
                 if (is_file(base_path() . "/plugin/{$name}/public/config/update.php")) {
-                    //unlink(base_path() . "/plugin/{$name}/public/config/update.php");
+                    if (isset($globalplugin['globalplugin']['delupdate']) && $globalplugin['globalplugin']['delupdate']) {
+                        unlink(base_path() . "/plugin/{$name}/public/config/update.php");
+                    }
                 }
             }
             $this->updateOrInsert($post);
@@ -400,6 +407,7 @@ EOF;
      */
     public function uninstall(Request $request): Response
     {
+        $globalplugin = options('globalplugin');
         $id     = $request->post('id');
         $Plugin = Plugin::where('id', $id)->first();
         if (!$Plugin) {
@@ -432,8 +440,10 @@ EOF;
                 Monitor::pause();
             }
             try {
-                //卸载不删除模块
-                //$this->rmDir($path);
+                //卸载删除模块
+                if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin']) {
+                    $this->rmDir($path);
+                }
             } finally {
                 if ($monitor_support_pause) {
                     Monitor::resume();
@@ -508,10 +518,7 @@ EOF;
             ]);
             $content = $response->getBody()->getContents();
             $data = json_decode($content, true);
-            if ($data['code'] == 2) {
-                return $this->json($data['code'], $data['msg'], []);
-            }
-            if ($data['code'] == 0) {
+            if ($data['code'] == 200) {
                 session()->set('webniu-plugin-user', $data['data']);
             }
             return $this->json($data['code'], $data['msg'], $data['data']);
@@ -532,7 +539,6 @@ EOF;
         if (!$token) {
             return $this->json(1, '请先获取验证码');
         }
-        print_r($request->post());
         try {
             $client     = Util::httpClient();
             $response   = $client->post('/api/v1/user/register', [
@@ -546,7 +552,7 @@ EOF;
             ]);
             $content = $response->getBody()->getContents();
             $data = json_decode($content, true);
-            if ($data['code'] == 2) {
+            if ($data['code'] == 200) {
                 return $this->json($data['code'], $data['msg'], []);
             }
             return $this->json($data['code'], $data['msg'], $data['data']);
@@ -575,7 +581,7 @@ EOF;
             if ($data['code'] == 200) {
                 return $this->json($data['code'], $data['msg'], []);
             }
-            if ($data['code'] == 400) {
+            if ($data['code'] == 407) {
                 $request->session()->delete('webniu-plugin-user');
                 return $this->json($data['code'], $data['msg'], []);
             }
@@ -597,7 +603,7 @@ EOF;
             $response   = $client->post('/api/v1/user/account');
             $content    = $response->getBody()->getContents();
             $data       = json_decode($content, true);
-            if ($data['code'] == 102) {
+            if ($data['code'] == 407) {
                 $request->session()->delete('webniu-plugin-user');
                 return $this->json($data['code'], $data['msg'], []);
             }
@@ -638,7 +644,7 @@ EOF;
                 if ($contents['code']) {
                     throw new BusinessException($contents['msg']);
                 }
-            }else{
+            } else {
                 file_put_contents($file, $zip_content);
             }
         }

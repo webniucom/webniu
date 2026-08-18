@@ -1,4 +1,5 @@
 <?php
+
 namespace plugin\webniu\app\common;
 
 use plugin\webniu\app\model\Rule;
@@ -11,22 +12,26 @@ class RuleService
      * 获取权限菜单
      * @param array $roles
      * @param string $types
+     * @param array $where
+     * @param string $plugin
      * @return array
      */
-    public static function getMenus(array $roles, $types = '0,1,2,3',$where = [['menu', '=', 0]])
+    public static function getMenus(array $roles, $types = '0,1,2,3', $where = [['menu', '=', 0]],$plugin = 'webniu')
     {
         $rules = self::getRules($roles);
         $types = is_string($types) ? explode(',', $types) : [0, 1, 2, 3];
         $items = Rule::where($where)->orderBy('sort', 'desc')->get()->toArray();
         $formatted_items = [];
         foreach ($items as $item) {
-            if($item['is_iframe']){
+            if ($item['is_iframe']) {
                 $item['is_iframe'] = true;
             }
+            $item['plugin'] = $item['open'] == 0 ? $plugin : $item['plugin'];
             $meta = array_key_to_camel($item);
             $formatted_items[] = [
                 'id'    => $item['id'],
                 'title' => $item['title'],
+                'model' => $item['model'],
                 'pid'   => $item['pid'],
                 'type'  => $item['type'],
                 'path'  => $item['path'],

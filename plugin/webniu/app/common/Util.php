@@ -601,8 +601,8 @@ class Util
         if ($token = session('webniu-plugin-token')) {
             $options['headers']['Cookie'] = "PHPSID=$token;";
         }
-        if($core = options(['core'])['core']){
-            $options['headers']['fingerprint'] = $core['fingerprint'];
+        if($fingerprint1 = options('systemSetting')['systemSetting']['fingerprint'] ?? false){
+            $options['headers']['fingerprint'] = $fingerprint1;
         };
         return new Client($options);
     }

@@ -34,7 +34,7 @@ class ConfigController extends Base
     public function index(): Response
     {
         try {
-            $data = options(['systemInfo', 'systemSetting', 'systemTheme','attachMent']);
+            $data = options(['systemInfo', 'systemSetting', 'systemTheme', 'attachMent']);
             if (isEmpty2DArray($data)) {
                 $data = $this->getByDefault();
             }
@@ -77,7 +77,7 @@ class ConfigController extends Base
                 ];
                 if ($item['type'] == 'treeselect') {
                     $db['props']['data'] = json_decode($item['options'], true);
-                }else{
+                } else {
                     $db['props']['options'] = json_decode($item['options'], true);
                 }
                 $db['props']['dict'] = $item['dict'];

@@ -1,10 +1,6 @@
 <?php
 return [
-    '/webniu'   => [
-        plugin\webniu\app\admin\controller\IndexController::class,
-        'index'
-    ],
-    '/webniu/'   => [
+    '/app/webniu/'   => [
         plugin\webniu\app\admin\controller\IndexController::class,
         'index'
     ]
