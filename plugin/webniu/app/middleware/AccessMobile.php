@@ -1,7 +1,6 @@
 <?php
 namespace plugin\webniu\app\middleware;
 
-use plugin\webniu\api\Auth;
 use ReflectionException;
 use support\exception\BusinessException;
 use Webman\Http\Request;

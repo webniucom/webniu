@@ -215,7 +215,7 @@ return [
                 'title' => '应用列表',
                 'type' => 1,
                 'icon' => 'ri:list-check-2',
-                'component' => '/apps/plugin',
+                'component' => '/admin/plugin',
                 'children' => [],
             ],
             [

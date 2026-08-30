@@ -20,15 +20,54 @@
       }
     </style>
     <script>
-      var __Config__; // 站点基础配置
-      var __Info__; // 用户信息
-      var __Login__; // 登录入口
-      var __APP_VERSION__; // 版本号
-      var __WORKTAB__; // 工作台
+      var __Config__ // 站点基础配置
+      var __Info__ // 用户信息
+      var __Login__ // 登录入口
+      var __APP_VERSION__ // 版本号
+      var __WORKTAB__ // 工作台
       // 可用在控制器中创建自己的入口变量
-      __Config__ = '{{ $confit_url }}';
-      __WORKTAB__ = '{{ $worktab }}'; 
-      //在这设置吗
+      __Config__ = '{{ $confit_url }}'
+      __WORKTAB__ = '{{ $worktab }}'
+
+      /**
+       * 多应用模式检测（仅开发环境生效）
+       * 开发时 PHP 不渲染本文件，上方双花括号占位符保持字面量；
+       * 生产环境 public_view 会把占位符替换为真实值（不含 {{ ），本脚本自动跳过，
+       * 行为与 PHP 注入完全一致。
+       */
+      ;(function () {
+        // 生产环境已由 PHP 注入真实配置，直接跳过
+        if (typeof __Config__ !== 'string' || __Config__.indexOf('\{\{') === -1) return
+
+        // 应用预设表：新增平台在这里加一项即可
+        var APP_PRESETS = {
+          webniu: { config: '/webniu/admin/config', worktab: 'webniu' },
+          wechat: { config: '/wechat/account/config', worktab: 'wechat' }
+        }
+        var DEV_KEY = 'sys-dev-app'
+        var DEFAULT_APP = 'webniu'
+
+        function getAppFromPath() {
+          var m = location.pathname.match(/^\/app\/([^/]+)/i)
+          if (m) return m[1].toLowerCase()
+          return m ? m[1].toLowerCase() : ''
+        }
+
+        // 解析生效应用：?app= 显式覆盖 > 路径前缀 > localStorage 记忆 > 默认
+        var params = new URLSearchParams(location.search)
+        var app =
+          params.get('app') || getAppFromPath() || localStorage.getItem(DEV_KEY) || DEFAULT_APP
+        var preset = APP_PRESETS[app] || APP_PRESETS[DEFAULT_APP]
+
+        // 写入全局配置
+        __Config__ = preset.config
+        __WORKTAB__ = preset.worktab
+
+        // ?app= 显式指定时记住选择，下次从 / 根路径进入也能恢复
+        if (params.get('app')) localStorage.setItem(DEV_KEY, app)
+
+        console.info('[dev] app=' + app + ' config=' + __Config__ + ' worktab=' + __WORKTAB__)
+      })()
     </script>
     <script>
       // 初始化 html class 主题属性
@@ -46,8 +85,8 @@
         }
       })()
     </script>
-    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/js/index-IeNrWF3D.js"></script>
-    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/css/index-C39k9IuI.css">
+    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/js/index-BsIKUKEh.js"></script>
+    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/css/index-Dk1MWTpO.css">
   </head>
 
   <body>
