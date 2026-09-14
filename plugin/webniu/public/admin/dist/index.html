@@ -30,59 +30,6 @@
       __WORKTAB__ = '{{ $worktab }}'
       __Login__ = '{{ $login_url }}'
       __Info__ = '{{ $info_url }}'
-
-      /**
-       * 多应用模式检测（仅开发环境生效）
-       * 开发时 PHP 不渲染本文件，上方双花括号占位符保持字面量；
-       * 生产环境 public_view 会把占位符替换为真实值（不含 {{ ），本脚本自动跳过，
-       * 行为与 PHP 注入完全一致。
-       */
-      ;(function () {
-        // 生产环境已由 PHP 注入真实配置，直接跳过
-        if (typeof __Config__ !== 'string' || __Config__.indexOf('\{\{') === -1) return
-
-        // 应用预设表：新增平台在这里加一项即可
-        var APP_PRESETS = {
-          webniu: { 
-            config: '/webniu/admin/config', 
-            worktab: 'webniu',
-            login: '/webniu/admin/account/login',
-            info: '/webniu/admin/account/info',
-          },
-          wechat: { 
-            config: '/wechat/account/config', 
-            worktab: 'wechat',
-            login: '/webniu/admin/account/login',
-            info: '/webniu/admin/account/info',
-          },
-          wniot: { 
-            config: '/wniot/mobile/config', 
-            worktab: 'wniot',
-            login: '/wniot/mobile/login',
-            info: '/wniot/mobile/info',
-          }
-        }
-        var DEFAULT_APP = 'webniu'
-
-        function getAppFromPath() {
-          var m = location.pathname.match(/^\/app\/([^/]+)/i)
-          return m ? m[1].toLowerCase() : ''
-        }
-
-        // 解析生效应用：?app= 显式覆盖 > 路径前缀 > 默认
-        // （不再读 localStorage 记忆，保证默认始终为 webniu，避免旧选择残留）
-        var params = new URLSearchParams(location.search)
-        var app = params.get('app') || getAppFromPath() || DEFAULT_APP
-        var preset = APP_PRESETS[app] || APP_PRESETS[DEFAULT_APP]
-
-        // 写入全局配置
-        __Config__ = preset.config
-        __WORKTAB__ = preset.worktab
-        __Login__ = preset.login || ''
-        __Info__ = preset.info || ''
-
-        console.info('[dev] app=' + app + ' config=' + __Config__ + ' worktab=' + __WORKTAB__)
-      })()
     </script>
     <script>
       // 初始化 html class 主题属性
@@ -105,6 +52,7 @@
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="app"></div>
+
   </body>
 </html>
