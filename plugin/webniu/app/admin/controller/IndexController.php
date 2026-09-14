@@ -43,6 +43,8 @@ class IndexController
         return public_view('admin/dist/index', [
             'confit_url' => '/webniu/admin/config',
             'worktab' => 'webniu',
+            'login_url' => '/webniu/admin/account/login',
+            'info_url' => '/webniu/admin/account/info',
         ]);
     }
 
