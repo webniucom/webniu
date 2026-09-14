@@ -7,12 +7,10 @@ use GuzzleHttp\Exception\GuzzleException;
 use plugin\webniu\app\common\Util;
 use app\process\Monitor;
 use support\exception\BusinessException;
-use support\Log;
 use support\Request;
 use support\Response;
 use plugin\webniu\app\model\Plugin;
 use plugin\webniu\app\model\Rule;
-use support\think\Cache;
 use ZIPARCHIVE;
 use function array_diff;
 use function ini_get;
@@ -268,33 +266,90 @@ EOF;
     }
 
     /**
-     * 检测更新版本
+     * 检测更新版本（本地优先 + 远程查询）
+     * 本地读取 plugin/{identifier}/config/app.php 的版本号，
+     * 与客户端提交版本对比；本地版本 ≥ 远程版本时优先返回本地数据。
+     * webniu 不走本地查询。
      * @param Request $request
      * @return Response
      * @throws GuzzleException
      */
     public function checkupdate(Request $request): Response
     {
-        $version   = $request->post('data', null);
-        $data = [];
+        $version = $request->post('data', null);
         if (empty($version)) {
             return json(['code' => 0, 'msg' => '无更新版本', 'data' => []]);
         }
+
+        // 规范化提交数据：统一为 [identifier => version] 映射
+        $submitted = [];
+        foreach ($version as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $identifier = $row['identifier'] ?? ($row[0] ?? '');
+            $ver = $row['version'] ?? ($row[1] ?? '');
+            if ($identifier) {
+                $submitted[$identifier] = $ver;
+            }
+        }
+
+        // 1. 远程查询（失败不阻断本地查询）
+        $remote_map = [];
         try {
-            $names      = array_column($version, 'identifier');
-            $name       = implode(',', $names);
-            $client     = Util::httpClient();
-            $form_params['plugin']  = $version;
-            $response   = $client->post('/api/v1/checkupdate', ['form_params' => $form_params]);
-            $content    = $response->getBody()->getContents();
-            $content    = json_decode($content, true);
-            if ($content['code'] == 200) {
-                $data = $content['data'];
+            $client = Util::httpClient();
+            $form_params['plugin'] = $version;
+            $response = $client->post('/api/v1/checkupdate', ['form_params' => $form_params]);
+            $content = $response->getBody()->getContents();
+            $content = json_decode($content, true);
+            if (($content['code'] ?? 0) == 200) {
+                foreach ($content['data'] ?? [] as $item) {
+                    if (isset($item['identifier'])) {
+                        $remote_map[$item['identifier']] = $item;
+                    }
+                }
             }
         } catch (\Throwable $e) {
-            return $this->json(400, $e->getMessage(), []);
+            // 远程失败不阻断，继续本地查询
         }
-        return $this->json(200, '读取成功', $data);
+
+        // 2. 本地兜底 + 远程合并
+        $result = [];
+        foreach ($submitted as $identifier => $current_ver) {
+            // 远程有更新 → 直接用远程结果
+            $remote_item = $remote_map[$identifier] ?? null;
+            $remote_ver = $remote_item['version'] ?? '';
+            $remote_has_update = $remote_item && $remote_ver && $current_ver
+                && version_compare_custom($remote_ver, $current_ver, '>');
+
+            if ($remote_has_update) {
+                $result[] = array_merge($remote_item, ['source' => 'remote']);
+                continue;
+            }
+
+            // webniu 不走本地查询
+            if ($identifier === 'webniu') {
+                continue;
+            }
+
+            // 远程无更新 → 本地兜底：读 plugin/{identifier}/config/app.php
+            $local_app = $this->getPluginApp($identifier);
+            $local_ver = $local_app['version'] ?? '';
+            $local_has_update = $local_ver && $current_ver
+                && version_compare_custom($local_ver, $current_ver, '>');
+
+            if ($local_has_update) {
+                $result[] = array_merge($local_app, [
+                    'identifier' => $identifier,
+                    'version' => $local_ver,
+                    'installedtype' => 'localapps',
+                    'source' => 'local',
+                    'app_config' => $local_app,
+                ]);
+            }
+        }
+
+        return $this->json(200, '读取成功', $result);
     }
 
     /**
@@ -469,6 +524,7 @@ EOF;
         $data = $this->inputFilter($post);
         $data['installed'] = 1;
         $data['created_at'] = date('Y-m-d H:i:s');
+        unset($data['id']);
         return Plugin::updateOrInsert(
             [
                 'identifier' => $data['identifier']

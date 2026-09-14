@@ -28,6 +28,8 @@
       // 可用在控制器中创建自己的入口变量
       __Config__ = '{{ $confit_url }}'
       __WORKTAB__ = '{{ $worktab }}'
+      __Login__ = '{{ $login_url }}'
+      __Info__ = '{{ $info_url }}'
 
       /**
        * 多应用模式检测（仅开发环境生效）
@@ -41,30 +43,43 @@
 
         // 应用预设表：新增平台在这里加一项即可
         var APP_PRESETS = {
-          webniu: { config: '/webniu/admin/config', worktab: 'webniu' },
-          wechat: { config: '/wechat/account/config', worktab: 'wechat' }
+          webniu: { 
+            config: '/webniu/admin/config', 
+            worktab: 'webniu',
+            login: '/webniu/admin/account/login',
+            info: '/webniu/admin/account/info',
+          },
+          wechat: { 
+            config: '/wechat/account/config', 
+            worktab: 'wechat',
+            login: '/webniu/admin/account/login',
+            info: '/webniu/admin/account/info',
+          },
+          wniot: { 
+            config: '/wniot/mobile/config', 
+            worktab: 'wniot',
+            login: '/wniot/mobile/login',
+            info: '/wniot/mobile/info',
+          }
         }
-        var DEV_KEY = 'sys-dev-app'
         var DEFAULT_APP = 'webniu'
 
         function getAppFromPath() {
           var m = location.pathname.match(/^\/app\/([^/]+)/i)
-          if (m) return m[1].toLowerCase()
           return m ? m[1].toLowerCase() : ''
         }
 
-        // 解析生效应用：?app= 显式覆盖 > 路径前缀 > localStorage 记忆 > 默认
+        // 解析生效应用：?app= 显式覆盖 > 路径前缀 > 默认
+        // （不再读 localStorage 记忆，保证默认始终为 webniu，避免旧选择残留）
         var params = new URLSearchParams(location.search)
-        var app =
-          params.get('app') || getAppFromPath() || localStorage.getItem(DEV_KEY) || DEFAULT_APP
+        var app = params.get('app') || getAppFromPath() || DEFAULT_APP
         var preset = APP_PRESETS[app] || APP_PRESETS[DEFAULT_APP]
 
         // 写入全局配置
         __Config__ = preset.config
         __WORKTAB__ = preset.worktab
-
-        // ?app= 显式指定时记住选择，下次从 / 根路径进入也能恢复
-        if (params.get('app')) localStorage.setItem(DEV_KEY, app)
+        __Login__ = preset.login || ''
+        __Info__ = preset.info || ''
 
         console.info('[dev] app=' + app + ' config=' + __Config__ + ' worktab=' + __WORKTAB__)
       })()
@@ -85,8 +100,8 @@
         }
       })()
     </script>
-    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/js/index-BsIKUKEh.js"></script>
-    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/css/index-Dk1MWTpO.css">
+    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/js/index-C_6owoze.js"></script>
+    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/css/index-wlhz9ZFw.css">
   </head>
 
   <body>
