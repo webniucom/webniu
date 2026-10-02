@@ -25,7 +25,7 @@ class PluginController extends Crud
      * 不需要鉴权的方法
      * @var string[]
      */
-    protected $noNeedAuth = ['schema', 'captcha'];
+    protected $noNeedAuth = ['schema', 'captcha', 'storejump'];
 
     /**
      * @var User
@@ -667,6 +667,32 @@ EOF;
         } catch (\Exception $e) {
             return $this->json(1, $e->getMessage(), []);
         }
+    }
+
+    /**
+     * 应用市场跳转（302 到云端应用中心）
+     *
+     * 客户端站点后台菜单「应用市场」指向此接口：
+     *   - 已在本站插件页登录过云端账号：读取 session webniu-plugin-user 中的会员 token
+     *     302 跳转云端 /store?sso={token}，云端按 token 自动登录
+     *   - 未登录：直接 302 跳转云端 /store，云端显示登录/注册
+     *
+     * 云端地址见 plugin/webniu/config/app.php plugin_market_host
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function storejump(Request $request): Response
+    {
+        $host = rtrim(config('plugin.webniu.app.plugin_market_host', 'https://store.webniu.com'), '/');
+        $user = session('webniu-plugin-user');
+        $token = '';
+        if (is_array($user) && !empty($user['token'])) {
+            $token = (string)$user['token'];
+        }
+        $url = $host . '/store' . ($token !== '' ? '?sso=' . urlencode($token) : '');
+        echo $url;
+        return redirect($url, 302);
     }
 
     /**

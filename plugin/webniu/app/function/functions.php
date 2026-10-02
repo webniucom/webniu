@@ -908,7 +908,7 @@ if (!function_exists('public_view')) {
         $content = file_get_contents($path);
         // 如果传入变量，则执行 PHP 变量替换
         if ($vars) {
-            $content = preg_replace_callback('/\{\{\s*\$(\w+)\s*\}\}/', function ($matches) use ($vars) {
+            $content = preg_replace_callback('/\{\{\s*\$?(\w+)\s*\}\}/', function ($matches) use ($vars) {
                 return $vars[$matches[1]] ?? '';
             }, $content);
         }
