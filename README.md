@@ -17,13 +17,13 @@ webniu 网牛引擎是一个基于workerman(异步PHP)+vue3+element-plus开发�
 * 9、应用权限，可灵活配置应用权限，独立登录。
 ----
 最后一次更新
-* 本次更新内容：v1.2.2.5
+* 本次更新内容：v1.2.2.6
 * 1、修复了一些bug。
 * 2、支持本地应用升级。
 * 3、支持公众号应用。
 ## 安装环境
 ```
-PHP >= 8.1
+PHP >= 8.2
 MySQL >= 5.7
 composer >= 2.5.8
 ```
@@ -72,7 +72,7 @@ php start.php start
 ```
 ## 访问
 ```
-http://ip地址:8787/webniu
+http://ip地址:8787/app/webniu/
 ```
 ## 安装事项
 ```
@@ -116,7 +116,7 @@ http://ip地址:8787/webniu
 ```
 ## 生产访问后台入口
 ```
-http://你的域名/webniu
+http://你的域名/app/webniu/
 ```
 ## 使用文档
 ```
@@ -124,7 +124,7 @@ https://help.webniu.com 制作中未上线
 ```
 ## 更多插件
 ```
-https://app.webniu.com 制作中未上线
+https://store.webniu.com 制作中未上线
 ```
 
  
