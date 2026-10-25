@@ -27,7 +27,63 @@ class RuleService
                 $item['is_iframe'] = true;
             }
             $item['plugin'] = $item['open'] == 0 ? $plugin : $item['plugin'];
+            $pluginName = $item['plugin'] ?? '';
+            // ---- 微前端探测：仅子应用需要 remoteEntry，基座 webniu 直接跳过 ----
+            // 每个菜单项严格用自己的 pluginName 查，绝不扫全目录
+            // （否则 A 插件的 remoteEntry 会被误分配给 B 插件的菜单项 → 路由串台）
+            $remoteEntry = '';
+            if ($pluginName && $pluginName !== 'webniu') {
+                // DB typo 纠正：case-insensitive 匹配 pluginName 与真实目录名
+                $realName = $pluginName;
+                $pluginDir = base_path('plugin');
+                if (is_dir($pluginDir)) {
+                    foreach (scandir($pluginDir) ?: [] as $dir) {
+                        if ($dir === '.' || $dir === '..') continue;
+                        if (strcasecmp($dir, $pluginName) === 0) {
+                            $realName = $dir;
+                            break;
+                        }
+                    }
+                }
+                // 优先级 1：子应用自己的 config/app.php 里 mfe_dev_server
+                //   true           → 自动拼 dev server 地址（用 mfe_dev_port，默认 5174）
+                //   false / 空     → 跳过 dev server，走生产构建包
+                //   URL 字符串     → 直接用（向后兼容旧写法）
+                $devServerRaw = config("plugin.{$realName}.app.mfe_dev_server");
+                $devServer = '';
+                if ($devServerRaw === true) {
+                    $port = (int) config("plugin.{$realName}.app.mfe_dev_port", 5174);
+                    $devServer = "http://localhost:{$port}/app/{$realName}/admin/dist/remoteEntry.js";
+                } elseif (is_string($devServerRaw) && $devServerRaw !== '') {
+                    $devServer = $devServerRaw;
+                }
+                if ($devServer !== '') {
+                    $pluginName = $realName;
+                    $remoteEntry = $devServer;
+                } else {
+                    // 优先级 2：生产构建包 plugin/<name>/public/admin/dist/remoteEntry.js
+                    $remoteFile = base_path("plugin/{$realName}/public/admin/dist/remoteEntry.js");
+                    if (is_file($remoteFile)) {
+                        $pluginName = $realName;
+                        // remoteEntry.js 无 hash 文件名，追加构建版本号（文件 mtime）避免浏览器缓存旧产物
+                        $remoteEntry = "/app/{$realName}/admin/dist/remoteEntry.js?v=" . filemtime($remoteFile);
+                    }
+                }
+            }
+            // ---- end 微前端 ----
+            // route name 必须全局唯一：Vue Router addRoute 按 name 去重，
+            // 不同 plugin 即使 path 相同（如 webniu 和 devs 都有 path='user'）也不能冲突
+            // 规则：显式 name 优先，否则 plugin + path 组合兜底，再不行用 id
+            $routeName = $item['name'];
+            if (empty($routeName)) {
+                $pathPart = !empty($item['path']) ? $item['path'] : ('id' . $item['id']);
+                $routeName = ($pluginName ?: 'base') . '_' . $pathPart;
+            }
+
             $meta = array_key_to_camel($item);
+            // 前端 RouteMeta 是 Open interface，remoteEntry/pluginName 塞进 meta 就能安全取用
+            $meta['pluginName'] = $pluginName;
+            $meta['remoteEntry'] = $remoteEntry;
             $formatted_items[] = [
                 'id'    => $item['id'],
                 'title' => $item['title'],
@@ -35,8 +91,10 @@ class RuleService
                 'pid'   => $item['pid'],
                 'type'  => $item['type'],
                 'path'  => $item['path'],
-                'name'  => $item['name'] ?: $item['path'],
+                'name'  => $routeName,
                 'component' => $item['component'],
+                'pluginName' => $pluginName,
+                'remoteEntry' => $remoteEntry,
                 'meta'  => $meta,
             ];
         }

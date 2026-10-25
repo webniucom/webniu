@@ -1,1 +1,0 @@
-function e(e){let r=e.replace(/^plugin\\/,"");return r=r.replace(/\\app\\/,"\\"),r=r.replace(/\\controller\\/,"\\"),r=r.replace(/Controller$/,""),r=r.replace(/\\/g,"/"),r=r.toLowerCase(),r.startsWith("/")||(r="/"+r),r}export{e as c};
