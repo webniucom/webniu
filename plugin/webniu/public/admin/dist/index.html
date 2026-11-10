@@ -18,6 +18,41 @@
       html.dark {
         background-color: #070707;
       }
+      /* 启动画面：JS 下载/执行期间先展示，app 挂载后自动被替换 */
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        z-index: 9999;
+        background-color: #fafbfc;
+      }
+      html.dark #app-splash {
+        background-color: #070707;
+      }
+      #app-splash .splash-spinner {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 3px solid rgba(64, 158, 255, 0.2);
+        border-top-color: #409eff;
+        animation: splash-spin 0.9s linear infinite;
+      }
+      #app-splash .splash-text {
+        font-size: 13px;
+        letter-spacing: 2px;
+        color: #909399;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      }
+      @keyframes splash-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
     <script>
       var __Config__ // 站点基础配置
@@ -48,11 +83,23 @@
         }
       })()
     </script>
-    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/index-DSbBoCAl.js"></script>
-    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/index-BhQkCHyP.css">
+    <script type="module" crossorigin src="/app/webniu/admin/dist/assets/index-BcrUxInY.js"></script>
+    <link rel="modulepreload" crossorigin href="/app/webniu/admin/dist/assets/vendor-core-DOagWpao.js">
+    <link rel="modulepreload" crossorigin href="/app/webniu/admin/dist/assets/vendor-el-icons-BEiUokyW.js">
+    <link rel="modulepreload" crossorigin href="/app/webniu/admin/dist/assets/vendor-element-plus-DdXciOTI.js">
+    <link rel="modulepreload" crossorigin href="/app/webniu/admin/dist/assets/vendor-iconify-1u3enyk7.js">
+    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/vendor-core-BgDCIyLK.css">
+    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/vendor-element-plus-BhDZDkeU.css">
+    <link rel="stylesheet" crossorigin href="/app/webniu/admin/dist/assets/index-C4k2ZK6o.css">
   </head>
 
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- 启动画面：Vue 挂载时会替换 #app 内容，此画面自动消失 -->
+      <div id="app-splash">
+        <div class="splash-spinner"></div>
+        <div class="splash-text">加载中...</div>
+      </div>
+    </div>
   </body>
 </html>

@@ -363,9 +363,6 @@ EOF;
         $post       = $request->post();
         $globalplugin = options('globalplugin');
         $wn_version = config('plugin.webniu.app.version');
-        if (isset($post['webniu_version']) && !version_compare_custom($wn_version, $post['webniu_version'], '>=')) {
-            return $this->json(400, '网牛引擎版本过低,请升级网牛引擎到 v' . $post['webniu_version'] . ' 以上版本');
-        }
         $name       = $post['identifier'];
         $version    = $post['version'];
         $installed  = $post['installedtype'] ?? false;
@@ -377,15 +374,34 @@ EOF;
         if (!$name || !$version || !$installed) {
             return $this->json(400, '缺少参数');
         }
+
+        // ========== 版本校验：先比前端传值（waitapps 云接口已带），再比本地文件（localapps） ==========
+        $plugin_webniu_version = null;
+        if (!empty($post['webniu_version'])) {
+            // waitapps：前端从云接口已带 webniu_version，直接用（避免下载浪费流量）
+            $plugin_webniu_version = $post['webniu_version'];
+        } else {
+            // localapps：读本地 plugin/{name}/config/app.php
+            $local_app_config = $this->getPluginApp($name);
+            $plugin_webniu_version = $local_app_config['webniu_version'] ?? null;
+        }
+        if ($plugin_webniu_version && !version_compare_custom($wn_version, $plugin_webniu_version, '>=')) {
+            return $this->json(400, sprintf(
+                '网牛引擎版本过低：当前基座版本 v%s，插件「%s」要求 v%s 以上版本',
+                $wn_version,
+                $name,
+                $plugin_webniu_version
+            ));
+        }
+
+        // waitapps 模式：下载 zip 到本地
+        $zip_file = null;
         if ($installed == 'waitapps') {
-            $base_path = base_path() . "/plugin/$name";
-            $zip_file = "$base_path.zip";
-            $extract_to = base_path() . '/plugin/';
-            echo base64_decode($post['tokens']);
+            $zip_file = base_path() . "/plugin/{$name}.zip";
             $this->downloadZipFile(base64_decode($post['tokens']), $zip_file);
             $has_zip_archive = class_exists(ZipArchive::class, false);
             if (!$has_zip_archive) {
-                $cmd = $this->getUnzipCmd($zip_file, $extract_to);
+                $cmd = $this->getUnzipCmd($zip_file, base_path() . '/plugin/');
                 if (!$cmd) {
                     return $this->json(400, '请给php安装zip模块或者给系统安装unzip命令');
                 }
@@ -394,56 +410,54 @@ EOF;
                 }
             }
         }
+
+        // 解压 + 安装钩子：整体放在 pause/resume 里，避免文件监控误触发
         Util::pauseFileMonitor();
         try {
-            // 解压zip到plugin目录
-            if ($installed == 'waitapps') {
-                if ($has_zip_archive) {
+            // waitapps 解压 zip
+            if ($installed == 'waitapps' && $zip_file) {
+                if (class_exists(ZipArchive::class, false)) {
                     $zip = new ZipArchive;
                     $zip->open($zip_file);
-                }
-                if (!empty($zip)) {
-                    $zip->extractTo(base_path() . '/plugin/');
-                    if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin']) {
-                        unset($zip);
+                    if ($zip) {
+                        $zip->extractTo(base_path() . '/plugin/');
                     }
                 } else {
                     $this->unzipWithCmd($cmd);
                 }
-                if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin']) {
-                    unlink($zip_file);
-                }
             }
 
+            // 执行安装/更新钩子
             $context = null;
             $install_class = "\\plugin\\$name\\api\\Install";
             if ($installed_version) {
-                // 执行beforeUpdate
                 if (class_exists($install_class) && method_exists($install_class, 'beforeUpdate')) {
                     $context = call_user_func([$install_class, 'beforeUpdate'], $installed_version, $installed_app);
                 }
             }
             if ($installed_version) {
-                // 执行update更新
                 if (class_exists($install_class) && method_exists($install_class, 'update')) {
                     call_user_func([$install_class, 'update'], $installed_version, $installed_app, $context);
                 }
             } else {
-                // 执行install安装
                 if (class_exists($install_class) && method_exists($install_class, 'install')) {
                     call_user_func([$install_class, 'install'], $installed_app);
                 }
             }
+
+            // waitapps 安装后清理
             if ($installed == 'waitapps') {
-                //判断文件是否存在 在 删除
+                if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin'] && $zip_file) {
+                    @unlink($zip_file);
+                }
                 if (is_file(base_path() . "/plugin/{$name}/public/config/install.php")) {
                     if (isset($globalplugin['globalplugin']['delinstall']) && $globalplugin['globalplugin']['delinstall']) {
-                        unlink(base_path() . "/plugin/{$name}/public/config/install.php");
+                        @unlink(base_path() . "/plugin/{$name}/public/config/install.php");
                     }
                 }
                 if (is_file(base_path() . "/plugin/{$name}/public/config/update.php")) {
                     if (isset($globalplugin['globalplugin']['delupdate']) && $globalplugin['globalplugin']['delupdate']) {
-                        unlink(base_path() . "/plugin/{$name}/public/config/update.php");
+                        @unlink(base_path() . "/plugin/{$name}/public/config/update.php");
                     }
                 }
             }
@@ -478,7 +492,11 @@ EOF;
         clearstatcache();
         $path = get_realpath(base_path() . "/plugin/$name");
         if (!$path || !is_dir($path)) {
-            return $this->json(1, '已经删除');
+            // 安装包已被手动删除：执行不到插件里的 uninstall，这里兜底清理安装记录与菜单数据
+            Rule::where('plugin', $name)->delete();
+            $Plugin->delete();
+            Util::reloadWebman();
+            return $this->json(200, '包已被手动删除，已清理安装记录与菜单数据');
         }
 
         // 执行uninstall卸载

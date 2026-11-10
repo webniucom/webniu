@@ -17,6 +17,8 @@ use plugin\webniu\app\model\Base;
  * @property string $login_at 登录时间
  * @property string $roles 角色
  * @property integer $status 状态 0正常 1禁用
+ * @property string $admin_id 创建人ID
+ * @property string $appset 可用应用（插件标识，逗号分隔；NULL=全部）
  */
 class Admin extends Base
 {

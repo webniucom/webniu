@@ -69,15 +69,19 @@ class Menu
         $children = $menu_tree['children'] ?? [];
         $model = $menu_tree['model'] ?? 'webniu';
         $plugin = $menu_tree['plugin'] ?? null;
-        $open = $menu_tree['open'] ?? 0;
+        // 打开方式：菜单自定义 > 插件 config/app.php 声明 > 默认 0
+        $menu_tree['open'] = $menu_tree['open'] ?? static::pluginOpen($plugin);
+        $open = $menu_tree['open'];
         unset($menu_tree['children']);
         if (isset($menu_tree['key']) && $old_menu = Menu::get($menu_tree['key'], $model, $plugin)) {
             $pid = $old_menu['id'];
             if(isset($menu_tree['model'])){
                 $model = $old_menu['model'];
                 $plugin = $old_menu['plugin'];
-                $open = $old_menu['open'];
             }
+            // 已存在的菜单不覆盖 open，保留后台「路由」页签里的手动设置
+            $open = $old_menu['open'];
+            unset($menu_tree['open']);
             Rule::where([
                 'key' => $menu_tree['key'],
                 'model' => $model,
@@ -95,9 +99,33 @@ class Menu
             $menu['pid'] = $pid;
             $menu['model'] = $model;
             $menu['plugin'] = $plugin;
-            $menu['open'] = $open;
+            // 子菜单未自定义 open 时继承父级
+            if (!isset($menu['open'])) {
+                $menu['open'] = $open;
+            }
             static::import($menu);
         }
+    }
+
+    /**
+     * 读取插件 config/app.php 中声明的默认打开方式
+     * 安装时新插件配置尚未加载，这里直接读文件，不依赖 config()
+     *
+     * @param string|null $plugin
+     * @return mixed
+     */
+    protected static function pluginOpen(?string $plugin)
+    {
+        if (!$plugin) {
+            return 0;
+        }
+        clearstatcache();
+        $file = base_path() . "/plugin/{$plugin}/config/app.php";
+        if (!is_file($file)) {
+            return 0;
+        }
+        $app = include $file;
+        return is_array($app) && array_key_exists('open', $app) ? $app['open'] : 0;
     }
 
     /**

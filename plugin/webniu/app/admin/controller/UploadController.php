@@ -18,6 +18,12 @@ use Throwable;
 class UploadController extends Crud
 {
     /**
+     * 需要登录无需鉴权的方法
+     * @var array
+     */
+    protected $noNeedAuth = ['groupselect', 'insert', 'select'];
+
+    /**
      * @var Upload
      */
     protected $model = null;

@@ -1,6 +1,8 @@
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__admins` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `admin_id` int unsigned NOT NULL DEFAULT '0' COMMENT '创建人(归属管理员ID)',
+  `appset` varchar(500) DEFAULT NULL COMMENT '可用应用(插件标识,逗号分隔;NULL=全部,空=无)',
   `username` varchar(32) NOT NULL COMMENT '用户名',
   `nickname` varchar(40) NOT NULL COMMENT '昵称',
   `password` varchar(255) NOT NULL COMMENT '密码',
@@ -14,7 +16,8 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__admins` (
   `created_at` datetime DEFAULT NULL COMMENT '创建时间',
   `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`)
+  UNIQUE KEY `username` (`username`),
+  KEY `idx_admin_id` (`admin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='管理员表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__admin_log` (
@@ -358,6 +361,25 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__users` (
   KEY `mobile` (`mobile`),
   KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户表';
+
+CREATE TABLE IF NOT EXISTS `__PREFIX__user_finance_log` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int unsigned NOT NULL DEFAULT '0' COMMENT '会员ID',
+  `type` tinyint unsigned NOT NULL DEFAULT '1' COMMENT '1=余额 2=积分',
+  `change` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '变动值，正增负减',
+  `before` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '变动前',
+  `after` decimal(12,2) NOT NULL DEFAULT '0.00' COMMENT '变动后',
+  `remark` varchar(100) NOT NULL DEFAULT '' COMMENT '备注',
+  `source` varchar(20) NOT NULL DEFAULT 'admin' COMMENT '来源 admin/lottery/system',
+  `operator_id` int unsigned NOT NULL DEFAULT '0' COMMENT '操作人ID，0=系统',
+  `biz_key` varchar(64) DEFAULT NULL COMMENT '业务唯一键，用于幂等，如 lottery:prizelog:123',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_biz_key` (`biz_key`),
+  KEY `idx_uid_type` (`uid`, `type`),
+  KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='会员余额/积分变动记录';
 
 LOCK TABLES `__PREFIX__roles` WRITE;
 INSERT INTO `__PREFIX__roles` VALUES (1,0,'超级管理员','创建者',0,'*',1,'2022-08-13 16:15:01','2022-12-23 12:05:07');
