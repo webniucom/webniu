@@ -51,7 +51,7 @@ class Upload
         $config = self::getConfig($customConfig);
         // 校验文件
         self::validate($file, $config);
-        $ext    = strtolower($file->getUploadExtension() ?: '');
+        $ext    = preg_replace('/[^a-z0-9]/', '', strtolower($file->getUploadExtension() ?: ''));
         $name   = $file->getUploadName();
         $size   = $file->getSize();
         $mime   = $file->getUploadMimeType();
@@ -63,10 +63,10 @@ class Upload
             $ext = strtolower($ext);
         }
 
-        // 生成相对路径
-        $relative_dir = $relative_dir ?: '/' . $config['dirname'] . '/' . self::buildPathStyle($config['path_style']);
-        $filename     = $filename ?: self::generateFilename($ext);
-        $relative_path = trim($relative_dir, '\\/') . '/' . $filename;
+        // 生成相对路径（目录/文件名统一清洗，防止路径穿越）
+        $relative_dir  = self::sanitizeRelativeDir($relative_dir, $config);
+        $filename      = $filename ? self::sanitizeFilename($filename) : self::generateFilename($ext);
+        $relative_path = $relative_dir . '/' . $filename;
 
         // 路由到对应驱动
         switch ((int)$config['storage_type']) {
@@ -118,15 +118,15 @@ class Upload
         }
 
         $config = self::getConfig($customConfig);
-        $ext    = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+        $ext    = preg_replace('/[^a-z0-9]/', '', strtolower(pathinfo($file_path, PATHINFO_EXTENSION)));
         $name   = basename($file_path);
         $size   = filesize($file_path);
         $mime   = mime_content_type($file_path) ?: 'application/octet-stream';
 
-        // 生成相对路径
-        $relative_dir = $relative_dir ?: '/' . $config['dirname'] . '/' . self::buildPathStyle($config['path_style']);
-        $filename       = self::generateFilename($ext);
-        $relative_path  = trim($relative_dir, '\\/') . '/' . $filename;
+        // 生成相对路径（目录统一清洗，防止路径穿越）
+        $relative_dir  = self::sanitizeRelativeDir($relative_dir, $config);
+        $filename      = self::generateFilename($ext);
+        $relative_path = $relative_dir . '/' . $filename;
 
         // 路由到对应驱动
         switch ((int)$config['storage_type']) {
@@ -183,6 +183,10 @@ class Upload
      */
     public static function delete(string $key, ?array $customConfig = null): bool
     {
+        // 兼容传入完整 URL：只取路径部分作为 key
+        if (strpos($key, '://') !== false) {
+            $key = ltrim((string)parse_url($key, PHP_URL_PATH), '/');
+        }
         $config = self::getConfig($customConfig);
         switch ((int)$config['storage_type']) {
             case self::STORAGE_FTP:
@@ -208,8 +212,8 @@ class Upload
     public static function validate(UploadFile $file, ?array $customConfig = null): void
     {
         $config = self::getConfig($customConfig);
-        // 扩展名校验
-        $ext = strtolower($file->getUploadExtension() ?: '');
+        // 扩展名校验（与 save 使用同一清洗规则，避免 "php " 之类绕过）
+        $ext = preg_replace('/[^a-z0-9]/', '', strtolower($file->getUploadExtension() ?: ''));
         // 危险可执行脚本后缀：不依赖后台配置，始终拦截
         $dangerous = ['php', 'php2', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar', 'phps', 'pht', 'asp', 'aspx', 'jsp', 'jspx', 'cgi', 'htaccess'];
         if ($ext !== '' && in_array($ext, $dangerous, true)) {
@@ -317,14 +321,14 @@ class Upload
 
         $full_path = $base_dir . $relative_path;
         $dir = dirname($full_path);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+            throw new BusinessException('创建上传目录失败', 500);
         }
 
         if ($file instanceof UploadFile) {
             $file->move($full_path);
-        } else {
-            copy($file, $full_path);
+        } elseif (!@copy($file, $full_path)) {
+            throw new BusinessException('保存上传文件失败', 500);
         }
 
         return [
@@ -344,6 +348,11 @@ class Upload
         // 兼容传入 url 或纯路径
         if (strpos($key, '/app/webniu/') === 0) {
             $key = str_replace('/app/webniu/', '', $key);
+        }
+        $key = str_replace('\\', '/', $key);
+        // 拒绝绝对路径与路径穿越，防止越权删除
+        if ($key === '' || $key[0] === '/' || strpos($key, "\0") !== false || preg_match('#(^|/)\.\.(/|$)#', $key)) {
+            return false;
         }
         $base_dir = rtrim(config('plugin.webniu.app.public_path', ''), '\\/');
         if ($base_dir) {
@@ -367,70 +376,55 @@ class Upload
      */
     protected static function saveToFtp($file, string $relative_path, array $config): array
     {
-        if (!function_exists('ftp_connect')) {
-            throw new BusinessException('服务器未安装 FTP 扩展', 500);
-        }
-
-        $ip       = $config['ftp_ip'] ?? '';
-        $port     = (int)($config['ftp_port'] ?? 21);
-        $user     = $config['ftp_username'] ?? '';
-        $pass     = $config['ftp_password'] ?? '';
-        $pasv     = (bool)($config['ftp_pasv'] ?? false);
-        $domain   = rtrim($config['ftp_domain'] ?? '', '/');
+        $ip     = $config['ftp_ip'] ?? '';
+        $port   = (int)($config['ftp_port'] ?? 21);
+        $user   = $config['ftp_username'] ?? '';
+        $pass   = $config['ftp_password'] ?? '';
+        $domain = rtrim($config['ftp_domain'] ?? '', '/');
 
         if (!$ip || !$user) {
             throw new BusinessException('FTP 配置不完整', 500);
         }
-
-        $conn = @\ftp_connect($ip, $port, 30);
-        if (!$conn) {
-            throw new BusinessException('FTP 连接失败', 500);
-        }
-        if (!@\ftp_login($conn, $user, $pass)) {
-            @\ftp_close($conn);
-            throw new BusinessException('FTP 登录失败', 500);
-        }
-        if ($pasv) {
-            @\ftp_pasv($conn, true);
+        if (!function_exists('curl_init')) {
+            throw new BusinessException('服务器未安装 cURL 扩展，无法上传到 FTP', 500);
         }
 
-        // 递归创建目录
-        self::ftpMkdirRecursive($conn, dirname($relative_path));
-
-        // 上传文件
         $tmp_path = $file instanceof UploadFile ? $file->getPathname() : $file;
-        $ftp_binary = defined('FTP_BINARY') ? FTP_BINARY : 2;
-        if (!@\ftp_put($conn, $relative_path, $tmp_path, $ftp_binary)) {
-            @\ftp_close($conn);
-            throw new BusinessException('FTP 上传失败', 500);
+        if (!is_file($tmp_path)) {
+            throw new BusinessException('上传临时文件不存在', 500);
         }
 
-        @\ftp_close($conn);
+        // 使用 cURL 的 EPSV 模式上传：FTP 服务端 PASV 可能返回内网 IP，PHP ftp 扩展会连接失败
+        $remote_url = sprintf('ftp://%s:%d/%s', $ip, $port, ltrim($relative_path, '/'));
+        $fp         = fopen($tmp_path, 'rb');
+        $ch         = curl_init($remote_url);
+        curl_setopt_array($ch, [
+            CURLOPT_UPLOAD                  => true,
+            CURLOPT_INFILE                  => $fp,
+            CURLOPT_INFILESIZE              => filesize($tmp_path),
+            CURLOPT_USERPWD                 => $user . ':' . $pass,
+            CURLOPT_FTP_CREATE_MISSING_DIRS => defined('CURLFTP_CREATE_DIR_RETRY') ? CURLFTP_CREATE_DIR_RETRY : 2,
+            CURLOPT_FTP_USE_EPSV            => true,
+            CURLOPT_CONNECTTIMEOUT          => 8,
+            CURLOPT_TIMEOUT                 => 55,
+            CURLOPT_RETURNTRANSFER          => true,
+        ]);
+        $result = curl_exec($ch);
+        $errno  = curl_errno($ch);
+        $error  = curl_error($ch);
+        $code   = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        curl_close($ch);
+        fclose($fp);
+
+        if ($result === false || $errno || $code >= 400) {
+            throw new BusinessException('FTP 上传失败：' . ($error ?: ('响应码 ' . $code)), 500);
+        }
 
         $url = $domain ? $domain . '/' . $relative_path : $relative_path;
-
         return [
             'url'      => $url,
             'realpath' => $relative_path,
         ];
-    }
-
-    /**
-     * FTP 递归创建目录
-     * @param mixed $conn FTP 连接（PHP 8.1+ 为 FTP\Connection 对象）
-     * @param string $path 目录路径
-     */
-    protected static function ftpMkdirRecursive($conn, string $path): void
-    {
-        $path = trim($path, '/');
-        if ($path === '' || @\ftp_chdir($conn, $path)) {
-            return;
-        }
-        $parent = dirname($path);
-        if ($parent !== '.' && $parent !== '') {
-            self::ftpMkdirRecursive($conn, $parent);
-        }
-        @\ftp_mkdir($conn, $path);
     }
 
     /**
@@ -442,6 +436,10 @@ class Upload
     protected static function deleteFromFtp(string $key, array $config): bool
     {
         if (!function_exists('ftp_connect')) {
+            return false;
+        }
+        $key = str_replace('\\', '/', ltrim($key, '/'));
+        if ($key === '' || strpos($key, "\0") !== false || preg_match('#(^|/)\.\.(/|$)#', $key)) {
             return false;
         }
         $conn = @\ftp_connect($config['ftp_ip'] ?? '', (int)($config['ftp_port'] ?? 21), 30);
@@ -792,6 +790,43 @@ class Upload
     // ===================== 工具方法 =====================
 
     /**
+     * 清洗相对目录，禁止绝对路径和 ../ 穿越
+     * @param string|null $dir
+     * @param array $config
+     * @return string
+     * @throws BusinessException
+     */
+    protected static function sanitizeRelativeDir(?string $dir, array $config): string
+    {
+        $dir = $dir ?: '/' . $config['dirname'] . '/' . self::buildPathStyle($config['path_style']);
+        $dir = str_replace(['\\', "\0"], ['/', ''], $dir);
+        $dir = preg_replace('#/+#', '/', $dir) ?? '';
+        $dir = trim($dir, '/');
+        if ($dir === '' || preg_match('#(^|/)\.\.(/|$)#', $dir)) {
+            throw new BusinessException('上传目录不合法', 400);
+        }
+        return $dir;
+    }
+
+    /**
+     * 清洗文件名，去掉路径、控制字符和隐藏文件前缀
+     * @param string $filename
+     * @return string
+     * @throws BusinessException
+     */
+    protected static function sanitizeFilename(string $filename): string
+    {
+        $filename = str_replace(['\\', "\0"], ['/', ''], $filename);
+        $filename = basename($filename);
+        $filename = preg_replace('/[^\p{L}\p{N}._-]+/u', '_', $filename) ?? '';
+        $filename = ltrim($filename, '.');
+        if ($filename === '' || strlen($filename) > 120) {
+            throw new BusinessException('文件名不合法', 400);
+        }
+        return $filename;
+    }
+
+    /**
      * 根据路径风格生成日期目录
      * @param string $style 风格，如 Ymd / Ym / Y/m/d
      * @return string
@@ -812,7 +847,7 @@ class Upload
      */
     protected static function generateFilename(string $ext): string
     {
-        $name = bin2hex(pack('Nn', time(), random_int(1, 65535)));
+        $name = bin2hex(random_bytes(8));
         return $ext ? $name . '.' . $ext : $name;
     }
 
