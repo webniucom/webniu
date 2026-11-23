@@ -25,7 +25,7 @@ class PluginController extends Crud
      * 不需要鉴权的方法
      * @var string[]
      */
-    protected $noNeedAuth = ['schema', 'captcha'];
+    protected $noNeedAuth = ['schema', 'captcha', 'licenses', 'unbindlicense'];
 
     /**
      * @var User
@@ -172,6 +172,52 @@ class PluginController extends Crud
             return json(['code' => 400, 'msg' => '网牛云服务不可用', 'count' => 0, 'data' => []]);
         }
         return json(['code' => $code, 'msg' => $msg, 'count' => $total, 'data' => array_values($data)]);
+    }
+
+    /**
+     * 授权列表
+     *
+     * 代理商城会员中心的应用授权数据。
+     * @param Request $request
+     * @return Response
+     */
+    public function licenses(Request $request): Response
+    {
+        try {
+            $client   = Util::httpClient();
+            $response = $client->post('/api/v1/user/licenses', ['form_params' => []]);
+            $content  = json_decode($response->getBody()->getContents(), true);
+            if (!is_array($content)) {
+                return $this->json(400, '网牛云服务返回异常', []);
+            }
+            return json($content);
+        } catch (\Throwable $e) {
+            return $this->json(400, '网牛云服务不可用', []);
+        }
+    }
+
+    /**
+     * 解绑授权
+     *
+     * 代理商城解绑应用授权，解绑后可在任意站点重新安装。
+     * @param Request $request
+     * @return Response
+     */
+    public function unbindlicense(Request $request): Response
+    {
+        try {
+            $client   = Util::httpClient();
+            $response = $client->post('/api/v1/user/license/unbind', [
+                'form_params' => ['app_id' => (int)$request->post('app_id', 0)],
+            ]);
+            $content  = json_decode($response->getBody()->getContents(), true);
+            if (!is_array($content)) {
+                return $this->json(400, '网牛云服务返回异常', []);
+            }
+            return json($content);
+        } catch (\Throwable $e) {
+            return $this->json(400, '网牛云服务不可用', []);
+        }
     }
 
     /**
@@ -374,6 +420,10 @@ EOF;
         if (!$name || !$version || !$installed) {
             return $this->json(400, '缺少参数');
         }
+        // 插件标识只允许字母数字下划线，避免路径/类名注入
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', (string)$name)) {
+            return $this->json(400, '插件标识不合法');
+        }
 
         // ========== 版本校验：先比前端传值（waitapps 云接口已带），再比本地文件（localapps） ==========
         $plugin_webniu_version = null;
@@ -394,13 +444,13 @@ EOF;
             ));
         }
 
-        // waitapps 模式：下载 zip 到本地
+        // waitapps 模式：下载 zip 到 runtime 临时目录（随机文件名，避免占用 plugin 目录、并发冲突与同名覆盖）
         $zip_file = null;
+        $cmd = null;
         if ($installed == 'waitapps') {
-            $zip_file = base_path() . "/plugin/{$name}.zip";
+            $zip_file = $this->makeTempZipPath($name);
             $this->downloadZipFile(base64_decode($post['tokens']), $zip_file);
-            $has_zip_archive = class_exists(ZipArchive::class, false);
-            if (!$has_zip_archive) {
+            if (!class_exists(ZipArchive::class, false)) {
                 $cmd = $this->getUnzipCmd($zip_file, base_path() . '/plugin/');
                 if (!$cmd) {
                     return $this->json(400, '请给php安装zip模块或者给系统安装unzip命令');
@@ -414,14 +464,10 @@ EOF;
         // 解压 + 安装钩子：整体放在 pause/resume 里，避免文件监控误触发
         Util::pauseFileMonitor();
         try {
-            // waitapps 解压 zip
+            // waitapps 解压 zip（zip 扩展可用时先做完整性与结构校验）
             if ($installed == 'waitapps' && $zip_file) {
                 if (class_exists(ZipArchive::class, false)) {
-                    $zip = new ZipArchive;
-                    $zip->open($zip_file);
-                    if ($zip) {
-                        $zip->extractTo(base_path() . '/plugin/');
-                    }
+                    $this->extractZip($zip_file, $name);
                 } else {
                     $this->unzipWithCmd($cmd);
                 }
@@ -447,9 +493,6 @@ EOF;
 
             // waitapps 安装后清理
             if ($installed == 'waitapps') {
-                if (isset($globalplugin['globalplugin']['delplugin']) && $globalplugin['globalplugin']['delplugin'] && $zip_file) {
-                    @unlink($zip_file);
-                }
                 if (is_file(base_path() . "/plugin/{$name}/public/config/install.php")) {
                     if (isset($globalplugin['globalplugin']['delinstall']) && $globalplugin['globalplugin']['delinstall']) {
                         @unlink(base_path() . "/plugin/{$name}/public/config/install.php");
@@ -463,6 +506,10 @@ EOF;
             }
             $this->updateOrInsert($post);
         } finally {
+            // 远程安装的包一律删除，不留存
+            if ($zip_file && is_file($zip_file)) {
+                @unlink($zip_file);
+            }
             Util::resumeFileMonitor();
         }
         Util::reloadWebman();
@@ -689,38 +736,195 @@ EOF;
 
     /**
      * 下载zip
-     * @param $url
-     * @param $file
+     *
+     * 下载到 runtime 临时文件并校验完整性，失败自动重试；
+     * 不完整/非 zip 会立即报错，避免把坏包解压进 plugin 目录。
+     *
+     * @param string $url
+     * @param string $file
      * @return void
      * @throws BusinessException
-     * @throws GuzzleException
      */
     protected function downloadZipFile($url, $file)
     {
-        $client = Util::httpClient();
-        $response = $client->get($url);
-        $body = $response->getBody();
-        $status = $response->getStatusCode();
-        if ($status == 404) {
-            throw new BusinessException('安装包不存在');
+        $url = (string)$url;
+        if (!preg_match('~^https?://~i', $url)) {
+            throw new BusinessException('下载地址无效：' . $url);
         }
-        $zip_content = $body->getContents();
-        if ($status == 503) {
-            throw new BusinessException($zip_content);
-        }
-        if (empty($zip_content)) {
-            throw new BusinessException('安装包不存在');
-        }
-        if ($status == 200) {
-            //判断是否是json格式
-            if (str_starts_with($zip_content, '{')) {
-                $contents = json_decode($zip_content, true);
-                if ($contents['code']) {
-                    throw new BusinessException($contents['msg']);
+        $max_attempts = 3;
+        $last_error   = '';
+        for ($attempt = 1; $attempt <= $max_attempts; $attempt++) {
+            @unlink($file);
+            try {
+                $this->fetchZipFile($url, $file);
+                return;
+            } catch (BusinessException $e) {
+                // 业务错误（无权限 / 包不存在等）重试无意义
+                @unlink($file);
+                throw $e;
+            } catch (\Throwable $e) {
+                // 网络截断等可重试错误
+                $last_error = $e->getMessage() ?: '下载失败';
+                @unlink($file);
+                if ($attempt < $max_attempts) {
+                    usleep(300000);
                 }
-            } else {
-                file_put_contents($file, $zip_content);
             }
+        }
+        throw new BusinessException(sprintf('安装包下载失败（已重试 %d 次）：%s', $max_attempts, $last_error ?: '未知错误'));
+    }
+
+    /**
+     * 拉取 zip 内容并落盘
+     *
+     * @param string $url
+     * @param string $file
+     * @return void
+     * @throws BusinessException|\Throwable
+     */
+    protected function fetchZipFile(string $url, string $file): void
+    {
+        // 下载安装包单独放宽超时，默认 60s 在慢网络/大包时会被截断
+        $client = Util::httpClient([
+            'base_uri'        => config('plugin.webniu.app.plugin_market_host'),
+            'timeout'         => 300,
+            'connect_timeout' => 10,
+            'verify'          => false,
+            'http_errors'     => false,
+            'headers'         => [
+                'Domain'     => hosturl(),
+                'Referer'    => \request()->fullUrl(),
+                'User-Agent' => 'webniu-app-plugin',
+                'Accept'     => '*/*',
+                'version'    => config('plugin.webniu.app.version'),
+            ],
+        ]);
+        $response = $client->get($url);
+        $status   = $response->getStatusCode();
+        $body     = $response->getBody();
+        if ($status == 404) {
+            throw new BusinessException('安装包不存在（云端 404）');
+        }
+
+        $content = $body->getContents();
+        if ($status == 503) {
+            throw new BusinessException($content ?: '安装包服务暂时不可用');
+        }
+        if ($status != 200) {
+            throw new \RuntimeException(sprintf('HTTP %s', $status));
+        }
+        if ($content === '') {
+            throw new \RuntimeException('下载内容为空');
+        }
+
+        // 云端返回 JSON：业务错误（无权限/包不存在等），不重试
+        if (str_starts_with(ltrim($content), '{')) {
+            $json = json_decode($content, true);
+            throw new BusinessException('安装包下载失败：' . (($json['msg'] ?? '') ?: '云端返回异常内容'));
+        }
+
+        // zip 必须以 PK 开头，否则多半是拦截页/登录页/CDN 错误页
+        if (substr($content, 0, 2) !== 'PK') {
+            throw new BusinessException(sprintf(
+                '下载内容不是安装包（HTTP %s，Content-Type: %s，大小 %d 字节），请检查下载地址或服务器出网',
+                $status,
+                $response->getHeaderLine('Content-Type') ?: '未知',
+                strlen($content)
+            ));
+        }
+
+        // Content-Length 与实际字节数不符 → 传输被截断（gzip 传输时长度不可比，跳过）
+        $content_length = $response->getHeaderLine('Content-Length');
+        if ($response->getHeaderLine('Content-Encoding') === '' && $content_length !== '' && is_numeric($content_length)) {
+            $declared = (int)$content_length;
+            if (strlen($content) < $declared) {
+                throw new \RuntimeException(sprintf('下载被截断（%d/%d 字节）', strlen($content), $declared));
+            }
+        }
+
+        $bytes = @file_put_contents($file, $content);
+        if ($bytes === false) {
+            throw new BusinessException('安装包写入失败：请检查 runtime 目录写权限或磁盘空间');
+        }
+        if ($bytes !== strlen($content)) {
+            throw new \RuntimeException(sprintf('写入不完整（%d/%d 字节）', $bytes, strlen($content)));
+        }
+    }
+
+    /**
+     * 生成临时安装包路径
+     *
+     * 放在 runtime 目录并使用随机文件名，避免占用 plugin 目录、开发者自打包同名文件、并发安装互相覆盖。
+     *
+     * @param string $name 插件标识
+     * @return string
+     * @throws BusinessException
+     */
+    protected function makeTempZipPath(string $name): string
+    {
+        $dir = runtime_path() . '/plugin-install';
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            throw new BusinessException('无法创建临时目录：' . $dir . '，请检查 runtime 目录写权限');
+        }
+        $safe = preg_replace('/[^A-Za-z0-9_\-]/', '', $name);
+        if ($safe === '') {
+            $safe = 'plugin';
+        }
+        return $dir . '/' . $safe . '-' . uniqid('', true) . '.zip';
+    }
+
+    /**
+     * 校验并解压安装包
+     *
+     * 解压前做一致性校验与目录结构校验，避免坏包/错误包污染 plugin 目录。
+     *
+     * @param string $zip_file
+     * @param string $name 插件标识
+     * @return void
+     * @throws BusinessException
+     */
+    protected function extractZip(string $zip_file, string $name): void
+    {
+        clearstatcache(true, $zip_file);
+        if (!is_file($zip_file) || filesize($zip_file) <= 0) {
+            throw new BusinessException('安装包下载失败：文件不存在或为空');
+        }
+        $zip = new ZipArchive;
+        // CHECKCONS：额外一致性校验，可识别大部分截断/损坏包
+        $ret = $zip->open($zip_file, ZipArchive::CHECKCONS);
+        if ($ret !== true) {
+            throw new BusinessException(sprintf(
+                '安装包已损坏，无法解压（错误码 %s，文件大小 %d 字节），请重新安装',
+                $ret,
+                (int)filesize($zip_file)
+            ));
+        }
+        // 校验包内根目录为插件标识，并拒绝绝对路径/路径穿越条目（Zip Slip）
+        $prefix = $name . '/';
+        $found  = false;
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = str_replace('\\', '/', (string)$zip->getNameIndex($i));
+            // 兼容以 ./ 开头的打包工具
+            $entry = preg_replace('#^(?:\./)+#', '', $entry);
+            if ($entry === '') {
+                continue;
+            }
+            if ($entry[0] === '/' || preg_match('#^[A-Za-z]:#', $entry) || preg_match('#(^|/)\.\.(/|$)#', $entry)) {
+                $zip->close();
+                throw new BusinessException('安装包包含非法路径，已终止安装');
+            }
+            if ($entry === $name || $entry === $prefix || str_starts_with($entry, $prefix)) {
+                $found = true;
+            }
+        }
+        if (!$found) {
+            $zip->close();
+            throw new BusinessException(sprintf('安装包结构异常：包内未找到「%s」目录，已终止安装', $name));
+        }
+        $ok = $zip->extractTo(base_path() . '/plugin/');
+        $zip->close();
+        if ($ok === false) {
+            throw new BusinessException('安装包解压失败：请检查 plugin 目录写权限与磁盘空间');
         }
     }
 
@@ -732,12 +936,14 @@ EOF;
      */
     protected function getUnzipCmd($zip_file, $extract_to)
     {
+        $zip_arg = escapeshellarg($zip_file);
+        $dir_arg = escapeshellarg($extract_to);
         if ($cmd = $this->findCmd('unzip')) {
-            $cmd = "$cmd -o -qq $zip_file -d $extract_to";
+            $cmd = "$cmd -o -qq $zip_arg -d $dir_arg";
         } else if ($cmd = $this->findCmd('7z')) {
-            $cmd = "$cmd x -bb0 -y $zip_file -o$extract_to";
+            $cmd = "$cmd x -bb0 -y $zip_arg -o$dir_arg";
         } else if ($cmd = $this->findCmd('7zz')) {
-            $cmd = "$cmd x -bb0 -y $zip_file -o$extract_to";
+            $cmd = "$cmd x -bb0 -y $zip_arg -o$dir_arg";
         }
         return $cmd;
     }

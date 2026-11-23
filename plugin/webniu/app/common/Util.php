@@ -11,6 +11,7 @@ use support\exception\BusinessException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use support\Db;
+use support\Log;
 use Workerman\Timer;
 use Workerman\Worker;
 
@@ -540,13 +541,27 @@ class Util
      */
     public static function reloadWebman()
     {
+        // 先清 opcache 字节码缓存：否则开了 opcache 的环境下 reload 换了进程，
+        // 新 worker 仍会从 opcache 共享内存读到旧字节码，表现为"更新后必须手动重启才生效"
+        if (function_exists('opcache_reset')) {
+            try {
+                @opcache_reset();
+            } catch (Throwable $e) {
+            }
+        }
         if (function_exists('posix_kill')) {
             try {
                 posix_kill(posix_getppid(), SIGUSR1);
+                Log::info('reloadWebman：已向主进程发送平滑重载信号');
                 return true;
-            } catch (Throwable $e) {}
+            } catch (Throwable $e) {
+                Log::warning('reloadWebman：平滑重载信号发送失败: ' . $e->getMessage());
+            }
         } else {
-            Timer::add(1, function () {
+            // Windows 无 posix_kill：无法平滑重载，延迟停服等待人工拉起
+            // （Windows 下 webman 通常前台运行，stopAll 后需手动再次启动服务）
+            Log::warning('reloadWebman：当前环境不支持 posix_kill（Windows），新代码将在服务重启后生效，服务将于 3 秒后停止，请重新启动 webman');
+            Timer::add(3, function () {
                 Worker::stopAll();
             });
         }

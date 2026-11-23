@@ -210,6 +210,11 @@ class Upload
         $config = self::getConfig($customConfig);
         // 扩展名校验
         $ext = strtolower($file->getUploadExtension() ?: '');
+        // 危险可执行脚本后缀：不依赖后台配置，始终拦截
+        $dangerous = ['php', 'php2', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar', 'phps', 'pht', 'asp', 'aspx', 'jsp', 'jspx', 'cgi', 'htaccess'];
+        if ($ext !== '' && in_array($ext, $dangerous, true)) {
+            throw new BusinessException('不支持该格式的文件上传', 400);
+        }
         $exclude = self::parseList($config['exclude'] ?? '');
         $include = self::parseList($config['include'] ?? '');
 

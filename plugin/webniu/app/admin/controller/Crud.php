@@ -100,10 +100,20 @@ class Crud extends Base
             $field = null;
         }
         foreach ($where as $column => $value) {
-            if (
-                $value === '' || !isset($allow_column[$column]) ||
-                is_array($value) && (empty($value) || !in_array($value[0], ['null', 'not null']) && !isset($value[1]))
-            ) {
+            if ($value === '' || !isset($allow_column[$column])) {
+                unset($where[$column]);
+                continue;
+            }
+            if (!is_array($value)) {
+                continue;
+            }
+            $operator = $value[0] ?? null;
+            // 禁止外部传入 raw 表达式（exp => whereRaw），防止 SQL 注入
+            if (is_string($operator) && strtolower($operator) === 'exp') {
+                unset($where[$column]);
+                continue;
+            }
+            if (empty($value) || (!in_array($operator, ['null', 'not null'], true) && !isset($value[1]))) {
                 unset($where[$column]);
             }
         }

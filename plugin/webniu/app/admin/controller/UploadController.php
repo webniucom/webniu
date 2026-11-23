@@ -360,7 +360,6 @@ class UploadController extends Crud
         $result = parent::delete($request);
         if (($res = json_decode($result->rawBody())) && $res->code === 200) {
             foreach ($file_list as $file) {
-                echo $file . PHP_EOL;
                 @unlink($file);
             }
         }
