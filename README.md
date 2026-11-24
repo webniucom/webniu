@@ -52,9 +52,7 @@ composer create-project webniucom/webniu
 cd webniu
 ```
 ## 在安装 webniu
-```
-------
-```
+![安装向导](https://www.webniu.com/screenshots/1.png)
 ## 注意事项
 ```
 1. 安装后给目录权限，否则启动容易报错！；
